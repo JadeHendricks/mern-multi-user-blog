@@ -10,6 +10,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 dotenv.config();
 const connectDB = require('./db');
 const authRouter = require('./routes/authRoute');
+const userRouter = require('./routes/userRoute');
 
 //Connection to the database
 connectDB();
@@ -34,3 +35,4 @@ app.use(hpp());
 
 //Routes
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/user', userRouter);
