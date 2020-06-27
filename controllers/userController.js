@@ -16,6 +16,32 @@ exports.getAllUsers = async (req, res, next) => {
     }
 }
 
+exports.getUserById = async (req, res, next) => {
+
+    try {
+        const user = await User.findById(req.params.id);
+
+        if (!user) {
+            return res.status(400).json({
+                status: 'fail',
+                message: 'Document does not exist'
+            });
+        }
+
+        res.status(200).json({
+            status: 'ok',
+            user
+        });
+        
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({
+            status: 'fail',
+            message: 'Sever Error'
+        });
+    }
+}
+
 exports.createUser = (req, res) => {
     res.status(500).json({
       status: 'error',
