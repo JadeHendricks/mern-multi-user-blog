@@ -1,15 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const authController = require('../controllers/authController');
 const userController = require('../controllers/userController');
+const authController = require('../controllers/authController');
 
 router
     .route('/')
-    .get(userController.getAllUsers)
-    .post(userController.createUser);
+    .get(authController.protect, userController.getUser)
+    .put(authController.protect, userController.updateUser);
 
-router
-    .route('/:id')
-    .get(userController.getUserById);
+//admin only example
+//router.put('/admin', requireSignin, adminOnlyRoutes, updateUser);
 
 module.exports = router;

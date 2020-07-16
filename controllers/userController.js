@@ -1,51 +1,63 @@
 const User = require('../models/UserModel');
 
-exports.getAllUsers = async (req, res, next) => {
+exports.getUser = async (req, res) => {
     try {
-        const users = await User.find().select('-__v');
-        res.status(200).json({
-            status: 'ok',
-            users
-        });
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).json({
-            status: 'fail',
-            message: 'Server Error'
-        });
-    }
-}
-
-exports.getUserById = async (req, res, next) => {
-
-    try {
-        const user = await User.findById(req.params.id);
-
+        const user = await User.findById(req.user._id);
         if (!user) {
             return res.status(400).json({
-                status: 'fail',
-                message: 'Document does not exist'
+                message: 'User not found!'
             });
         }
 
-        res.status(200).json({
-            status: 'ok',
-            user
-        });
-        
+        res.status(200).json(user);
+
     } catch (err) {
-        console.error(err.message);
-        res.status(500).json({
-            status: 'fail',
-            message: 'Sever Error'
+        console.error(err);
+        res.status(400).json({
+            message: err
         });
     }
 }
 
-exports.createUser = (req, res) => {
-    res.status(500).json({
-      status: 'error',
-      message: 'This route is not defined! Please use /signup instead'
-    });
-  };
-  
+exports.updateUser = async (req, res) => {
+    const { name, password } = req.body;
+
+    try {
+        const user = await User.findById(req.user._id);
+
+        if (!user) {
+            return res.status(400).json({
+                message: 'User not found'
+            });
+        }
+    
+        if (!name) {
+            return res.status(400).json({
+                message: 'Name is required'
+            }); 
+        } else {
+            user.name = name;
+        }
+    
+        if (!password || password.length < 6) {
+            return res.status(400).json({
+                message: 'Password with length or 6 or more characters are required'
+            }); 
+        } else {
+            user.password = password;
+        }
+
+        const newUser = await user.save();
+
+
+        newUser.hashed_password = undefined;
+        newUser.salt = undefined;
+        res.status(200).json(newUser);
+
+    } catch (err) {
+        res.status(400).json({
+            error: err.message,
+            message: 'User update failed'
+        });
+    }
+}

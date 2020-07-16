@@ -1,38 +1,43 @@
 const express = require('express');
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
+const cors = require('cors');
 const dotenv = require('dotenv');
-const rateLimit = require('express-rate-limit');
-const hpp = require('hpp');
-const xss = require('xss-clean');
+const morgan = require('morgan');
 const helmet = require('helmet');
+const cookieParser = require('cookie-parser');
+const hpp = require('hpp');
 const mongoSanitize = require('express-mongo-sanitize');
-dotenv.config();
-const connectDB = require('./db');
+const xss = require('xss-clean');
+const rateLimit = require('express-rate-limit');
 const authRouter = require('./routes/authRoute');
 const userRouter = require('./routes/userRoute');
 
-//Connection to the database
+dotenv.config();
+const connectDB = require('./db');
+
 connectDB();
 app.listen(port, () => console.log(`Server running on port:${port}`))
 
 //Middleware
+app.use(morgan('dev'));
 app.use(helmet());
+if (process.env.NODE_ENV = 'development') { app.use(cors({ origin: `http://localhost:3000` })) }
+
 const limiter = rateLimit({
-    max: 100,
-    windowMs: 60 * 60 * 1000,
-    message: 'Too many requests from this IP, please try again in an hour!'
+   max: 100,
+   windowMs: 60 * 60 * 1000,
+   message: 'Too many requests from this IP, please try again in an hour!' 
 });
+
 app.use('/api', limiter);
 app.use(express.json({ limit: '10kb' }));
-
-//Data sanitization against noSQL query injection
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(cookieParser());
 app.use(mongoSanitize());
-//Data sanitization against XSS - HTML Code
 app.use(xss());
-//Prevent parameter pollution - query string
+//Add a whitelist option if you allow duplicate parameters
 app.use(hpp());
 
-//Routes
-app.use('/api/v1/auth', authRouter);
-app.use('/api/v1/user', userRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/user', userRouter);
