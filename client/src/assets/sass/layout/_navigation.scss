@@ -1,0 +1,42 @@
+.nav {
+    display: flex;
+    &--posts {
+        flex: 0 1 40%;
+    }
+    &--user {
+        flex: 0 1 40%;
+        justify-content: flex-end;
+    }
+    &__el {
+        color: $light-grey;
+        text-transform: uppercase;
+        font-size: 1.8rem;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        transition: all 0.2s;
+        font-weight: 400;
+        background: none;
+        border: none;
+        cursor: pointer;
+        &:hover {
+            transform: translateY(-2px);
+            text-shadow: 0 0.7rem 1rem #000;
+        }
+        &:not(:last-child) {
+            margin-right: 3rem;
+        }
+        &--cta {
+            padding: 1.5rem 3rem;
+            border-radius: 5rem;
+            border: 1px solid currentColor;
+            transition: all 0.3s;
+            &:hover {
+                background-color: $light-grey;
+                color: $grey;
+                text-shadow: none;
+                border-color: $light-grey;
+            }
+        }
+    }
+}
