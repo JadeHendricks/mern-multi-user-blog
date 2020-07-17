@@ -13,4 +13,12 @@ html {
 
 body {
     box-sizing: border-box;
+    background-color: $light-grey;
+}
+
+.container {
+    max-width: 120rem;
+    padding: 2rem;
+    margin: 0 auto;
+    display: block;
 }

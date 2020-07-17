@@ -1,0 +1,12 @@
+.all-posts {
+    padding: 6rem 0;
+}
+.cards {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+.card {
+    flex: 0 1 30%;
+    margin-bottom: 5rem;
+}

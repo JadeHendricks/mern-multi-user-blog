@@ -1,0 +1,60 @@
+.card {
+    border-radius: 0.3rem;
+    overflow: hidden;
+    box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.1);
+    background-color: $white;
+    backface-visibility: hidden;
+    &__header {
+        position: relative;
+    }
+    &__image {
+        width: 100%;
+        height: auto;
+    }
+    &__tag {
+        position: absolute;
+        color: $white;
+        font-weight: 300;
+        background-color: $green;
+        padding: 1rem;
+        bottom: 2rem;
+        right: 2rem;
+    }
+    &__details {
+        padding: 3rem 2rem;
+    }
+    &__title {
+        margin-bottom: 1rem;
+        font-size: 2.2rem;
+    }
+    &__description {
+        line-height: 1.4;
+    }
+    &__user {
+        display: flex;
+        align-items: center;
+        background-color: $light-grey;
+        padding: 2.5rem;
+        border-top: 0.1rem solid $grey;
+    }
+    &__user-image {
+        width: 6rem;
+        width: 6rem;
+        flex: 0 0 6rem;
+        border-radius: 100%;
+        margin-right: 0.5rem;
+    }
+    &__user-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        font-size: 1.8rem;
+        & div:first-child {
+            font-weight: 700;
+        }
+        & div:last-child {
+            font-size: 1.6rem;
+        }
+
+    }
+}

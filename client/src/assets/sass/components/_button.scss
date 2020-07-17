@@ -1,0 +1,13 @@
+.button {
+    border: 0;
+    text-decoration: none;
+    padding: 1.5rem 3rem;
+    color: $white;
+    background-color: transparent;
+    outline: none;
+    cursor: pointer;
+    border-radius: .5rem;
+    &--green {
+        background-color: $green;
+    }
+}

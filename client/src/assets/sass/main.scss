@@ -9,9 +9,10 @@
 @import "base/utilities";
 
 //COMPONENTS
-//TODO
+@import "components/card";
 
 // Layouts
 @import "layout/navigation";
+@import "layout/layouts";
 @import "layout/header";
 @import "layout/footer";
