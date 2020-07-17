@@ -30,6 +30,26 @@
     &__description {
         line-height: 1.4;
     }
+    &__interaction {
+        display: flex;
+        align-items: center;
+        padding-top: 2rem;
+    }
+    &__interaction-block {
+        display: flex;
+        align-items: center;
+        font-size: 1.4rem;
+        font-weight: 700;
+        &:not(:last-child) {
+            margin-right: 2rem;
+        }
+    }
+    &__interaction-icon {
+        fill: $green;
+        width: 2rem;
+        height: 2rem;
+        margin-right: 1rem;
+    }
     &__user {
         display: flex;
         align-items: center;
@@ -55,6 +75,5 @@
         & div:last-child {
             font-size: 1.6rem;
         }
-
     }
 }
