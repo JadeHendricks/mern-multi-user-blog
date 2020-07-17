@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link href="https://fonts.googleapis.com/css?family=Lato:300,300i,700" rel="stylesheet">
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="shortcut icon" type="image/png" href="images/favicon.png">
+        <title>Multi user blog</title>
+    </head>
+    <body>
+        <header class="header">
+            <nav class="nav nav--posts">
+                <a href="/" class="nav__el">All Posts</a>
+            </nav>
+            <div class="header__logo">
+                <img src="./images/logo-white.png" alt="" />
+            </div>
+            <nav class="nav nav--user">
+                <a class="nav__el" href="/login.html">Log in</a>
+                <a class="nav__el nav__el--cta" href="/register.html">Sign up</a>
+            </nav>
+        </header>
+        <main class="main">
+            <div class="login-form">
+                <h2 class="login-form__title">Create your account!</h2>
+                <form class="form form--signup">
+                    <div class="form-group">
+                        <label class="form__label" for="name">Email address</label>
+                        <input class="form__input" id="name" type="text" placeholder="John Doe" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form__label" for="email">Email address</label>
+                        <input class="form__input" id="email" type="email" placeholder="you@example.com" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form__label" for="password">Password</label>
+                        <input class="form__input" id="password" type="password" placeholder="••••••••" />
+                    </div>
+                    <div class="form__group">
+                        <button class="button button--green">Sign up</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+        <footer class="footer">
+            <div class="footer__logo">
+                <img src="./images/logo-green.png" alt="Natour logo">
+            </div>
+            <ul class="footer__nav">
+                <li><a href="#">About us</a></li>
+                <li><a href="#">Download apps</a></li>
+                <li><a href="#">Become a guide</a></li>
+                <li><a href="#">Careers</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+            <p class="footer__copyright">© 2020 by Jade Hendricks</p></footer>
+    </body>
+</html>

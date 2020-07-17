@@ -300,6 +300,65 @@ strong {
     .card__user-info div:last-child {
       font-size: 1.6rem; }
 
+.login-form {
+  margin: 0 auto;
+  margin-top: 8rem;
+  max-width: 55rem;
+  background-color: #fff;
+  -webkit-box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
+  padding: 5rem 7rem;
+  border-radius: 5px; }
+  .login-form__title {
+    margin: 2.5rem 0 4rem 0;
+    color: #55c57a; }
+
+.form-group {
+  margin-bottom: 2.5rem; }
+  .form-group:last-child {
+    margin-bottom: 0; }
+
+.form__label {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: #777777; }
+
+.form__input {
+  display: block;
+  font-family: inherit;
+  font-size: 1.5rem;
+  color: inherit;
+  padding: 1.25rem 1.75rem;
+  border: none;
+  width: 100%;
+  background-color: #fff;
+  background-color: #f2f2f2;
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  border-radius: 4px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box; }
+
+.button {
+  font-size: 1.8rem;
+  padding: 1.4rem 3rem;
+  border-radius: 10rem;
+  text-transform: uppercase;
+  display: inline-block;
+  text-decoration: none;
+  position: relative;
+  transition: all 0.4s;
+  font-weight: 400;
+  border: none;
+  cursor: pointer; }
+  .button--green {
+    background-color: #55c57a;
+    color: #ffffff; }
+
 .nav {
   display: flex; }
   .nav--posts {
@@ -358,6 +417,9 @@ strong {
 
 .footer {
   background-color: #f7f7f7;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
   padding: 6rem 4rem 3rem 4rem;
   font-size: 1.4rem;
   display: grid;
