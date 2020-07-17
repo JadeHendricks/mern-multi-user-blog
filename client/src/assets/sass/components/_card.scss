@@ -9,7 +9,7 @@
     }
     &__image {
         width: 100%;
-        height: auto;
+        height: 30rem;
     }
     &__tag {
         position: absolute;
@@ -34,7 +34,7 @@
         display: flex;
         align-items: center;
         background-color: $light-grey;
-        padding: 2.5rem;
+        padding: 1.5rem;
         border-top: 0.1rem solid $grey;
     }
     &__user-image {
