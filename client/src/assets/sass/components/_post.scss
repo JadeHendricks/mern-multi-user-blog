@@ -1,7 +1,21 @@
 .post {
     &__banner {
         height: 50rem;
+        position: relative;
         background-image: linear-gradient(to right bottom, #7dd56f, #28b487);
+        & .author-options {
+            position: absolute;
+            right: 5rem;
+            bottom: 5rem;
+            & .button:not(:last-child) {
+                margin-right: 1rem;
+            }
+        }
+        & .back-button {
+            position: absolute;
+            left: 5rem;
+            bottom: 5rem;
+        }
     }
     &__container {
         max-width: 80rem;

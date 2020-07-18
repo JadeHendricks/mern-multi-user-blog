@@ -10,8 +10,24 @@
     font-weight: 400;
     border: none;
     cursor: pointer;
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15)
+    }
     &--green {
         background-color: $green;
         color: $white;
+    }
+    &--white {
+        background-color: $white;
+        color: $black;
+    }
+    &--yellow {
+        background-color: $yellow;
+        color: $black;  
+    }
+    &--red {
+        background-color: $red;
+        color: $white;  
     }
 }

@@ -378,13 +378,36 @@ strong {
   font-weight: 400;
   border: none;
   cursor: pointer; }
+  .button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15); }
   .button--green {
     background-color: #55c57a;
+    color: #ffffff; }
+  .button--white {
+    background-color: #ffffff;
+    color: #444444; }
+  .button--yellow {
+    background-color: #fcd983;
+    color: #444444; }
+  .button--red {
+    background-color: #cd2d2d;
     color: #ffffff; }
 
 .post__banner {
   height: 50rem;
+  position: relative;
   background-image: linear-gradient(to right bottom, #7dd56f, #28b487); }
+  .post__banner .author-options {
+    position: absolute;
+    right: 5rem;
+    bottom: 5rem; }
+    .post__banner .author-options .button:not(:last-child) {
+      margin-right: 1rem; }
+  .post__banner .back-button {
+    position: absolute;
+    left: 5rem;
+    bottom: 5rem; }
 
 .post__container {
   max-width: 80rem;
