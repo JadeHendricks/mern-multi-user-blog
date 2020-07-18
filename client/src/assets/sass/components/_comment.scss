@@ -1,0 +1,74 @@
+.comment {
+    margin: 4rem 0;
+    background-color: $white;
+    padding: 4rem 2.5rem;
+    border-radius: 0.3rem;
+    overflow: hidden;
+    box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.1);
+    &__header {
+        margin-bottom: 2.5rem;
+    }
+    &__title {
+        margin-bottom: 0.5rem;
+    }
+    &__auth {
+        color: #3f4bf9;
+        font-weight: 500;
+        text-decoration: none;
+        font-size: 1.8rem;
+    }
+    & .button {
+        display: block;
+        margin-left: auto;
+    }
+}
+
+.comment-post {
+    margin-top: 2.5rem;
+    padding-top: 2.5rem;
+    border-top: 0.2rem solid $light-grey;
+    display: flex;
+    position: relative;
+    &__icon {
+        flex: 0 0 8rem;
+        & img {
+            width: 8rem;
+            height: 8rem;
+            border-radius: 100%;
+        }
+    }
+    &__information {
+        flex: 1;
+        margin: 0 2rem;
+    }
+    &__user-name {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+        & span {
+            margin-left: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+    }
+    &__user-comment {
+        font-size: 1.6rem;
+    }
+    &__interaction {
+        display: flex;
+        align-content: center;
+    }
+    &__post-icon {
+        fill: $grey;
+        width: 2rem;
+        height: 2rem;
+        &:not(:last-child) {
+            margin-right: 1rem;
+        }
+    }
+    &__count {
+        color: $grey;
+        font-size: 1.6rem;
+        margin-right: 0.5rem;
+        font-weight: 700;
+    }
+}

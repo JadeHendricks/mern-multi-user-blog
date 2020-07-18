@@ -330,6 +330,9 @@ strong {
     margin: 2.5rem 0 4rem 0;
     color: #55c57a; }
 
+.comment-form {
+  padding-bottom: 4rem; }
+
 .form-group {
   margin-bottom: 2.5rem; }
   .form-group:last-child {
@@ -342,7 +345,7 @@ strong {
   margin-bottom: 1rem;
   color: #777777; }
 
-.form__input {
+.form__textarea, .form__input {
   display: block;
   font-family: inherit;
   font-size: 1.5rem;
@@ -350,7 +353,6 @@ strong {
   padding: 1.25rem 1.75rem;
   border: none;
   width: 100%;
-  background-color: #fff;
   background-color: #f2f2f2;
   border-top: 3px solid transparent;
   border-bottom: 3px solid transparent;
@@ -359,6 +361,10 @@ strong {
   border-radius: 4px;
   -webkit-box-sizing: border-box;
   box-sizing: border-box; }
+
+.form__textarea {
+  min-height: 15rem;
+  background-color: #eaeaea; }
 
 .button {
   font-size: 1.8rem;
@@ -450,6 +456,65 @@ strong {
     font-size: 2rem; }
     .post__body p:not(:last-child) {
       margin-bottom: 4rem; }
+
+.comment {
+  margin: 4rem 0;
+  background-color: #ffffff;
+  padding: 4rem 2.5rem;
+  border-radius: 0.3rem;
+  overflow: hidden;
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.1); }
+  .comment__header {
+    margin-bottom: 2.5rem; }
+  .comment__title {
+    margin-bottom: 0.5rem; }
+  .comment__auth {
+    color: #3f4bf9;
+    font-weight: 500;
+    text-decoration: none;
+    font-size: 1.8rem; }
+  .comment .button {
+    display: block;
+    margin-left: auto; }
+
+.comment-post {
+  margin-top: 2.5rem;
+  padding-top: 2.5rem;
+  border-top: 0.2rem solid #f7f7f7;
+  display: flex;
+  position: relative; }
+  .comment-post__icon {
+    flex: 0 0 8rem; }
+    .comment-post__icon img {
+      width: 8rem;
+      height: 8rem;
+      border-radius: 100%; }
+  .comment-post__information {
+    flex: 1;
+    margin: 0 2rem; }
+  .comment-post__user-name {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem; }
+    .comment-post__user-name span {
+      margin-left: 1.5rem;
+      font-size: 1.2rem;
+      font-weight: 500; }
+  .comment-post__user-comment {
+    font-size: 1.6rem; }
+  .comment-post__interaction {
+    display: flex;
+    align-content: center; }
+  .comment-post__post-icon {
+    fill: #777777;
+    width: 2rem;
+    height: 2rem; }
+    .comment-post__post-icon:not(:last-child) {
+      margin-right: 1rem; }
+  .comment-post__count {
+    color: #777777;
+    font-size: 1.6rem;
+    margin-right: 0.5rem;
+    font-weight: 700; }
 
 .nav {
   display: flex; }

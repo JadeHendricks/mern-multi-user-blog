@@ -12,7 +12,9 @@
         color: $green;
     }
 }
-
+.comment-form {
+    padding-bottom: 4rem;
+}
 .form {
     &-group {
         margin-bottom: 2.5rem;
@@ -27,7 +29,7 @@
         margin-bottom: 1rem;
         color: $grey;
     }
-    &__input {
+    &__textarea, &__input {
         display: block;
         font-family: inherit;
         font-size: 1.5rem;
@@ -35,7 +37,6 @@
         padding: 1.25rem 1.75rem;
         border: none;
         width: 100%;
-        background-color: #fff;
         background-color: #f2f2f2;
         border-top: 3px solid transparent;
         border-bottom: 3px solid transparent;
@@ -44,5 +45,9 @@
         border-radius: 4px;
         -webkit-box-sizing: border-box;
         box-sizing: border-box;
+    }
+    &__textarea {
+        min-height: 15rem;
+        background-color: darken($light-grey, 5%);
     }
 }
