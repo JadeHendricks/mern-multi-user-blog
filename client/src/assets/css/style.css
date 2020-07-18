@@ -374,7 +374,7 @@ strong {
 .form__textarea, .form__input {
   display: block;
   font-family: inherit;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   color: inherit;
   padding: 1.25rem 1.75rem;
   border: none;
@@ -386,7 +386,9 @@ strong {
   transition: all 0.3s;
   border-radius: 4px;
   -webkit-box-sizing: border-box;
-  box-sizing: border-box; }
+  box-sizing: border-box;
+  outline: none;
+  color: #444444; }
 
 .form__textarea {
   min-height: 15rem;
@@ -742,8 +744,6 @@ strong {
 
 .footer {
   background-color: #f7f7f7;
-  position: fixed;
-  bottom: 0;
   width: 100%;
   padding: 6rem 4rem 3rem 4rem;
   font-size: 1.4rem;
