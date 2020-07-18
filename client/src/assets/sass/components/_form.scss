@@ -2,8 +2,7 @@
     margin: 0 auto;
     margin-top: 8rem;
     max-width: 55rem;
-    background-color: #fff;
-    -webkit-box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
+    background-color: $white;
     box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
     padding: 5rem 7rem;
     border-radius: 5px;
@@ -16,10 +15,20 @@
     padding-bottom: 4rem;
 }
 .form {
-    &-group {
+    &--createPost {
+        background-color: $white;
+        box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
+        padding: 5rem;
+        border-radius: 5px;
+    }
+    &__group {
         margin-bottom: 2.5rem;
         &:last-child {
             margin-bottom: 0;
+        }
+        & .button {
+            margin-left: auto;
+            display: block;
         }
     }
     &__label {
@@ -49,5 +58,50 @@
     &__textarea {
         min-height: 15rem;
         background-color: darken($light-grey, 5%);
+    }
+    &__upload {
+        width: 0.01rem;
+        height: 0.01rem;
+        opacity: 0;
+        overflow: hidden;
+        position: absolute;
+        z-index: -1;
+        & + label {
+            color: $green;
+            display: inline-block;
+            text-decoration: none;
+            border-bottom: 0.1rem solid $green;
+            padding: 0.3rem;
+            font-size: 2rem;
+            -webkit-transition: all 0.2s;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+    }
+    &__photo-upload {
+        display: flex;
+        align-items: center;
+        font-size: 1.6rem;
+    }
+    &__user-photo {
+        height: 10rem;
+        width: 10rem;
+        margin-right: 2rem;
+    }
+}
+
+.create-post {
+    max-width: 80rem;
+    margin: 0 auto;
+    transform: translateY(-30rem);
+    color: $white;
+    &__title {
+        color: currentColor;
+        margin-bottom: 1rem;
+    }
+    &__description {
+        color: currentColor;
+        font-size: 2rem;
+        margin-bottom: 4rem;
     }
 }

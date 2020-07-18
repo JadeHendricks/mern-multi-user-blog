@@ -14,35 +14,43 @@
             <nav class="nav nav--posts">
                 <a href="/" class="nav__el">All Posts</a>
             </nav>
-            <div class="header__logo">
-                <img src="./images/logo-white.png" alt="" />
-            </div>
             <nav class="nav nav__user">
-                <a class="nav__el" href="/login.html">Log in</a>
-                <a class="nav__el nav__el--cta" href="/register.html">Sign up</a>
-            </nav>
-            <!-- <nav class="nav nav__user">
                 <a class="nav__el nav__el--logout">Log out</a>
                 <a class="nav__el" href="/me">
                     <img class="nav__user-img" src="./images/jade-hendricks.jpg" alt="Photo of Jade Hendricks" title="Photo of Jade Hendricks" />
                     <span>Laura</span>
                 </a>
-            </nav> -->
+            </nav>
         </header>
         <main class="main">
-            <div class="login-form">
-                <h2 class="login-form__title">Log into your account</h2>
-                <form class="form form--login">
+            <div class="post">
+                <div class="post__banner"></div>
+            </div>
+            <div class="create-post">
+                <div class="create-post__information">
+                    <h1 class="create-post__title">Create a blog post!</h1>
+                    <p class="create-post__description">
+                        Lorem ipsum dolor sit, amet consectetur adipisicing elit. 
+                        Modi cupiditate minus adipisci aliquid dolor deleniti excepturi, 
+                        nemo quisquam ea eos saepe quidem ipsum assumenda omnis.
+                    </p>
+                </div>
+                <form class="form form--createPost">
                     <div class="form__group">
-                        <label class="form__label" for="email">Email address</label>
-                        <input class="form__input" id="email" type="email" placeholder="you@example.com" />
+                        <label class="form__label" for="title">Post Title</label>
+                        <input class="form__input" id="title" type="text" placeholder="Title goes here" />
                     </div>
                     <div class="form__group">
-                        <label class="form__label" for="password">Password</label>
-                        <input class="form__input" id="password" type="password" placeholder="••••••••" />
+                        <label class="form__label" for="title">Post Body</label>
+                        <textarea class="form__input form__textarea" placeholder="Post goes here"></textarea>
+                    </div>
+                    <div class="form__group form__photo-upload">
+                        <img class="form__user-photo" src="./images/jade-hendricks.jpg" alt="User photo" />
+                        <input class="form__upload" type="file" accept="image/*" id="photo" name="photo" />
+                        <label for="photo">Choose a blog post image</label>
                     </div>
                     <div class="form__group">
-                        <button class="button button--green">Login</button>
+                        <button class="button button--green">Post</button>
                     </div>
                 </form>
             </div>

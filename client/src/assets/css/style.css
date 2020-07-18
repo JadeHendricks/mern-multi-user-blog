@@ -321,8 +321,7 @@ strong {
   margin: 0 auto;
   margin-top: 8rem;
   max-width: 55rem;
-  background-color: #fff;
-  -webkit-box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
+  background-color: #ffffff;
   box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
   padding: 5rem 7rem;
   border-radius: 5px; }
@@ -333,10 +332,19 @@ strong {
 .comment-form {
   padding-bottom: 4rem; }
 
-.form-group {
+.form--createPost {
+  background-color: #ffffff;
+  box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
+  padding: 5rem;
+  border-radius: 5px; }
+
+.form__group {
   margin-bottom: 2.5rem; }
-  .form-group:last-child {
+  .form__group:last-child {
     margin-bottom: 0; }
+  .form__group .button {
+    margin-left: auto;
+    display: block; }
 
 .form__label {
   display: block;
@@ -365,6 +373,47 @@ strong {
 .form__textarea {
   min-height: 15rem;
   background-color: #eaeaea; }
+
+.form__upload {
+  width: 0.01rem;
+  height: 0.01rem;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1; }
+  .form__upload + label {
+    color: #55c57a;
+    display: inline-block;
+    text-decoration: none;
+    border-bottom: 0.1rem solid #55c57a;
+    padding: 0.3rem;
+    font-size: 2rem;
+    -webkit-transition: all 0.2s;
+    transition: all 0.2s;
+    cursor: pointer; }
+
+.form__photo-upload {
+  display: flex;
+  align-items: center;
+  font-size: 1.6rem; }
+
+.form__user-photo {
+  height: 10rem;
+  width: 10rem;
+  margin-right: 2rem; }
+
+.create-post {
+  max-width: 80rem;
+  margin: 0 auto;
+  transform: translateY(-30rem);
+  color: #ffffff; }
+  .create-post__title {
+    color: currentColor;
+    margin-bottom: 1rem; }
+  .create-post__description {
+    color: currentColor;
+    font-size: 2rem;
+    margin-bottom: 4rem; }
 
 .button {
   font-size: 1.8rem;
@@ -560,7 +609,6 @@ strong {
     align-items: center;
     transition: all 0.2s;
     font-weight: 400;
-    background: none;
     border: none;
     cursor: pointer; }
     .nav__el:hover {
