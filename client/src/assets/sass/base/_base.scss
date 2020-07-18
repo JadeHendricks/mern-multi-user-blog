@@ -21,4 +21,11 @@ body {
     padding: 2rem;
     margin: 0 auto;
     display: block;
+    position: relative;
+}
+
+hr {
+    border: 0;
+    height: 0.2rem;
+    background: $light-grey;
 }

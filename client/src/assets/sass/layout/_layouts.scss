@@ -6,7 +6,83 @@
     justify-content: space-between;
     flex-wrap: wrap;
 }
+.cards--account {
+    & .card {
+        flex: 0 1 48%;
+        margin-bottom: 6rem;
+    }
+}
 .card {
     flex: 0 1 30%;
     margin-bottom: 6rem;
+}
+
+.account {
+    display: flex;
+    padding: 6rem 0;
+    &--settings {
+        background-color: $white;
+        box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
+    }
+    &__options {
+        background-image: linear-gradient(to right bottom, #7dd56f, #28b487);
+        flex: 0 0 23%;
+        margin-right: 4%;
+        padding: 2.5rem;
+    }
+    &__view {
+        background-color: $white;
+        flex: 1;
+    }
+}
+
+.account-nav {
+    &__ul {
+        list-style-type: none;
+    }
+    &__el {
+        font-size: 1.8rem;
+        text-transform: uppercase;
+        border-bottom: 0.1rem solid $white;
+        padding: 2rem 0;
+
+    }
+    & a {
+        text-decoration: none;
+        color: $white;
+    }
+}
+
+.user-header {
+    display: flex;
+    align-items: center;
+    &__image {
+        flex: 0 0 20rem;
+        & img {
+            width: 20rem;
+            height: 20rem;
+        }
+    }
+    &__info {
+        flex: 0 0 50%;
+        margin: 0 4rem;
+        color: $white;
+    }
+    &__info-name {
+        color: currentColor;
+        font-size: 4rem;
+    }
+    &__info-description {
+        color: currentColor; 
+        font-size: 1.8rem;
+        margin: 0.5rem 0 2rem 0;
+    }
+    &__socials-icon {
+        fill: $white;
+        height: 4rem;
+        width: 4rem;
+        &:not(:last-child) {
+            margin-right: 2rem;
+        }
+    }
 }

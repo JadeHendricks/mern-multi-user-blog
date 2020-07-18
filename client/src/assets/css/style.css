@@ -16,7 +16,13 @@ body {
   max-width: 120rem;
   padding: 2rem;
   margin: 0 auto;
-  display: block; }
+  display: block;
+  position: relative; }
+
+hr {
+  border: 0;
+  height: 0.2rem;
+  background: #f7f7f7; }
 
 *,
 html,
@@ -336,6 +342,18 @@ strong {
   background-color: #ffffff;
   box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
   padding: 5rem;
+  border-radius: 5px;
+  margin-bottom: 6rem; }
+
+.form--changePassword {
+  background-color: #ffffff;
+  padding: 5rem;
+  border-radius: 5px;
+  margin-bottom: 6rem; }
+
+.form--account {
+  background-color: #ffffff;
+  padding: 5rem;
   border-radius: 5px; }
 
 .form__group {
@@ -405,7 +423,7 @@ strong {
 .create-post {
   max-width: 80rem;
   margin: 0 auto;
-  transform: translateY(-30rem);
+  transform: translateY(-40rem);
   color: #ffffff; }
   .create-post__title {
     color: currentColor;
@@ -414,6 +432,18 @@ strong {
     color: currentColor;
     font-size: 2rem;
     margin-bottom: 4rem; }
+
+.account-settings__title {
+  font-size: 3rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  background-image: linear-gradient(to right, #7dd56f, #28b487);
+  -webkit-background-clip: text;
+  color: transparent;
+  letter-spacing: 0.1rem;
+  line-height: 1.3;
+  display: inline-block;
+  margin-bottom: 4rem; }
 
 .button {
   font-size: 1.8rem;
@@ -457,6 +487,10 @@ strong {
     position: absolute;
     left: 5rem;
     bottom: 5rem; }
+
+.post__banner--account {
+  height: auto;
+  padding: 5rem 0; }
 
 .post__container {
   max-width: 80rem;
@@ -635,9 +669,67 @@ strong {
   justify-content: space-between;
   flex-wrap: wrap; }
 
+.cards--account .card {
+  flex: 0 1 48%;
+  margin-bottom: 6rem; }
+
 .card {
   flex: 0 1 30%;
   margin-bottom: 6rem; }
+
+.account {
+  display: flex;
+  padding: 6rem 0; }
+  .account--settings {
+    background-color: #ffffff;
+    box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06); }
+  .account__options {
+    background-image: linear-gradient(to right bottom, #7dd56f, #28b487);
+    flex: 0 0 23%;
+    margin-right: 4%;
+    padding: 2.5rem; }
+  .account__view {
+    background-color: #ffffff;
+    flex: 1; }
+
+.account-nav__ul {
+  list-style-type: none; }
+
+.account-nav__el {
+  font-size: 1.8rem;
+  text-transform: uppercase;
+  border-bottom: 0.1rem solid #ffffff;
+  padding: 2rem 0; }
+
+.account-nav a {
+  text-decoration: none;
+  color: #ffffff; }
+
+.user-header {
+  display: flex;
+  align-items: center; }
+  .user-header__image {
+    flex: 0 0 20rem; }
+    .user-header__image img {
+      width: 20rem;
+      height: 20rem; }
+  .user-header__info {
+    flex: 0 0 50%;
+    margin: 0 4rem;
+    color: #ffffff; }
+  .user-header__info-name {
+    color: currentColor;
+    font-size: 4rem; }
+  .user-header__info-description {
+    color: currentColor;
+    font-size: 1.8rem;
+    margin: 0.5rem 0 2rem 0; }
+  .user-header__socials-icon {
+    fill: #ffffff;
+    height: 4rem;
+    width: 4rem; }
+    .user-header__socials-icon:not(:last-child) {
+      margin-right: 2rem; }
 
 .header {
   background-color: #444444;
