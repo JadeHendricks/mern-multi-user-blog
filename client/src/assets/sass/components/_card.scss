@@ -80,4 +80,12 @@
             font-size: 1.6rem;
         }
     }
+    &__user-options {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        & .button {
+            flex: 0 1 48%;
+        }
+    }
 }

@@ -325,6 +325,12 @@ strong {
       font-weight: 700; }
     .card__user-info div:last-child {
       font-size: 1.6rem; }
+  .card__user-options {
+    width: 100%;
+    display: flex;
+    justify-content: space-between; }
+    .card__user-options .button {
+      flex: 0 1 48%; }
 
 .login-form {
   margin: 0 auto;
@@ -339,7 +345,7 @@ strong {
     color: #55c57a; }
 
 .comment-form {
-  padding-bottom: 4rem; }
+  padding-bottom: 2rem; }
 
 .form--createPost {
   background-color: #ffffff;
@@ -462,6 +468,7 @@ strong {
   transition: all 0.4s;
   font-weight: 400;
   border: none;
+  text-align: center;
   cursor: pointer; }
   .button:hover {
     transform: translateY(-3px);
@@ -588,6 +595,10 @@ strong {
   .comment .button {
     display: block;
     margin-left: auto; }
+  .comment__total {
+    display: inline;
+    float: right;
+    font-size: 1.8rem; }
 
 .comment-post {
   margin-top: 2.5rem;

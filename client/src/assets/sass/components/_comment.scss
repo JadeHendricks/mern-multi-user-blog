@@ -21,6 +21,11 @@
         display: block;
         margin-left: auto;
     }
+    &__total {
+        display: inline;
+        float: right;
+        font-size: 1.8rem;
+    }
 }
 
 .comment-post {
