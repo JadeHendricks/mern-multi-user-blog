@@ -3,8 +3,6 @@ const jwt = require('jsonwebtoken');
 const sendGridMail = require('@sendgrid/mail');
 const dotenv = require('dotenv');
 const _ = require('lodash');
-const fetch = require('node-fetch');
-const { OAuth2Client } = require('google-auth-library');
 
 dotenv.config();
 sendGridMail.setApiKey(process.env.SG_API_KEY);
@@ -12,7 +10,6 @@ sendGridMail.setApiKey(process.env.SG_API_KEY);
 //Signup - email work flow
 exports.register = async (req, res) => {
     const { name, email, password } = req.body;
-
     try {
         const user = await User.findOne({ email });
         if (user) {
@@ -46,7 +43,7 @@ exports.register = async (req, res) => {
     } catch (err) {
         console.error(err);
         return res.status(404).json({
-            message: err.message
+            message: err
         });
     }
 }
@@ -261,136 +258,5 @@ exports.resetPassword = async (req, res) => {
         res.status(401).json({
             message: err.message
         });
-    }
-}
-
-const client = new OAuth2Client(process.env.REACT_APP_GOOGLE_CLIENT_ID);
-exports.googleLogin = async (req, res) => {
-    const { idToken } = req.body;
-
-    try {
-        const response = await client.verifyIdToken({ idToken, audience: process.env.REACT_APP_GOOGLE_CLIENT_ID });   
-
-        if (response.payload.email_verified) {
-            let user = await User.findOne({ email: response.payload.email });
-
-            if (user) {
-                const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-                    expiresIn: 3600000
-                });
-
-                const cookieOptions = {
-                    expires: new Date(Date.now() + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
-                    httpOnly: true
-                }
-                if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
-                res.cookie('authtoken', token, cookieOptions);
-
-                const { _id, email, name, role } = user;
-    
-                res.status(200).json({
-                    token,
-                    user: { _id, email, name, role }
-                });
-            } 
-
-            if (!user) {
-                const password = response.payload.email + process.env.JWT_SECRET;
-    
-                user = new User({ name: response.payload.name, email: response.payload.email, password });
-                user.save();
-    
-                const { _id, email, name, role } = user;
-    
-                const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-                    expiresIn: 3600000
-                });
-
-                const cookieOptions = {
-                    expires: new Date(Date.now() + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
-                    httpOnly: true
-                }
-                if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
-                res.cookie('authtoken', token, cookieOptions);
-    
-    
-                res.status(200).json({
-                    token,
-                    user: { _id, email, name, role }
-                });
-            }
-        }
-        } catch (err) {
-            console.error(err.message);
-            res.status(400).json({
-                error: err.message,
-                message: 'Google Login Failed. Try Again!'
-            });  
-    }
-}
-
-exports.facebookLogin = async (req, res) => {
-    const { accessToken, userID } = req.body;
-
-    //this will give us the user profile
-    const url = `https://graph.facebook.com/v2.11/${userID}/?fields=id,name,email&access_token=${accessToken}`;
-
-    try {
-        const response = await fetch(url, { method: 'GET'})
-        const data = await response.json();
-
-        let user = await User.findOne({ email: data.email });
-
-        if (user) {
-            const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-                expiresIn: 3600000
-            });
-            const { _id, email, name, role } = user;
-
-            const cookieOptions = {
-                expires: new Date(Date.now() + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
-                httpOnly: true
-            }
-            if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
-            res.cookie('authtoken', token, cookieOptions);
-
-            res.status(200).json({
-                token,
-                user: { _id, email, name, role }
-            }); 
-        }
-
-        if (!user) {
-            const password = data.email + process.env.JWT_SECRET;
-    
-            user = new User({ name: data.name, email: data.email, password });
-            user.save();
-
-            const { _id, email, name, role } = user;
-
-            const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-                expiresIn: 3600000
-            });
-
-            const cookieOptions = {
-                expires: new Date(Date.now() + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
-                httpOnly: true
-            }
-            if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
-            res.cookie('authtoken', token, cookieOptions);
-
-
-            res.status(200).json({
-                token,
-                user: { _id, email, name, role }
-            });
-        }
-
-    } catch (err) {
-        console.error(err.message);
-        res.status(400).json({
-            error: err.message,
-            message: 'Facebook Login Failed. Try Again!'
-        });  
     }
 }

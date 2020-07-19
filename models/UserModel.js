@@ -22,8 +22,8 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['subscriber', 'admin'],
-        default: 'subscriber'
+        enum: ['user', 'admin'],
+        default: 'user'
     },
     resetPasswordLink: {
         data: String,
