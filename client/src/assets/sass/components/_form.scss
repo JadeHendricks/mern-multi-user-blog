@@ -11,6 +11,26 @@
         color: $green;
     }
 }
+
+.forgot-password-form {
+    margin: 0 auto;
+    margin-top: 8rem;
+    max-width: 80rem;
+    background-color: $white;
+    box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
+    padding: 5rem 7rem;
+    border-radius: 5px;
+    &__title {
+        margin: 2.5rem 0 1rem 0;
+        color: $green;
+    }
+    &__description {
+        font-size: 1.8rem;
+        color: $grey; 
+        margin-bottom: 4rem;
+    }
+}
+
 .comment-form {
     padding-bottom: 2rem;
 }

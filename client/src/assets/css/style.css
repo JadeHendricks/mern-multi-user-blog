@@ -344,6 +344,22 @@ strong {
     margin: 2.5rem 0 4rem 0;
     color: #55c57a; }
 
+.forgot-password-form {
+  margin: 0 auto;
+  margin-top: 8rem;
+  max-width: 80rem;
+  background-color: #ffffff;
+  box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
+  padding: 5rem 7rem;
+  border-radius: 5px; }
+  .forgot-password-form__title {
+    margin: 2.5rem 0 1rem 0;
+    color: #55c57a; }
+  .forgot-password-form__description {
+    font-size: 1.8rem;
+    color: #777777;
+    margin-bottom: 4rem; }
+
 .comment-form {
   padding-bottom: 2rem; }
 
