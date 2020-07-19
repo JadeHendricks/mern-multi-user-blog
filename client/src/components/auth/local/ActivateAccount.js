@@ -21,20 +21,17 @@ const ActivateAccount = ({ match }) => {
     }
     
     return (
-        <section className="py-5">
-            <div className="col-md-8 offset-md-2 col-12">
-                <div className="card border-secondary mb-3">
-                    <div className="card-header">Hello <strong className="text-success">{ name }</strong>, ready to activate you account?</div>
-                    <div className="card-body">
-                        <div className="row">
-                            <div className="col-12">
-                                <button className="btn btn-outline-primary" onClick={ handleActivationClick }>Activate Account</button>
-                            </div>
-                        </div>
-                    </div>
+        <div class="forgot-password-form">
+            <h2 class="forgot-password-form__title">Hello Name, activate your account now!</h2>
+            <p class="forgot-password-form__description">
+                By clicking activate, your account with be verified and ready to use.
+            </p>
+            <form class="form form--activateaccount">
+                <div class="form__group">
+                    <button class="button button--green" onClick={ handleActivationClick }>Activate</button>
                 </div>
-            </div>
-        </section>
+            </form>
+        </div>
     )
 }
 

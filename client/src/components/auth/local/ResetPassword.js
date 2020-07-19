@@ -4,8 +4,8 @@ import jwt from 'jsonwebtoken';
 
 const ResetPassword = ({ match }) => {
     const { resetPassword } = useContext(AuthContext);
-    const [values, setValues] = useState({ name: '', token: '', newPassword: '', buttonText: 'Submit' });
-    const { name, token, newPassword, buttonText } = values;
+    const [values, setValues] = useState({ name: '', token: '', newPassword: ''});
+    const { name, token, newPassword } = values;
 
     useEffect(() => {
         let token = match.params.token;
@@ -21,34 +21,26 @@ const ResetPassword = ({ match }) => {
 
     const handleOnSubmit = async (e) => {
         e.preventDefault();
-        setValues({ ...values, buttonText: 'Submitting...' });
         resetPassword(newPassword, token);
-        setValues({ ...values, buttonText: 'Submit' });
+        setValues({ ...values, newPassword: '' });
     }
 
     return (
-        <section className="py-5">
-            <div className="col-md-8 offset-md-2 col-12">
-                <div className="card border-secondary mb-3">
-                    <div className="card-header">Hello <strong className="text-success">{ name }</strong>, please enter in your new password</div>
-                    <div className="card-body">
-                        <div className="row">
-                            <div className="col-12">
-                                <form onSubmit={ handleOnSubmit }>
-                                    <div className="form-group">
-                                        <label className="text-muted" htmlFor="newPassword">New password</label>
-                                        <input onChange={ handleOnChange } placeholder="••••••••" name="newPassword" value={ newPassword } type="password" className="form-control" required />
-                                    </div>
-                                    <div>
-                                        <button className="btn btn-primary" type="submit">{ buttonText }</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+        <div class="reset-password-form">
+            <h2 class="reset-password-form__title">Reset your password</h2>
+            <p class="reset-password-form__description">
+                Enter in your new password to proceed.
+            </p>
+            <form class="form form--resetPassword" onSubmit={ handleOnSubmit }>
+                <div class="form__group">
+                    <label class="form__label" for="newpassword">New Password</label>
+                    <input class="form__input" id="newpassword" onChange={ handleOnChange } name="newpassword" type="password" placeholder="••••••••" />
                 </div>
-            </div>
-        </section>
+                <div class="form__group">
+                    <button class="button button--green">Reset Password</button>
+                </div>
+            </form>
+        </div>
     )
 }
 

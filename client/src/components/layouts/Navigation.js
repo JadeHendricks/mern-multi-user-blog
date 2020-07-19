@@ -15,7 +15,7 @@ const Navigation = () => {
                 <Link to='/' className="nav__el">All Posts</Link>
             </nav>
             <div className="header__logo">
-                <img src="./images/logo-white.png" alt="" />
+                <Link to='/'><img src="./images/logo-white.png" alt="" /></Link>
             </div>
             { !isAuthenticated && (
                 <nav className="nav nav__user">

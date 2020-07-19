@@ -3,41 +3,33 @@ import AuthContext from '../../../context/authContext/AuthContext';
 
 const ForgotPassword = () => {
     const { forgotPassword } = useContext(AuthContext);
-    const [values, setValues] = useState({ email: '', buttonText: 'Submit' });
-    const { email, buttonText } = values;
+    const [values, setValues] = useState({ email: '' });
+    const { email } = values;
 
     const handleOnChange = e => setValues({ ...values, [e.target.name]: e.target.value });
 
     const handleOnSubmit = async (e) => {
         e.preventDefault();
-        setValues({ ...values, buttonText: 'Submitting...' });
         forgotPassword(email);
-        setValues({ ...values, email: '', buttonText: 'Submit' });
+        setValues({ ...values, email: '',});
     }
     
     return (
-        <section className="py-5">
-            <div className="col-md-8 offset-md-2 col-12">
-                <div className="card border-secondary mb-3">
-                    <div className="card-header">Forgot password</div>
-                    <div className="card-body">
-                        <div className="row">
-                            <div className="col-12">
-                                <form onSubmit={ handleOnSubmit }>
-                                    <div className="form-group">
-                                        <label className="text-muted" htmlFor="email">Email address</label>
-                                        <input onChange={ handleOnChange } placeholder="you@example.com" name="email" value={ email } type="email" className="form-control"/>
-                                    </div>
-                                    <div>
-                                        <button className="btn btn-primary" type="submit">{ buttonText }</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+        <div className="forgot-password-form">
+            <h2 className="forgot-password-form__title">Forgot password?</h2>
+            <p className="forgot-password-form__description">
+                Enter in your email and a reset link will be sent for you to change your password.
+            </p>
+            <form className="form form--forgotpassword" onSubmit={ handleOnSubmit }>
+                <div className="form__group">
+                    <label className="form__label" for="email">Email address</label>
+                    <input className="form__input" id="email" onClick={ handleOnChange } name="email" type="email" placeholder="you@example.com" />
                 </div>
-            </div>
-        </section>
+                <div className="form__group">
+                    <button className="button button--green">Send</button>
+                </div>
+            </form>
+        </div>
     )
 }
 

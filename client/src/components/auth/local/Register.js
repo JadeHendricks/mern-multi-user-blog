@@ -23,28 +23,28 @@ const Register = () => {
     }
     
     return (
-        <div class="login-form">
-            <h2 class="login-form__title">Create your account!</h2>
-            <form class="form form--signup" onSubmit={ handleOnSubmit }>
-                <div class="form__group">
-                    <label class="form__label" for="name">Name</label>
-                    <input class="form__input" id="name" onChange={ handleOnChange } type="text" placeholder="John Doe" />
+        <div className="login-form">
+            <h2 className="login-form__title">Create your account!</h2>
+            <form className="form form--signup" onSubmit={ handleOnSubmit }>
+                <div className="form__group">
+                    <label className="form__label" for="name">Name</label>
+                    <input className="form__input" id="name" onChange={ handleOnChange } type="text" placeholder="John Doe" />
                 </div>
-                <div class="form__group">
-                    <label class="form__label" for="email">Email address</label>
-                    <input class="form__input" id="email" onChange={ handleOnChange } type="email" placeholder="you@example.com" />
+                <div className="form__group">
+                    <label className="form__label" for="email">Email address</label>
+                    <input className="form__input" id="email" onChange={ handleOnChange } type="email" placeholder="you@example.com" />
                 </div>
-                <div class="form__group">
-                    <label class="form__label" for="password">Password</label>
-                    <input class="form__input" id="password" onChange={ handleOnChange } type="password" placeholder="••••••••" />
+                <div className="form__group">
+                    <label className="form__label" for="password">Password</label>
+                    <input className="form__input" id="password" onChange={ handleOnChange } type="password" placeholder="••••••••" />
                 </div>
-                <div class="form__group">
-                    <div class="form__useraccount-block">
+                <div className="form__group">
+                    <div className="form__useraccount-block">
                         <Link to='/login'>Already have an account?</Link>
                     </div>
                 </div>
-                <div class="form__group">
-                    <button type="submit" class="button button--green">Sign up</button>
+                <div className="form__group">
+                    <button type="submit" className="button button--green">Sign up</button>
                 </div>
             </form>
         </div>
