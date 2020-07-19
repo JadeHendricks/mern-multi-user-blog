@@ -7,8 +7,8 @@ const Register = () => {
 
     const { register, isAuthenticated, user } = useContext(AuthContext);
 
-    const [values, setValues] = useState({ name: '', email: '', password: '', buttonText: 'Register' });
-    const { name, email, password, buttonText } = values;
+    const [values, setValues] = useState({ name: '', email: '', password: ''});
+    const { name, email, password } = values;
 
     const handleOnChange = e => setValues({ ...values, [e.target.name]: e.target.value });
 
