@@ -335,7 +335,7 @@ strong {
 .login-form {
   margin: 0 auto;
   margin-top: 8rem;
-  max-width: 55rem;
+  max-width: 65rem;
   background-color: #ffffff;
   box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
   padding: 5rem 7rem;
@@ -446,6 +446,19 @@ strong {
   height: 10rem;
   width: 10rem;
   margin-right: 2rem; }
+
+.form__useraccount-block {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4rem; }
+  .form__useraccount-block a {
+    color: #55c57a;
+    text-decoration: none;
+    font-size: 1.8rem;
+    transition: all 0.4s;
+    font-weight: 700; }
+    .form__useraccount-block a:hover {
+      transform: translateY(-2px); }
 
 .create-post {
   max-width: 80rem;

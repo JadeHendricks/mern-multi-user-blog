@@ -31,7 +31,7 @@ const AuthState = props => {
         dispatch({ type: AUTH_ERROR });
         return;
       } else {
-        props.history.push('/signin');
+        props.history.push('/login');
         dispatch({ type: AUTH_ERROR });
       }
     }
@@ -143,7 +143,7 @@ const AuthState = props => {
         toast.success(res.data.message);
         if (res.status === 200) {
           setTimeout(() => {
-            props.history.push('/signin');
+            props.history.push('/login');
           }, 4000);
         }
     } catch (err) {
@@ -161,7 +161,7 @@ const AuthState = props => {
         toast.success(res.data.message);
         setTimeout(() => {
           if (res.status === 201) {
-            props.history.push('/signin');
+            props.history.push('/login');
         }
         }, 4000);
     } catch (err) {

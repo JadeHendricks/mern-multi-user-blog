@@ -10,14 +10,14 @@ import ForgotPassword from './components/auth/local/ForgotPassword';
 import ResetPassword from './components/auth/local/ResetPassword';
 import Base from './components/layouts/Base';
 import Navigation from './components/layouts/Navigation';
-import Dashboard from './components/layouts/Dashboard';
+import Footer from './components/layouts/Footer';
 import Loader from './components/layouts/Loader';
 import PrivateRoute from './components/routing/PrivateRoute';
 import Random from './components/layouts/Random';
 
 import AuthState from "./context/authContext/AuthState";
 
-function App(props) {
+function App (props) {
   return (
     <Router>
       <AuthState>
@@ -25,18 +25,18 @@ function App(props) {
         <Loader />
         <ToastContainer autoClose={ 4000 } pauseOnHover={ false }/>
         <Navigation />
-        <div className="container">
+        <main className="main">
           <Switch>
             <Route path='/' exact component={ Base } />
-            <Route path='/signup' exact component={ Register } />
-            <Route path='/signin' exact component={ Login } />
+            <Route path='/register' exact component={ Register } />
+            <Route path='/login' exact component={ Login } />
             <Route path='/forgot-password' exact component={ ForgotPassword } />
             <Route path='/auth/password/reset/:token' exact component={ ResetPassword } />
             <Route path='/auth/activate/:token' history={props.history} exact component={ ActivateAccount } />
-            <PrivateRoute path='/dashboard' exact component={ Dashboard } />
             <PrivateRoute path='/random' exact component={ Random } />
           </Switch>
-        </div>
+        </main>
+        <Footer />
       </Fragment>
       </AuthState>
     </Router>

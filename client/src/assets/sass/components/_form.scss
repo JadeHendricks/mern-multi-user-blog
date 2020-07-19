@@ -1,7 +1,7 @@
 .login-form {
     margin: 0 auto;
     margin-top: 8rem;
-    max-width: 55rem;
+    max-width: 65rem;
     background-color: $white;
     box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
     padding: 5rem 7rem;
@@ -121,6 +121,22 @@
         height: 10rem;
         width: 10rem;
         margin-right: 2rem;
+    }
+    &__useraccount-block {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 4rem;
+
+        & a {
+            color: $green;
+            text-decoration: none;
+            font-size: 1.8rem;
+            transition: all 0.4s;
+            font-weight: 700;
+            &:hover {
+                transform: translateY(-2px);
+            }
+        }
     }
 }
 
