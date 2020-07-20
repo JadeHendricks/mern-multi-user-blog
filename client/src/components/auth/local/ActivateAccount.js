@@ -16,19 +16,20 @@ const ActivateAccount = ({ match }) => {
     // eslint-disable-next-line
     }, [match.params.token]);
 
-    const handleActivationClick = async () => {
+    const handleActivationClick = async (e) => {
+        e.preventDefault();
         activateAccount(token);
     }
     
     return (
-        <div class="forgot-password-form">
-            <h2 class="forgot-password-form__title">Hello Name, activate your account now!</h2>
-            <p class="forgot-password-form__description">
+        <div className="forgot-password-form">
+            <h2 className="forgot-password-form__title">Hello { name && name.split(' ')[0] }, activate your account now!</h2>
+            <p className="forgot-password-form__description">
                 By clicking activate, your account with be verified and ready to use.
             </p>
-            <form class="form form--activateaccount">
-                <div class="form__group">
-                    <button class="button button--green" onClick={ handleActivationClick }>Activate</button>
+            <form className="form form--activateaccount">
+                <div className="form__group">
+                    <button className="button button--green" onClick={ handleActivationClick }>Activate</button>
                 </div>
             </form>
         </div>
