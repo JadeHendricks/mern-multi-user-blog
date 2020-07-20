@@ -827,6 +827,11 @@ strong {
     justify-self: end;
     color: #999; }
 
+    /*Toastify*/
+    .Toastify__toast  {
+      font-size: 1.4rem;
+      padding: 1rem;
+    }
 
     /*LOADER CSS*/
     @keyframes rotate-one {

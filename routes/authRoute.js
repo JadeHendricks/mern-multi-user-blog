@@ -1,21 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const { register, logout, protect, login, isLoggedIn, accountActivation, forgotPassword, resetPassword } = require('../controllers/authController');
+const authController = require('../controllers/authController');
 const { runValidation } = require('../validators/index');
-const { 
-    userRegisterValidator, 
-    userloginValidator, 
-    forgotPasswordValidator, 
-    resetPasswordValidator } = require('../validators/auth');
+const { userRegisterValidator, userloginValidator, forgotPasswordValidator, resetPasswordValidator } = require('../validators/auth');
 
-router.post('/register', userRegisterValidator, runValidation, register);
-router.post('/account-activation', accountActivation);
-router.post('/login', userloginValidator, runValidation, login);
+router.post('/register', userRegisterValidator, runValidation, authController.register);
+router.post('/account-activation', authController.accountActivation);
+router.post('/login', userloginValidator, runValidation, authController.login);
 
-router.put('/forgot-password', forgotPasswordValidator, runValidation, forgotPassword);
-router.put('/reset-password', resetPasswordValidator, runValidation, resetPassword);
+router.put('/forgot-password', forgotPasswordValidator, runValidation, authController.forgotPassword);
+router.put('/reset-password', resetPasswordValidator, runValidation, authController.resetPassword);
 
-router.get('/isloggedin', isLoggedIn);
-router.get('/logout', logout);
+router.get('/isloggedin', authController.isLoggedIn);
+router.get('/logout', authController.logout);
 
 module.exports = router;

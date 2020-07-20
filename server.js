@@ -12,6 +12,7 @@ const xss = require('xss-clean');
 const rateLimit = require('express-rate-limit');
 const authRouter = require('./routes/authRoute');
 const userRouter = require('./routes/userRoute');
+const postRouter = require('./routes/postRoute');
 
 dotenv.config();
 const connectDB = require('./db');
@@ -41,3 +42,4 @@ app.use(hpp());
 
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
+app.use('/api/post', postRouter);
