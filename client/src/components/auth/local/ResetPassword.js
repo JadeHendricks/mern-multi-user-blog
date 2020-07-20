@@ -33,7 +33,7 @@ const ResetPassword = ({ match }) => {
             </p>
             <form class="form form--resetPassword" onSubmit={ handleOnSubmit }>
                 <div class="form__group">
-                    <label class="form__label" for="newpassword">New Password</label>
+                    <label class="form__label" htmlFor="newpassword">New Password</label>
                     <input class="form__input" id="newpassword" onChange={ handleOnChange } name="newpassword" type="password" placeholder="••••••••" />
                 </div>
                 <div class="form__group">

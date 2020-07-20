@@ -22,7 +22,6 @@ const FullPost = () => {
                         </div>
                         <h1 className="post__title">How to build your professional network</h1>
                     </div>
-
                     <div className="post__user">
                         <div className="post__user-block">
                             <img className="post__user-icon" src="./images/jade-hendricks.jpg" alt="Photo of Jade Hendricks" title="Photo of Jade Hendricks" />

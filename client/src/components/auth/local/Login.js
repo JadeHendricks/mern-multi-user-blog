@@ -26,11 +26,11 @@ const Login = () => {
             <h2 className="login-form__title">Log into your account</h2>
             <form className="form form--login" onSubmit={ handleOnSubmit }>
                 <div className="form__group">
-                    <label className="form__label" for="email">Email address</label>
+                    <label className="form__label" htmlFor="email">Email address</label>
                     <input className="form__input" id="email" name="email" type="email" onChange={ handleOnChange }  placeholder="you@example.com" />
                 </div>
                 <div className="form__group">
-                    <label className="form__label" for="password">Password</label>
+                    <label className="form__label" htmlFor="password">Password</label>
                     <input className="form__input" id="password" name="password" onChange={ handleOnChange } type="password" placeholder="••••••••" />
                 </div>
                 <div className="form__group">

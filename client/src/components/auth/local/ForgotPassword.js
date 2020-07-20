@@ -22,7 +22,7 @@ const ForgotPassword = () => {
             </p>
             <form className="form form--forgotpassword" onSubmit={ handleOnSubmit }>
                 <div className="form__group">
-                    <label className="form__label" for="email">Email address</label>
+                    <label className="form__label" htmlFor="email">Email address</label>
                     <input className="form__input" id="email" onClick={ handleOnChange } name="email" type="email" placeholder="you@example.com" />
                 </div>
                 <div className="form__group">

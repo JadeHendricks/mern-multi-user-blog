@@ -27,15 +27,15 @@ const Register = () => {
             <h2 className="login-form__title">Create your account!</h2>
             <form className="form form--signup" onSubmit={ handleOnSubmit }>
                 <div className="form__group">
-                    <label className="form__label" for="name">Name</label>
+                    <label className="form__label" htmlFor="name">Name</label>
                     <input className="form__input" id="name" onChange={ handleOnChange } type="text" placeholder="John Doe" />
                 </div>
                 <div className="form__group">
-                    <label className="form__label" for="email">Email address</label>
+                    <label className="form__label" htmlFor="email">Email address</label>
                     <input className="form__input" id="email" onChange={ handleOnChange } type="email" placeholder="you@example.com" />
                 </div>
                 <div className="form__group">
-                    <label className="form__label" for="password">Password</label>
+                    <label className="form__label" htmlFor="password">Password</label>
                     <input className="form__input" id="password" onChange={ handleOnChange } type="password" placeholder="••••••••" />
                 </div>
                 <div className="form__group">

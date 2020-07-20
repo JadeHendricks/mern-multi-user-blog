@@ -26,7 +26,7 @@ function App (props) {
       <AuthState>
       <Fragment>
         <Loader />
-        <ToastContainer autoClose={ 4000 } pauseOnHover={ false }/>
+        <ToastContainer autoClose={ 4000 } pauseOnHover={ false } />
         <Navigation />
         <main className="main">
           <Switch>
@@ -36,7 +36,7 @@ function App (props) {
             <Route path='/forgot-password' exact component={ ForgotPassword } />
             <Route path='/auth/password/reset/:token' exact component={ ResetPassword } />
             <Route path='/auth/activate/:token' history={props.history} exact component={ ActivateAccount } />
-            <Route path='/create-post/:id' history={props.history} exact component={ PostFrom } />
+            <Route path='/create-post' history={props.history} exact component={ PostFrom } />
             <Route path='/post/:id' history={props.history} exact component={ FullPost } />
             <Route path='/profile/:id' history={props.history} exact component={ AccountProfile } />
             <PrivateRoute path='/random' exact component={ Random } />
