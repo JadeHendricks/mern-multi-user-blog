@@ -19,31 +19,34 @@ import FullPost from './components/post/FullPost';
 import AccountProfile from './components/account/AccountProfile';
 
 import AuthState from "./context/authContext/AuthState";
+import PostState from "./context/postContext/PostState";
 
 function App (props) {
   return (
     <Router>
       <AuthState>
-      <Fragment>
-        <Loader />
-        <ToastContainer autoClose={ 4000 } pauseOnHover={ false } />
-        <Navigation />
-        <main className="main">
-          <Switch>
-            <Route path='/' exact component={ Base } />
-            <Route path='/register' exact component={ Register } />
-            <Route path='/login' exact component={ Login } />
-            <Route path='/forgot-password' exact component={ ForgotPassword } />
-            <Route path='/auth/password/reset/:token' exact component={ ResetPassword } />
-            <Route path='/auth/activate/:token' history={props.history} exact component={ ActivateAccount } />
-            <Route path='/create-post' history={props.history} exact component={ PostFrom } />
-            <Route path='/post/:id' history={props.history} exact component={ FullPost } />
-            <Route path='/profile/:id' history={props.history} exact component={ AccountProfile } />
-            <PrivateRoute path='/random' exact component={ Random } />
-          </Switch>
-        </main>
-        <Footer />
-      </Fragment>
+      <PostState>
+        <Fragment>
+          <Loader />
+          <ToastContainer autoClose={ 4000 } pauseOnHover={ false } />
+          <Navigation />
+          <main className="main">
+            <Switch>
+              <Route path='/' exact component={ Base } />
+              <Route path='/register' exact component={ Register } />
+              <Route path='/login' exact component={ Login } />
+              <Route path='/forgot-password' exact component={ ForgotPassword } />
+              <Route path='/auth/password/reset/:token' exact component={ ResetPassword } />
+              <Route path='/auth/activate/:token' history={props.history} exact component={ ActivateAccount } />
+              <Route path='/create-post' history={props.history} exact component={ PostFrom } />
+              <Route path='/post/:id' history={props.history} exact component={ FullPost } />
+              <Route path='/profile/:id' history={props.history} exact component={ AccountProfile } />
+              <PrivateRoute path='/random' exact component={ Random } />
+            </Switch>
+          </main>
+          <Footer />
+        </Fragment>
+      </PostState>
       </AuthState>
     </Router>
 
