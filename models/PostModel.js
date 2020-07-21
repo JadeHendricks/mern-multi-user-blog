@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const postSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
+    },
     title: {
         type: String,
         trim: true,
@@ -17,8 +21,12 @@ const postSchema = new mongoose.Schema({
     description: {
         type: String,
         required: true,
+    },
+    date: {
+        type: Date,
+        default: Date.now
     }
-}, { timestamps: true });
+});
 
 
 module.exports = Post = mongoose.model('Post', postSchema);

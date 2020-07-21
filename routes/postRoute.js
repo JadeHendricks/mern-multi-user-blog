@@ -5,13 +5,13 @@ const authController = require('../controllers/authController');
 
 router
     .route('/')
-    .get(postController.getAllPosts);
+    .get(postController.getAllPosts)
+    .post(authController.protect, postController.createPost);
 
 router
     .route('/:id')
-    .get(postController.getPost)
+    .get(authController.protect, postController.getPost)
     .put(authController.protect, postController.editPost)
-    .post(authController.protect, postController.createPost)
     .delete(authController.protect, postController.deletePost);
 
 module.exports = router;

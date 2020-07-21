@@ -171,7 +171,7 @@ exports.protect = async (req, res, next) => {
             message: 'The user belonging to this token no longer exists'
         });
     }
-
+    console.log(token);
     req.user = currentUser;
     next();
 }

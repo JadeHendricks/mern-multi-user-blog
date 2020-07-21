@@ -2,7 +2,7 @@ const Post = require('../models/PostModel');
 
 exports.getAllPosts = async (req, res) => { 
     try {
-        const posts = await Post.find();
+        const posts = await Post.find().populate('user', ['name', 'email']);;
         
         if (!posts) {
             return res.status(404).json({
@@ -25,10 +25,10 @@ exports.getAllPosts = async (req, res) => {
 
 exports.getPost = async (req, res) => { 
     try {
-        const post = await Post.findById(req.params.id);
+        const post = await Post.findById(req.params.id).populate('user', ['name', 'email']);
         if (!post) {
           return res.status(404).json({ 
-              msg: 'Post not found' 
+            message: 'Post not found' 
           });
         }
     
@@ -38,25 +38,28 @@ exports.getPost = async (req, res) => {
       } catch (err) {
         console.error(err.message);
         if (err.kind === 'ObjectId') {
-          return res.status(404).json({ msg: 'Post not found' })
+          return res.status(404).json({ message: 'Post not found' })
         }
-        res.status(500).send('Server Error');
+        res.status(500).json({
+            message: err
+        });
       }
 }
 
 exports.createPost = async (req, res) => { 
     const { title, tag, description } = req.body;
     try {
-        const post = await Post.create({ title, tag, description });
+        const post = await Post.create({ title, tag, description, user: req.user._id });
         res.status(201).json({
             message: 'Post has been created',
             post
         });   
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Server Error');
+        res.status(500).json({
+            message: err
+        });
     }
-
 }
 
 exports.deletePost = async (req, res) => { 
@@ -64,21 +67,23 @@ exports.deletePost = async (req, res) => {
         const post = await Post.findById(req.params.id); 
 
         if (!post) {
-            return res.status(404).json({ msg: 'Post not found' })
+            return res.status(404).json({ message: 'Post not found' })
         }
         // Check user
         if (post.user.toString() !== req.user.id) {
-            return res.status(401).json({ msg: 'This post does not belong to you' });
+            return res.status(401).json({ message: 'This post does not belong to you' });
         }
         await post.remove();
-        res.json({ msg: 'Post removed' });
+        res.json({ message: 'Post removed' });
 
     } catch (err) {
-      console.error(err.message);
-      if (err.kind === 'ObjectId') {
-        return res.status(404).json({ msg: 'Post not found' })
-      }
-      res.status(500).send('Server Error');
+        console.error(err.message);
+        if (err.kind === 'ObjectId') {
+            return res.status(404).json({ message: 'Post not found' })
+        }
+        res.status(500).json({
+            message: err
+        });
     }
 }
 
