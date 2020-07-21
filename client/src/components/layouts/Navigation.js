@@ -2,6 +2,8 @@ import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import AuthContext from '../../context/authContext/AuthContext';
 import { withRouter } from 'react-router-dom';
+import SiteLogoW from '../../assets/images/logo-white.png';
+import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 
 const Navigation = () => {
 
@@ -15,7 +17,7 @@ const Navigation = () => {
                 <Link to='/' className="nav__el">All Posts</Link>
             </nav>
             <div className="header__logo">
-                <Link to='/'><img src="./images/logo-white.png" alt="" /></Link>
+                <Link to='/'><img src={ SiteLogoW } alt="Multi User Blog" title="Multi User Blog"/></Link>
             </div>
             { !isAuthenticated &&  (
                 <nav className="nav nav__user">
@@ -28,7 +30,7 @@ const Navigation = () => {
                 <nav className="nav nav__user">
                     <Link to='create-post' className="nav__el button button--green">Create Post</Link>
                     <Link className="nav__el" to="/profile/me">
-                        <img className="nav__user-img" src="./images/jade-hendricks.jpg" alt={user.name} title={user.name} />
+                        <img className="nav__user-img" src={ placeholderUserImage } alt={ user && user.name } title={ user && user.name } />
                         <span>{ user && user.name.split(' ')[0] }</span>
                     </Link>
                     <a className="nav__el nav__el--logout" onClick={ onLogout }>Log out</a>

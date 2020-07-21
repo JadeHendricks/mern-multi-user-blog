@@ -1,10 +1,11 @@
 import React from 'react';
+import placeholderFooterImage from '../../assets/images/logo-green.png';
 
 const Footer = () => {
     return (
         <footer className="footer">
             <div className="footer__logo">
-                <img src="./images/logo-green.png" alt="Natour logo" />
+                <img src={ placeholderFooterImage } alt="Multi User Blog" title="Multi User Blog"/>
             </div>
             <ul className="footer__nav">
                 <li><a href="#">About us</a></li>

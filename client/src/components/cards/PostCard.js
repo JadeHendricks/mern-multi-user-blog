@@ -1,19 +1,21 @@
 import React from 'react';
 import svg from '../../assets/images/icons/sprite.svg'
+import { Link } from 'react-router-dom';
+import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
+import placeholderPostImage from '../../assets/images/seven-img1.png';
 
-const PostCard = () => {
+const PostCard = ({ post: { _id, title, date, tag, description, user } }) => {
     return (
         <div className="card">
-            <div className="card__header">
-                <img className="card__image" src="https://via.placeholder.com/200" alt="BlogTitle" title="BlogTitle" />
-                <h5 className="card__tag">ipsum dolor</h5>
-            </div>
+            <Link to={`/post/${_id}`}>
+                <div className="card__header">
+                    <img className="card__image" src={ placeholderPostImage } alt={ title && title } title={ title && title } />
+                    <h5 className="card__tag">{ tag && tag }</h5>
+                </div>
+            </Link>
             <div className="card__details">
-                <h4 className="card__title">Consectetur amet adipisicing.</h4>
-                <p className="card__description">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-                    Quisquam sunt minus voluptatem ex minima sed vitae, praesentium
-                </p>
+                <Link to={`/post/${_id}`} className="card__title">{ title && title }</Link>
+                <p className="card__description">{ description && description }</p>
                 <div className="card__interaction">
                     <div className="card__interaction-block">
                         <svg className="card__interaction-icon">
@@ -29,13 +31,15 @@ const PostCard = () => {
                     </div>
                 </div>
             </div>
-            <div className="card__user">
-                <img className="card__user-image" src="./images/jade-hendricks.jpg" alt="UserName" title="UserName" />
-                <div className="card__user-info">
-                    <div>John Doe</div>
-                    <div>Posted on: 2 December 2020</div>
+            <Link to={`/profile/${user._id}`}>
+                <div className="card__user">
+                    <img className="card__user-image" src={ placeholderUserImage } alt={ user && user.name } title={ user && user.name } />
+                    <div className="card__user-info">
+                        <div>{ user && user.name }</div>
+                        <div>Posted on: { date }</div>
+                    </div>
                 </div>
-            </div>
+            </Link>
         </div>
     )
 }
