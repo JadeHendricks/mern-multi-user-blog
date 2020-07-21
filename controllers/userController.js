@@ -1,7 +1,6 @@
 const User = require('../models/UserModel');
 
 exports.getMe = async (req, res) => {
-    console.log(req.user);
     try {
         const user = await User.findById(req.user._id);
         if (!user) {

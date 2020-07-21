@@ -40,7 +40,6 @@ const AuthState = props => {
   const loadUser = async () => {
     try {
       const res = await axios.get('/api/user/me');
-      console.log(res.data);
       dispatch({ type: USER_LOADED, payload: res.data.user });
     } catch (err) {
       dispatch({ type: AUTH_ERROR });

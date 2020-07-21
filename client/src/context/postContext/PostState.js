@@ -19,7 +19,7 @@ const PostState = props => {
 
     const getAllPosts = async () => { 
         try {
-            const res = await axios.get('/api/user');
+            const res = await axios.get('/api/post');
             dispatch({ 
                 type: GET_ALL_POSTS, 
                 payload: res.data.posts
@@ -34,10 +34,10 @@ const PostState = props => {
 
     const getPost = async (id) => {
         try {
-            const res = await axios.get(`/api/user/${id}`);
+            const res = await axios.get(`/api/post/${id}`);
             dispatch({ 
                 type: GET_POST, 
-                payload: res.data
+                payload: res.data.post
             });
         } catch (err) {
             dispatch({
@@ -49,9 +49,9 @@ const PostState = props => {
 
     const createPost = async (title, tag, description, user) => { 
         const config = { headers: {'Content-Type': 'application/json'} };
-        const body = JSON.stringify({ title, tag, body, user });
+        const body = JSON.stringify({ title, tag, description, user });
         try {
-            const res = await axios.post('/api/user', body, config);
+            const res = await axios.post('/api/post', body, config);
             dispatch({
                 type: CREATE_POST,
                 payload: res.data.post
