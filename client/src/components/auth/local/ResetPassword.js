@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 const ResetPassword = ({ match }) => {
     const { resetPassword } = useContext(AuthContext);
     const [values, setValues] = useState({ name: '', token: '', newPassword: ''});
-    const { name, token, newPassword } = values;
+    const { token, newPassword } = values;
 
     useEffect(() => {
         let token = match.params.token;

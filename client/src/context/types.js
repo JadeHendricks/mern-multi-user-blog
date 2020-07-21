@@ -7,7 +7,8 @@ export const LOGOUT = 'LOGOUT';
 
 // POSTS
 export const GET_POST = 'GET_POST';
-export const GET_ALLPOSTS = 'GET_ALLPOSTS';
+export const GET_ALL_POSTS = 'GET_ALLPOSTS';
 export const CREATE_POST = 'CREATE_POST';
 export const EDIT_POST = 'EDIT_POST';
 export const POST_ERROR = 'POST_ERROR';
+export const DELETE_POST = 'DELETE_POST';

@@ -37,42 +37,11 @@ const AuthState = props => {
     }
   }
 
-  const externalAuthentication = (response) => {
-    toast.success('Login successful, welcome to the Mern Authentication Boilerplate.');
-    setTimeout(() => {
-      dispatch({ type: USER_LOADED, payload: response.data.user});
-    }, 4000);
-  }
-
-  const externalResponse = async (response) => {
-    if (response.graphDomain === 'facebook') {
-      const config = { headers: {'Content-Type': 'application/json'} };
-      const body = JSON.stringify({ accessToken: response.accessToken, userID: response.userID });
-  
-      try {
-          const res = await axios.post('/api/auth/facebook-login', body, config);
-          externalAuthentication(res)  
-      } catch (err) {
-        dispatch({ type: AUTH_ERROR });
-      } 
-    } else {
-      const config = { headers: {'Content-Type': 'application/json'} };
-      const body = JSON.stringify({ idToken: response.tokenId });
-
-      try {
-        const res = await axios.post('/api/auth/google-login', body, config);   
-        externalAuthentication(res);
-      } catch (err) {
-          toast.error(err.response.data.message);
-          dispatch({ type: AUTH_ERROR });
-      } 
-    }
-  }
-
   const loadUser = async () => {
     try {
-      const res = await axios.get('/api/user');
-      dispatch({ type: USER_LOADED, payload: res.data });
+      const res = await axios.get('/api/user/me');
+      console.log(res.data);
+      dispatch({ type: USER_LOADED, payload: res.data.user });
     } catch (err) {
       dispatch({ type: AUTH_ERROR });
     }
@@ -177,13 +146,12 @@ const AuthState = props => {
       isAuthenticated: state.isAuthenticated,
       loading: state.loading,
       user: state.user,
-      externalAuthentication,
       register,
       login,
       logout,
       resetPassword,
       forgotPassword,
-      externalResponse,
+
       activateAccount,
       loadUser
     }}>
