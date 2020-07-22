@@ -72,6 +72,7 @@ const PostState = props => {
                 type: DELETE_POST, 
                 payload: id 
             });
+            toast.success('Post has been deleted');
         } catch (err) {
             dispatch({
                 type: POST_ERROR,

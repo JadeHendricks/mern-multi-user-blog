@@ -6,7 +6,7 @@ import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 import placeholderPostImage from '../../assets/images/seven-img1.png';
 
 const FullPost = ({ match, history }) => {
-    const { post, getPost, loading } = useContext(PostContext);
+    const { post, getPost, deletePost } = useContext(PostContext);
     const { user } = useContext(AuthContext);
 
     useEffect(() => {
@@ -21,6 +21,7 @@ const FullPost = ({ match, history }) => {
         }
         return false;
     }
+
     
     return (
         <Fragment>
@@ -29,7 +30,7 @@ const FullPost = ({ match, history }) => {
                     { isUsersPosts() && (
                         <div className="author-options">
                             <button className="button button--yellow">Edit Post</button>
-                            <button className="button button--red">Delete Post</button>
+                            <button className="button button--red" onClick={ () => deletePost(post._id) }>Delete Post</button>
                         </div>
                     ) }
                     <div className="back-button">
