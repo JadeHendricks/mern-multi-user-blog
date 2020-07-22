@@ -12,3 +12,8 @@ export const CREATE_POST = 'CREATE_POST';
 export const EDIT_POST = 'EDIT_POST';
 export const POST_ERROR = 'POST_ERROR';
 export const DELETE_POST = 'DELETE_POST';
+
+// USERS
+export const GET_USER = 'GET_USER';
+export const GET_ALL_USERS = 'GET_ALL_USERS';
+export const USER_ERROR = 'USER_ERROR';
