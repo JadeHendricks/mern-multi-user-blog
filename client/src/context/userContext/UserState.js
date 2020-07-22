@@ -9,8 +9,8 @@ import { GET_USER, GET_ALL_USERS, USER_ERROR  } from '../types';
 const UserState = props => {
 
     const initialState = {
-        notAuthUser: null,
-        allUsers: null,
+        user: null,
+        users: null,
         loading: true,
         error: null
     };
@@ -49,8 +49,8 @@ const UserState = props => {
 
     return (
         <UserContext.Provider value={{
-            notAuthUser: state.notAuthUser,
-            allUsers: state.allUsers,
+            user: state.notAuthUser,
+            users: state.allUsers,
             loading: state.loading,
             error: state.error,
             getUser,

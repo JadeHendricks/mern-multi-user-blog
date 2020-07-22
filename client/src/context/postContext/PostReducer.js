@@ -30,10 +30,14 @@ export default ( state, action ) => {
             return {
 
             }  
+        case CLEAR_POST:
         case POST_ERROR: 
             return {
                 ...state,
-                error: action.payload
+                posts: [],
+                post: null,
+                loading: true,
+                error: null
             }   
         default: 
         return state;

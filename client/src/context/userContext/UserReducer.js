@@ -5,20 +5,21 @@ export default ( state, action ) => {
         case GET_ALL_USERS: 
             return {
                 ...state,
-                allUsers: action.payload,
+                users: action.payload,
                 loading: false,
             }
         case GET_USER: 
             return {
                 ...state,
-                notAuthUser: action.payload,
+                user: action.payload,
                 loading: false,
             }
         case USER_ERROR: 
+        case CLEAR_USER: 
             return {
                 ...state,
-                notAuthUser: null,
-                allUsers: null,
+                user: null,
+                users: null,
                 loading: true,
             }
         default: 

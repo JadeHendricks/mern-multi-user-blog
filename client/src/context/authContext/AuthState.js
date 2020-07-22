@@ -150,7 +150,6 @@ const AuthState = props => {
       logout,
       resetPassword,
       forgotPassword,
-
       activateAccount,
       loadUser
     }}>
