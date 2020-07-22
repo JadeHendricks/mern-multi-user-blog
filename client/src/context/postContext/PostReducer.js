@@ -1,4 +1,4 @@
-import { GET_POST, GET_ALL_POSTS, CREATE_POST, EDIT_POST, DELETE_POST, POST_ERROR  } from '../types';
+import { GET_POST, GET_ALL_POSTS, CREATE_POST, EDIT_POST, DELETE_POST, CLEAR_POST, POST_ERROR  } from '../types';
   
 export default ( state, action ) => {
     switch (action.type) {

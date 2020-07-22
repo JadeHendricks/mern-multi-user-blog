@@ -1,10 +1,20 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect, useContext } from 'react';
 import svg from '../../assets/images/icons/sprite.svg'
 import AccountPosts from './AccountPosts';
 import AccountLikedPosts from './AccountLikedPosts';
 import AccountSettings from './AccountSettings';
+import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
+import placeholderPostImage from '../../assets/images/seven-img1.png';
+import UserContext from '../../context/userContext/UserContext';
 
-const Profile = () => {
+const Profile = ({ match }) => {
+
+    const { getUser, user } = useContext(UserContext);
+
+    useEffect(() => {
+        getUser(match.params.id);
+    }, []);
+
     return (
         <Fragment>
             <div className="post">
@@ -12,10 +22,10 @@ const Profile = () => {
                     <div className="container">
                         <div className="user-header">
                             <div className="user-header__image">
-                                <img src="./images/jade-hendricks.jpg" alt="Photo of Jade Hendricks" title="Photo of Jade Hendricks" />
+                                <img src={ placeholderUserImage } alt={ user && user.name } title={ user && user.name } />
                             </div>
                             <div className="user-header__info">
-                                <h3 className="user-header__info-name">Lorem ipsum</h3>
+                                <h3 className="user-header__info-name">{ user && user.name }</h3>
                                 <p className="user-header__info-description">
                                     Lorem ipsum dolor sit amet consectetur adipisicing elit. 
                                     Corporis iusto quasi, quidem molestias aperiam in earum deleniti amet incidunt possimus.
@@ -36,22 +46,22 @@ const Profile = () => {
                     </div>
                 </div>
             </div>
-            <div class="container">
-                <div class="account">
-                    <aside class="account__options">
-                        <nav class="account-nav">
-                            <ul class="account-nav__ul">
-                                <li class="account-nav__el"><a href="#">All posts</a></li>
-                                <li class="account-nav__el"><a href="#">Liked posts</a></li>
-                                <li class="account-nav__el"><a href="#">Account settings</a></li>
+            <div className="container">
+                <div className="account">
+                    <aside className="account__options">
+                        <nav className="account-nav">
+                            <ul className="account-nav__ul">
+                                <li className="account-nav__el"><a href="#">All posts</a></li>
+                                <li className="account-nav__el"><a href="#">Liked posts</a></li>
+                                <li className="account-nav__el"><a href="#">Account settings</a></li>
                             </ul>
                         </nav>
                     </aside>
-                    <main class="account__view">
-                        <h2 class="account__view-title">All Your Posts</h2>
-                        <AccountPosts />
+                    <main className="account__view">
+                        <h2 className="account__view-title">All Your Posts</h2>
+                        {/* <AccountPosts />
                         <AccountLikedPosts />
-                        <AccountSettings />
+                        <AccountSettings /> */}
                     </main>
                 </div>
             </div>

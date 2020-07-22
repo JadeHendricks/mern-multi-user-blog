@@ -1,4 +1,4 @@
-import { GET_USER, GET_ALL_USERS, USER_ERROR  } from '../types';
+import { GET_USER, GET_ALL_USERS, CLEAR_USER, USER_ERROR  } from '../types';
   
 export default ( state, action ) => {
     switch (action.type) {
@@ -8,7 +8,8 @@ export default ( state, action ) => {
                 users: action.payload,
                 loading: false,
             }
-        case GET_USER: 
+        case GET_USER:
+            console.log(action.payload); 
             return {
                 ...state,
                 user: action.payload,
@@ -18,9 +19,9 @@ export default ( state, action ) => {
         case CLEAR_USER: 
             return {
                 ...state,
-                user: null,
-                users: null,
-                loading: true,
+                user: {},
+                users: [],
+                loading: true
             }
         default: 
         return state;

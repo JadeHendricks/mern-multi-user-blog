@@ -4,13 +4,13 @@ import UserReducer from './UserReducer';
 import { toast } from 'react-toastify';
 import { withRouter } from 'react-router-dom';
 import axios from 'axios';
-import { GET_USER, GET_ALL_USERS, USER_ERROR  } from '../types';
+import { GET_USER, GET_ALL_USERS, CLEAR_USER, USER_ERROR  } from '../types';
 
 const UserState = props => {
 
     const initialState = {
-        user: null,
-        users: null,
+        user: {},
+        users: [],
         loading: true,
         error: null
     };
@@ -49,8 +49,8 @@ const UserState = props => {
 
     return (
         <UserContext.Provider value={{
-            user: state.notAuthUser,
-            users: state.allUsers,
+            user: state.user,
+            users: state.users,
             loading: state.loading,
             error: state.error,
             getUser,

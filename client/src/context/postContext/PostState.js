@@ -4,7 +4,7 @@ import PostReducer from './PostReducer';
 import { toast } from 'react-toastify';
 import { withRouter } from 'react-router-dom';
 import axios from 'axios';
-import { GET_ALL_POSTS, GET_POST, CREATE_POST, DELETE_POST, EDIT_POST, POST_ERROR  } from '../types';
+import { GET_ALL_POSTS, GET_POST, CREATE_POST, DELETE_POST, EDIT_POST, CLEAR_POST, POST_ERROR  } from '../types';
 
 const PostState = props => {
 
