@@ -51,7 +51,7 @@ exports.createPost = async (req, res) => {
     try {
         const post = await Post.create({ title, tag, description, user: req.user._id });
         res.status(201).json({
-            message: 'Post has been created',
+            message: `Post "${title}", has been created`,
             post
         });   
     } catch (err) {

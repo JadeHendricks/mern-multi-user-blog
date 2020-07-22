@@ -47,9 +47,9 @@ const PostState = props => {
         }
     }
 
-    const createPost = async (title, tag, description, user) => { 
+    const createPost = async (title, tag, description) => { 
         const config = { headers: {'Content-Type': 'application/json'} };
-        const body = JSON.stringify({ title, tag, description, user });
+        const body = JSON.stringify({ title, tag, description });
         try {
             const res = await axios.post('/api/post', body, config);
             dispatch({

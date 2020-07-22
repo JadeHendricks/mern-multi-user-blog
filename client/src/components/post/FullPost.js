@@ -1,26 +1,39 @@
 import React, { Fragment, useContext, useEffect } from 'react';
 import svg from '../../assets/images/icons/sprite.svg'
 import PostContext from '../../context/postContext/PostContext';
+import AuthContext from '../../context/authContext/AuthContext';
 import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 import placeholderPostImage from '../../assets/images/seven-img1.png';
 
-const FullPost = ({ match }) => {
-    const { post, getPost } = useContext(PostContext);
+const FullPost = ({ match, history }) => {
+    const { post, getPost, loading } = useContext(PostContext);
+    const { user } = useContext(AuthContext);
 
     useEffect(() => {
         getPost(match.params.id);
     }, []);
 
+    const isUsersPosts = () => {
+        if (post && user) {
+            if (post.user._id === user._id) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     return (
         <Fragment>
             <div className="post">
                 <div className="post__banner">
-                    <div className="author-options">
-                        <button className="button button--yellow">Edit Post</button>
-                        <button className="button button--red">Delete Post</button>
-                    </div>
+                    { isUsersPosts() && (
+                        <div className="author-options">
+                            <button className="button button--yellow">Edit Post</button>
+                            <button className="button button--red">Delete Post</button>
+                        </div>
+                    ) }
                     <div className="back-button">
-                        <button className="button button--white">Go back</button>
+                        <button className="button button--white" onClick={ () => history.goBack() }>Go back</button>
                     </div>
                 </div>
                 <div className="post__container">
