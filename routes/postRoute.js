@@ -8,7 +8,7 @@ const { updatePostValidator, createPostValidator } = require('../validators/post
 router
     .route('/')
     .get(postController.getAllPosts)
-    .post(createPostValidator, runValidation, authController.protect, postController.createPost);
+    .post(authController.protect, postController.createPost);
 
 router
     .route('/user/:id')
@@ -17,7 +17,7 @@ router
 router
     .route('/:id')
     .get(authController.protect, postController.getPost)
-    .put(updatePostValidator, runValidation, authController.protect, postController.editPost)
+    .put(authController.protect, postController.editPost)
     .delete(authController.protect, postController.deletePost);
 
 module.exports = router;

@@ -104,11 +104,23 @@ exports.getAllUsersPosts = async (req, res) => {
 }
 
 exports.editPost = async (req, res) => {
+
+    const { title, tag, description } = req.body;
+
+    const postFields = {};
+
+    if (title) postFields.title = title;
+    if (tag) postFields.tag = tag;
+    if (description) postFields.description = description;
+
+
     try {
-        const post = await Post.findByIdAndUpdate(req.params.id, req.body, {
-            new: true
-        });
-    
+        const post = await Post.findOneAndUpdate(
+            { user: req.user.id },
+            { $set: postFields },
+            { new: true, upsert: true }
+          );
+
         if (!post) {
             res.status(404).json({
                 message: 'No post found with that ID'
