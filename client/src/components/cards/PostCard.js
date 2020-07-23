@@ -5,6 +5,11 @@ import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 import placeholderPostImage from '../../assets/images/seven-img1.png';
 
 const PostCard = ({ post: { _id, title, date, tag, description, user } }) => {
+
+    const descriptionTrimmer = (desc) => {
+        return desc.slice(0, 150) + '...';
+    }
+
     return (
         <div className="card">
             <Link to={`/post/${_id}`}>
@@ -15,7 +20,7 @@ const PostCard = ({ post: { _id, title, date, tag, description, user } }) => {
             </Link>
             <div className="card__details">
                 <Link to={`/post/${_id}`} className="card__title">{ title && title }</Link>
-                <p className="card__description">{ description && description }</p>
+                <p className="card__description">{ descriptionTrimmer(description) }</p>
                 <div className="card__interaction">
                     <div className="card__interaction-block">
                         <svg className="card__interaction-icon">
@@ -36,7 +41,7 @@ const PostCard = ({ post: { _id, title, date, tag, description, user } }) => {
                     <img className="card__user-image" src={ placeholderUserImage } alt={ user && user.name } title={ user && user.name } />
                     <div className="card__user-info">
                         <div>{ user && user.name }</div>
-                        <div>Posted on: { date }</div>
+                        <div>Posted on: { date && date }</div>
                     </div>
                 </div>
             </Link>

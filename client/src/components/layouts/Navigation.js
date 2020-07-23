@@ -7,7 +7,7 @@ import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 
 const Navigation = () => {
 
-    const { isAuthenticated, user, logout } = useContext(AuthContext);
+    const { isAuthenticated, loggedInUser, logout } = useContext(AuthContext);
 
     const onLogout = () => logout();
 
@@ -29,9 +29,9 @@ const Navigation = () => {
             { isAuthenticated && (
                 <nav className="nav nav__user">
                     <Link to='/create-post' className="nav__el button button--green">Create Post</Link>
-                    <Link className="nav__el" to="/profile/me">
-                        <img className="nav__user-img" src={ placeholderUserImage } alt={ user && user.name } title={ user && user.name } />
-                        <span>{ user && user.name.split(' ')[0] }</span>
+                    <Link className="nav__el" to={`/profile/${loggedInUser._id}`}>
+                        <img className="nav__user-img" src={ placeholderUserImage } alt={ loggedInUser && loggedInUser.name } title={ loggedInUser && loggedInUser.name } />
+                        <span>{ loggedInUser && loggedInUser.name.split(' ')[0] }</span>
                     </Link>
                     <a className="nav__el nav__el--logout" onClick={ onLogout }>Log out</a>
                 </nav> 

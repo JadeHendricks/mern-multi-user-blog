@@ -1,18 +1,29 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import svg from '../../assets/images/icons/sprite.svg'
+import placeholderPostImage from '../../assets/images/seven-img1.png';
+import { Link } from 'react-router-dom';
+import PostContext from '../../context/postContext/PostContext';
 
-const ProfileCard = () => {
+const ProfileCard = ({ post: { _id, title, tag, description } }) => {
+
+    const { deletePost } = useContext(PostContext);
+
+    const descriptionTrimmer = (desc) => {
+        return desc.slice(0, 150) + '...';
+    }
+
     return (
         <div className="card">
+            <Link to={`/post/${_id}`}>
             <div className="card__header">
-                <img className="card__image" src="https://via.placeholder.com/200" alt="BlogTitle" title="BlogTitle" />
-                <h5 className="card__tag">ipsum dolor</h5>
+                <img className="card__image" src={ placeholderPostImage } alt={ title && title } title={ title && title } />
+                <h5 className="card__tag">{ tag && tag }</h5>
             </div>
+            </Link>
             <div className="card__details">
-                <h4 className="card__title">Consectetur amet adipisicing.</h4>
+                <Link to={`/post/${_id}`} className="card__title">{ title && title }</Link>
                 <p className="card__description">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-                    Quisquam sunt minus voluptatem ex minima sed vitae, praesentium
+                    { descriptionTrimmer(description) }
                 </p>
                 <div className="card__interaction">
                     <div className="card__interaction-block">
@@ -31,8 +42,8 @@ const ProfileCard = () => {
             </div>
             <div className="card__user">
                 <div className="card__user-options">
-                    <a href="#" className="button button--yellow">Edit post</a>
-                    <a href="#" className="button button--red">Delete post</a>
+                    <Link to={`/create-post`} className="button button--yellow">Edit post</Link>
+                    <Link onClick={ () => deletePost(_id) } className="button button--red">Delete post</Link>
                 </div>
             </div>
         </div>
