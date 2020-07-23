@@ -4,13 +4,14 @@ import PostReducer from './PostReducer';
 import { toast } from 'react-toastify';
 import { withRouter } from 'react-router-dom';
 import axios from 'axios';
-import { GET_ALL_POSTS, GET_POST, CREATE_POST, DELETE_POST, EDIT_POST, CLEAR_POST, POST_ERROR  } from '../types';
+import { GET_ALL_POSTS, GET_POST, CREATE_POST, DELETE_POST, EDIT_POST, CLEAR_POST, GET_USERS_POSTS, POST_ERROR  } from '../types';
 
 const PostState = props => {
 
     const initialState = {
         posts: [],
         post: null,
+        userPosts: [],
         loading: true,
         error: null
     };
@@ -81,19 +82,49 @@ const PostState = props => {
         }
     }
 
-    const editPost = async () => { console.log('edit-post') }
+    const editPost = async (id) => { 
+        try {
+            const res = await axios.put(`/api/post/${id}`);
+            dispatch({ 
+                type: EDIT_POST, 
+                payload: res.data.post 
+            });
+        } catch (err) {
+            dispatch({
+                type: POST_ERROR,
+                payload: err.response.message
+            });
+        }
+    }
+
+    const getAllUsersPosts = async (id) => { 
+        try {
+            const res = await axios.get(`/api/post/user/${id}`);
+            dispatch({
+                type: GET_USERS_POSTS,
+                payload: res.data.posts
+            });
+        } catch (err) {
+            dispatch({
+                type: POST_ERROR,
+                payload: err.response.message
+            });
+        }
+    }
 
     return (
         <PostContext.Provider value={{
             posts: state.posts,
             post: state.post,
+            userPosts: state.userPosts,
             loading: state.loading,
             error: state.error,
             getAllPosts,
             getPost,
             createPost,
             editPost,
-            deletePost
+            deletePost,
+            getAllUsersPosts
         }}>
           { props.children }
         </PostContext.Provider>

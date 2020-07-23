@@ -25,7 +25,7 @@ exports.getAllPosts = async (req, res) => {
 
 exports.getPost = async (req, res) => { 
     try {
-        const post = await Post.findById(req.params.id).populate('user', ['name', 'email', '_id']);;
+        const post = await Post.findById(req.params.id).populate('user', ['name', 'email', '_id']);
         if (!post) {
           return res.status(404).json({ 
             message: 'Post not found' 
@@ -87,4 +87,42 @@ exports.deletePost = async (req, res) => {
     }
 }
 
-exports.editPost = async (req, res) => { }
+exports.getAllUsersPosts = async (req, res) => { 
+    try {
+        const usersPosts = await Post.find({'user': req.params.id}).populate('user', ['name', 'email', '_id']);
+        res.status(200).json({
+            message: 'success',
+            results: usersPosts.length,
+            posts: usersPosts
+        });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({
+            message: err
+        });
+    }
+}
+
+exports.editPost = async (req, res) => {
+    try {
+        const post = await Post.findByIdAndUpdate(req.params.id, req.body, {
+            new: true
+        });
+    
+        if (!post) {
+            res.status(404).json({
+                message: 'No post found with that ID'
+            });
+        }
+    
+        res.status(200).json({
+            status: 'success',
+            post
+        });  
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({
+            message: err
+        }); 
+    }
+}

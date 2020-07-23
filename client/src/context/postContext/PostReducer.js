@@ -1,4 +1,4 @@
-import { GET_POST, GET_ALL_POSTS, CREATE_POST, EDIT_POST, DELETE_POST, CLEAR_POST, POST_ERROR  } from '../types';
+import { GET_POST, GET_ALL_POSTS, CREATE_POST, EDIT_POST, DELETE_POST, CLEAR_POST, GET_USERS_POSTS, POST_ERROR  } from '../types';
   
 export default ( state, action ) => {
     switch (action.type) {
@@ -14,6 +14,13 @@ export default ( state, action ) => {
                 post: action.payload,
                 loading: false
             }
+        case GET_USERS_POSTS: {
+            return {
+                ...state,
+                userPosts: action.payload,
+                loading: false
+            }
+        }
         case CREATE_POST: 
             return {
                 ...state,

@@ -13,7 +13,7 @@ const FullPost = ({ match, history }) => {
         getPost(match.params.id);
     }, []);
 
-    const isUsersPosts = () => {
+    const isLoggedInUser = () => {
         if (post && user) {
             if (post.user._id === user._id) {
                 return true;
@@ -27,7 +27,7 @@ const FullPost = ({ match, history }) => {
         <Fragment>
             <div className="post">
                 <div className="post__banner">
-                    { isUsersPosts() && (
+                    { isLoggedInUser() && (
                         <div className="author-options">
                             <button className="button button--yellow">Edit Post</button>
                             <button className="button button--red" onClick={ () => deletePost(post._id) }>Delete Post</button>
