@@ -42,7 +42,7 @@ function App (props) {
               <Route path='/auth/password/reset/:token' exact component={ ResetPassword } />
               <Route path='/auth/activate/:token' history={props.history} exact component={ ActivateAccount } />
               <Route path='/create-post' history={props.history} exact component={ CreatePost } />
-              <Route path='/edit-post' history={props.history} exact component={ EditPost } />
+              <Route path='/edit-post/:id' history={props.history} exact component={ EditPost } />
               <Route path='/post/:id' history={props.history} exact component={ Post } />
               <Route path='/profile/:id' history={props.history} exact component={ AccountProfile } />
               <PrivateRoute path='/random' exact component={ Random } />

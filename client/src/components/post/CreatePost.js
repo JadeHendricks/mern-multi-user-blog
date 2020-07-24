@@ -1,5 +1,6 @@
 import React, { Fragment, useContext, useState } from 'react';
 import PostContext from '../../context/postContext/PostContext';
+import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 
 const PostForm = () => {
 
@@ -48,7 +49,7 @@ const PostForm = () => {
                         <textarea className="form__input form__textarea" onChange={ handleOnChange } id="description" name="description" placeholder="Post goes here"></textarea>
                     </div>
                     <div className="form__group form__photo-upload">
-                        <img className="form__user-photo" src="./images/jade-hendricks.jpg" alt="User photo" />
+                        <img className="form__user-photo" src={ placeholderUserImage } alt="User photo" />
                         <input className="form__upload" type="file" accept="image/*" id="photo" name="photo" />
                         <label htmlFor="photo">Choose a blog post image</label>
                     </div>

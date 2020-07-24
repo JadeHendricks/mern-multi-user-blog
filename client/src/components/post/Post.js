@@ -1,6 +1,7 @@
 import React, { Fragment, useContext, useEffect } from 'react';
 import svg from '../../assets/images/icons/sprite.svg'
 import Loader from '../layouts/Loader';
+import { Link } from 'react-router-dom';
 import PostContext from '../../context/postContext/PostContext';
 import AuthContext from '../../context/authContext/AuthContext';
 import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
@@ -21,7 +22,7 @@ const FullPost = ({ match, history }) => {
                     <div className="post__banner">
                         { post.user._id === loggedInUser._id && (
                             <div className="author-options">
-                                <button className="button button--yellow">Edit Post</button>
+                                <Link to={`/edit-post/${post._id}`} className="button button--yellow">Edit Post</Link>
                                 <button className="button button--red" onClick={ () => deletePost(post._id) }>Delete Post</button>
                             </div>
                         ) }

@@ -88,7 +88,8 @@ const PostState = props => {
             dispatch({ 
                 type: EDIT_POST, 
                 payload: res.data.post 
-            });
+            });            
+            toast.success(res.data.message);
         } catch (err) {
             dispatch({
                 type: POST_ERROR,

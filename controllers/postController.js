@@ -128,7 +128,7 @@ exports.editPost = async (req, res) => {
         }
     
         res.status(200).json({
-            status: 'success',
+            message: 'Post has been updated',
             post
         });  
     } catch (err) {

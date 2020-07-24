@@ -42,7 +42,7 @@ const ProfileCard = ({ post: { _id, title, tag, description } }) => {
             </div>
             <div className="card__user">
                 <div className="card__user-options">
-                    <Link to={`/create-post/${_id}`} className="button button--yellow">Edit post</Link>
+                    <Link to={`/edit-post/${_id}`} className="button button--yellow">Edit post</Link>
                     <Link onClick={ () => deletePost(_id) } className="button button--red">Delete post</Link>
                 </div>
             </div>
