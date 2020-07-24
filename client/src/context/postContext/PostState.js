@@ -82,9 +82,11 @@ const PostState = props => {
         }
     }
 
-    const editPost = async (id) => { 
+    const editPost = async (id, title, tag, description) => { 
+        const config = { headers: {'Content-Type': 'application/json'} };
+        const body = JSON.stringify({ title, tag, description });
         try {
-            const res = await axios.put(`/api/post/${id}`);
+            const res = await axios.put(`/api/post/${id}`, body, config);
             dispatch({ 
                 type: EDIT_POST, 
                 payload: res.data.post 
