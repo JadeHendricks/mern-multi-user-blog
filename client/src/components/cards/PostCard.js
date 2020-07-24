@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import svg from '../../assets/images/icons/sprite.svg'
+import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
 import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 import placeholderPostImage from '../../assets/images/seven-img1.png';
@@ -41,7 +42,7 @@ const PostCard = ({ post: { _id, title, date, tag, description, user } }) => {
                     <img className="card__user-image" src={ placeholderUserImage } alt={ user.name } title={ user.name } />
                     <div className="card__user-info">
                         <div>{ user.name }</div>
-                        <div>Posted on: { date }</div>
+                        <div>Posted on: <Moment format="DD/MM/YYYY">{ date }</Moment></div>
                     </div>
                 </div>
             </Link>
