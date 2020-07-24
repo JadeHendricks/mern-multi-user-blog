@@ -26,8 +26,16 @@
     }
     &__title {
         margin-bottom: 1rem;
+        display: block;
+        color: $black;
         font-size: 2.2rem;
+        font-weight: 700;
+        text-decoration: none;
         cursor: pointer;
+        width: 95%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     &__description {
         line-height: 1.4;
@@ -52,6 +60,10 @@
         width: 2rem;
         height: 2rem;
         margin-right: 1rem;
+    }
+    &__user-link {
+        color: $black;
+        text-decoration: none;
     }
     &__user {
         display: flex;

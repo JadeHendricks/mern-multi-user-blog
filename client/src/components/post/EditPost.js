@@ -27,9 +27,9 @@ const PostForm = ({ match }) => {
             { !post ? <Loader /> :  (
                 <Fragment>
                     <div className="post">
-                        <div className="post__banner"></div>
+                        <div className="post__banner post__banner--edit"></div>
                     </div>
-                    <div className="create-post">
+                    <div className="create-post create-post--edit">
                         <div className="create-post__information">
                             <h1 className="create-post__title">Edit your blog post!</h1>
                             <p className="create-post__description">

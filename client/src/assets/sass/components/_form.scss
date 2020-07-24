@@ -145,6 +145,9 @@
     margin: 0 auto;
     transform: translateY(-40rem);
     color: $white;
+    &--edit {
+        color: $grey;
+    }
     &__title {
         color: currentColor;
         margin-bottom: 1rem;

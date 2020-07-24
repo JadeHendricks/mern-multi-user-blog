@@ -282,8 +282,16 @@ strong {
     padding: 3rem 2rem; }
   .card__title {
     margin-bottom: 1rem;
+    display: block;
+    color: #444444;
     font-size: 2.2rem;
-    cursor: pointer; }
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    width: 95%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; }
   .card__description {
     line-height: 1.4; }
   .card__interaction {
@@ -303,6 +311,9 @@ strong {
     width: 2rem;
     height: 2rem;
     margin-right: 1rem; }
+  .card__user-link {
+    color: #444444;
+    text-decoration: none; }
   .card__user {
     display: flex;
     align-items: center;
@@ -465,6 +476,8 @@ strong {
   margin: 0 auto;
   transform: translateY(-40rem);
   color: #ffffff; }
+  .create-post--edit {
+    color: #777777; }
   .create-post__title {
     color: currentColor;
     margin-bottom: 1rem; }
@@ -529,6 +542,8 @@ strong {
     position: absolute;
     left: 5rem;
     bottom: 5rem; }
+  .post__banner--edit {
+    background-image: linear-gradient(to right bottom, #fcd983, #f7c74f); }
 
 .post__banner--account {
   height: auto;
@@ -826,6 +841,7 @@ strong {
   .footer__copyright {
     justify-self: end;
     color: #999; }
+
 
     /*Toastify*/
     .Toastify__toast  {

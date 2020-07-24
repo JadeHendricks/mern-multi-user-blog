@@ -16,6 +16,9 @@
             left: 5rem;
             bottom: 5rem;
         }
+        &--edit {
+            background-image: linear-gradient(to right bottom, #fcd983, #f7c74f);  
+        }
     }
     &__banner--account {
         height: auto;
