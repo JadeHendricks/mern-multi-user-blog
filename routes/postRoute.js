@@ -11,6 +11,14 @@ router
     .post(authController.protect, postController.createPost);
 
 router
+    .route('/like/:id')
+    .put(authController.protect, postController.likePost)
+
+router
+    .route('/unlike/:id')
+    .put(authController.protect, postController.unlikePost)
+
+router
     .route('/user/:id')
     .get(postController.getAllUsersPosts);
 
