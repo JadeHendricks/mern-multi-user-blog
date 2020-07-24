@@ -30,8 +30,8 @@ const Navigation = () => {
                 <nav className="nav nav__user">
                     <Link to='/create-post' className="nav__el button button--green">Create Post</Link>
                     <Link className="nav__el" to={`/profile/${loggedInUser._id}`}>
-                        <img className="nav__user-img" src={ placeholderUserImage } alt={ loggedInUser && loggedInUser.name } title={ loggedInUser && loggedInUser.name } />
-                        <span>{ loggedInUser && loggedInUser.name.split(' ')[0] }</span>
+                        <img className="nav__user-img" src={ placeholderUserImage } alt={ loggedInUser.name } title={ loggedInUser.name } />
+                        <span>{ loggedInUser.name.split(' ')[0] }</span>
                     </Link>
                     <a className="nav__el nav__el--logout" onClick={ onLogout }>Log out</a>
                 </nav> 

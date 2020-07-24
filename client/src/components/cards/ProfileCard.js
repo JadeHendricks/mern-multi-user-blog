@@ -16,12 +16,12 @@ const ProfileCard = ({ post: { _id, title, tag, description } }) => {
         <div className="card">
             <Link to={`/post/${_id}`}>
             <div className="card__header">
-                <img className="card__image" src={ placeholderPostImage } alt={ title && title } title={ title && title } />
-                <h5 className="card__tag">{ tag && tag }</h5>
+                <img className="card__image" src={ placeholderPostImage } alt={ title } title={ title } />
+                <h5 className="card__tag">{ tag }</h5>
             </div>
             </Link>
             <div className="card__details">
-                <Link to={`/post/${_id}`} className="card__title">{ title && title }</Link>
+                <Link to={`/post/${_id}`} className="card__title">{ title }</Link>
                 <p className="card__description">
                     { descriptionTrimmer(description) }
                 </p>
@@ -42,7 +42,7 @@ const ProfileCard = ({ post: { _id, title, tag, description } }) => {
             </div>
             <div className="card__user">
                 <div className="card__user-options">
-                    <Link to={`/create-post`} className="button button--yellow">Edit post</Link>
+                    <Link to={`/create-post/${_id}`} className="button button--yellow">Edit post</Link>
                     <Link onClick={ () => deletePost(_id) } className="button button--red">Delete post</Link>
                 </div>
             </div>

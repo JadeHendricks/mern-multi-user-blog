@@ -14,8 +14,9 @@ import Footer from './components/layouts/Footer';
 import Loader from './components/layouts/Loader';
 import PrivateRoute from './components/routing/PrivateRoute';
 import Random from './components/layouts/Random';
-import PostFrom from './components/post/PostForm';
-import FullPost from './components/post/FullPost';
+import CreatePost from './components/post/CreatePost';
+import EditPost from './components/post/EditPost';
+import Post from './components/post/Post';
 import AccountProfile from './components/account/AccountProfile';
 
 import AuthState from "./context/authContext/AuthState";
@@ -40,8 +41,9 @@ function App (props) {
               <Route path='/forgot-password' exact component={ ForgotPassword } />
               <Route path='/auth/password/reset/:token' exact component={ ResetPassword } />
               <Route path='/auth/activate/:token' history={props.history} exact component={ ActivateAccount } />
-              <Route path='/create-post' history={props.history} exact component={ PostFrom } />
-              <Route path='/post/:id' history={props.history} exact component={ FullPost } />
+              <Route path='/create-post' history={props.history} exact component={ CreatePost } />
+              <Route path='/edit-post' history={props.history} exact component={ EditPost } />
+              <Route path='/post/:id' history={props.history} exact component={ Post } />
               <Route path='/profile/:id' history={props.history} exact component={ AccountProfile } />
               <PrivateRoute path='/random' exact component={ Random } />
             </Switch>

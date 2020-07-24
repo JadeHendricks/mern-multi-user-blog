@@ -35,7 +35,9 @@ export default ( state, action ) => {
             }
         case EDIT_POST: 
             return {
-
+                ...state,
+                post: action.payload,
+                loading: false
             }  
         case CLEAR_POST:
         case POST_ERROR: 
@@ -43,6 +45,7 @@ export default ( state, action ) => {
                 ...state,
                 posts: [],
                 post: null,
+                userPosts: [],
                 loading: true,
                 error: null
             }   
