@@ -4,7 +4,7 @@ import PostReducer from './PostReducer';
 import { toast } from 'react-toastify';
 import { withRouter } from 'react-router-dom';
 import axios from 'axios';
-import { GET_ALL_POSTS, GET_POST, CREATE_POST, DELETE_POST, EDIT_POST, CLEAR_POST, GET_USERS_POSTS, POST_ERROR  } from '../types';
+import { GET_ALL_POSTS, GET_POST, CREATE_POST, DELETE_POST, EDIT_POST, CLEAR_POST, GET_USERS_POSTS, UPDATE_LIKES, POST_ERROR  } from '../types';
 
 const PostState = props => {
 
@@ -40,6 +40,7 @@ const PostState = props => {
                 type: GET_POST, 
                 payload: res.data.post
             });
+            return res.data.post;
         } catch (err) {
             dispatch({
                 type: POST_ERROR,
@@ -115,6 +116,29 @@ const PostState = props => {
         }
     }
 
+    const likePost = async (id) => {
+       try {
+        await axios.put(`/api/post/like/${id}`);  
+       } catch (err) {
+        dispatch({
+            type: POST_ERROR,
+            payload: err.response.message
+        });
+       } 
+    }
+
+    const unlikePost = async (id) => {
+        try {
+         await axios.put(`/api/post/unlike/${id}`);  
+        } catch (err) {
+         dispatch({
+             type: POST_ERROR,
+             payload: err.response.message
+         });
+        } 
+     }
+
+
     return (
         <PostContext.Provider value={{
             posts: state.posts,
@@ -127,7 +151,9 @@ const PostState = props => {
             createPost,
             editPost,
             deletePost,
-            getAllUsersPosts
+            getAllUsersPosts,
+            likePost,
+            unlikePost
         }}>
           { props.children }
         </PostContext.Provider>

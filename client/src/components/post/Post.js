@@ -8,7 +8,7 @@ import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 import placeholderPostImage from '../../assets/images/seven-img1.png';
 
 const FullPost = ({ match, history }) => {
-    const { post, getPost, deletePost } = useContext(PostContext);
+    const { post, likePost, unlikePost, getPost, deletePost } = useContext(PostContext);
     const { loggedInUser } = useContext(AuthContext);
 
     useEffect(() => {
@@ -22,7 +22,10 @@ const FullPost = ({ match, history }) => {
                     <div className="post__banner">
                         { post.user._id === loggedInUser._id && (
                             <div className="author-options">
-                                <button className="button button--white">Like Post</button>
+                                { post.likes.filter(like => like.user == loggedInUser._id ) ? 
+                                    <button className="button" onClick={ () => unlikePost(post._id) }>Unlike</button> : 
+                                    <button className="button" onClick={ () => likePost(post._id) }>Like</button>
+                                }
                                 <Link to={`/edit-post/${post._id}`} className="button button--yellow">Edit Post</Link>
                                 <button className="button button--red" onClick={ () => deletePost(post._id) }>Delete Post</button>
                             </div>

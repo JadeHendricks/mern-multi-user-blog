@@ -5,27 +5,23 @@ import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 
 const PostForm = ({ match }) => {
 
-    const { editPost } = useContext(PostContext)
+    const { getPost, editPost } = useContext(PostContext)
 
     const [values, setValues] = useState({ title: '', tag: '', description: '', user: ''});
     const { title, tag, description, user } = values;
 
-    const getPost = async (id) => {
-        try {
-            const res = await axios.get(`/api/post/${id}`);
-            setValues({ 
-                title: res.data.post.title, 
-                tag: res.data.post.tag, 
-                description: res.data.post.description,
-                user: res.data.post.user,
-            });
-        } catch (err) {
-            console.error(err.response.message);
-        }
+    const handleGetPost = async (id) => {
+        const post = await getPost(id);
+        setValues({ 
+            title: post.title, 
+            tag: post.tag, 
+            description: post.description,
+            user: post.user,
+        });
     }
 
     useEffect(() => {
-        getPost(match.params.id);
+        handleGetPost(match.params.id)
     }, [match.params.id]);
 
     const handleOnChange = e => setValues({ ...values, [e.target.name]: e.target.value });
