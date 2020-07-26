@@ -16,14 +16,7 @@ const CommentPost = ({ comment: { user, comment } }) => {
                 </p>
             </div>
             <div className="comment-post__interaction">
-                <span className="comment-post__count">0</span>
-                <svg className="comment-post__post-icon">
-                    <use xlinkHref={`${svg}#icon-thumbs-o-up`}></use>
-                </svg>    
-                <span className="comment-post__count">0</span>
-                <svg className="comment-post__post-icon">
-                    <use xlinkHref={`${svg}#icon-thumbs-o-down`}></use>
-                </svg>    
+                <button className="button button--red">Delete Comment</button>  
             </div>
         </div>
     )

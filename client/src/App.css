@@ -669,8 +669,15 @@ strong {
   .comment-post__user-comment {
     font-size: 1.6rem; }
   .comment-post__interaction {
-    display: flex;
-    align-content: center; }
+    position: absolute;
+    top: 2rem;
+    right: 0;
+    width: 20%;
+    font-size: 1rem; }
+    .comment-post__interaction .button {
+      display: block;
+      font-size: 1.2rem;
+      padding: 1.5rem; }
   .comment-post__post-icon {
     fill: #777777;
     width: 2rem;
@@ -841,6 +848,7 @@ strong {
   .footer__copyright {
     justify-self: end;
     color: #999; }
+
 
 
     /*Toastify*/
