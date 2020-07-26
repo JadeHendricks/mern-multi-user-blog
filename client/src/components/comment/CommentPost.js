@@ -1,16 +1,10 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useContext } from 'react';
 import axios from 'axios';
-import svg from '../../assets/images/icons/sprite.svg'
 import { toast } from 'react-toastify';
 import AuthContext from '../../context/authContext/AuthContext';
 import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 
-const CommentPost = ({ comment: { user, comment, _id }, postId }) => {
-
-    useEffect(() => {
-        // console.log(_id);
-    }, []);
-
+const CommentPost = ({ comment: { user, comment, name, date, _id }, postId }) => {
     const { loggedInUser } = useContext(AuthContext);
 
     const isUsersData = () => {
@@ -20,8 +14,6 @@ const CommentPost = ({ comment: { user, comment, _id }, postId }) => {
     }
 
     const deleteComment = async (postId, commentId) => {
-        console.log('postId', postId);
-        console.log('commentId', commentId);
         try {
             await axios.delete(`/api/post/comment/${postId}/${commentId}`);
             toast.success('Comment deleted')
@@ -33,10 +25,10 @@ const CommentPost = ({ comment: { user, comment, _id }, postId }) => {
     return (
         <div className="comment-post">
             <div className="comment-post__icon">
-                <img src={ placeholderUserImage } alt="Photo of Jade Hendricks" title="Photo of Jade Hendricks" />
+                <img src={ placeholderUserImage } alt={ name } title={ name } />
             </div>
             <div className="comment-post__information">
-                <h5 className="comment-post__user-name">John Doe <span>30 August 2020</span></h5>
+                <h5 className="comment-post__user-name">{ name } <span>{ date }</span></h5>
                 <p className="comment-post__user-comment">
                     { comment }
                 </p>

@@ -3,7 +3,7 @@ const User = require('../models/UserModel');
 
 exports.getAllPosts = async (req, res) => { 
     try {
-        const posts = await Post.find().populate('user', ['name', 'email', '_id']);;
+        const posts = await Post.find().populate('user', ['name', 'email', '_id']).sort({ 'date': '-1' });
         
         if (!posts) {
             return res.status(404).json({
@@ -191,14 +191,16 @@ exports.unlikePost = async (req, res) => {
 
 exports.addComment = async (req, res) => { 
     try {
+        const post = await Post.findById(req.params.id); 
         const user = await User.findById(req.user.id);
-        const post = await Post.findById(req.params.id).populate('user', ['name', 'email', '_id']); 
+    
+        const newComment = {
+          comment: req.body.comment,
+          name: user.name,
+          user: req.user.id
+        };
 
-        post.comments.unshift({
-            user: user,
-            comment: req.body.comment
-        });
-
+        post.comments.unshift(newComment);
         await post.save();
     
         res.status(201).json({
