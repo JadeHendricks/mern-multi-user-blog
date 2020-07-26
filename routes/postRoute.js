@@ -4,6 +4,7 @@ const postController = require('../controllers/postController')
 const authController = require('../controllers/authController');
 const { runValidation } = require('../validators/index');
 const { updatePostValidator, createPostValidator } = require('../validators/post');
+const { Router } = require('express');
 
 router
     .route('/')
@@ -24,8 +25,9 @@ router
 
 router
     .route('/comment/:id')
-    .post(authController.protect, postController.addComment);
-
+    .post(authController.protect, postController.addComment)
+    .delete(authController.protect, postController.deleteComment);
+    
 router
     .route('/:id')
     .get(authController.protect, postController.getPost)

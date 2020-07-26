@@ -209,3 +209,35 @@ exports.addComment = async (req, res) => {
         res.status(500).send('Server Error');
       }
 }
+
+exports.deleteComment = async (req, res) => { 
+    const { commentId } = req.body;
+    try {
+        const post = await Post.findById(req.params.id); 
+        const comment = post.comments.find(comment => comment._id.toString() === commentId);
+        if (!comment) {
+            return res.status(404).json({ 
+                message: 'Comment does not exist' 
+            });
+        }
+        
+        if (comment.user.toString() !== req.user.id) {
+            return res.status(401).json({ 
+                message: 'User not authorized' 
+            });
+        }
+
+        const removeIndex = post.comments.map(comment => comment._id.toString()).indexOf(commentId);
+    
+        post.comments.splice(removeIndex, 1);
+        await post.save();
+    
+        res.status(200).json({
+            message: 'Post has been deleted'
+        });
+    
+      } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+      }
+}
