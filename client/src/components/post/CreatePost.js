@@ -1,13 +1,22 @@
-import React, { Fragment, useContext, useState } from 'react';
-import PostContext from '../../context/postContext/PostContext';
+import React, { Fragment, useState } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 
 const PostForm = () => {
-
-    const { createPost } = useContext(PostContext)
-
     const [values, setValues] = useState({ title: '', tag: '', description: ''});
     const { title, tag, description } = values;
+
+    const createPost = async (title, tag, description) => { 
+        const config = { headers: {'Content-Type': 'application/json'} };
+        const body = JSON.stringify({ title, tag, description });
+        try {
+            const res = await axios.post('/api/post', body, config);
+            toast.success(res.data.message);
+        } catch (err) {
+            console.log(err.response.message);
+        }
+    }
 
     const handleOnChange = e => setValues({ ...values, [e.target.name]: e.target.value });
 

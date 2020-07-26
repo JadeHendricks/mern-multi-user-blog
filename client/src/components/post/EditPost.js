@@ -1,27 +1,39 @@
 import React, { Fragment, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
-import PostContext from '../../context/postContext/PostContext';
+import { toast } from 'react-toastify';
 import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 
 const PostForm = ({ match }) => {
-
-    const { getPost, editPost } = useContext(PostContext)
-
     const [values, setValues] = useState({ title: '', tag: '', description: '', user: ''});
     const { title, tag, description, user } = values;
 
-    const handleGetPost = async (id) => {
-        const post = await getPost(id);
-        setValues({ 
-            title: post.title, 
-            tag: post.tag, 
-            description: post.description,
-            user: post.user,
-        });
+    const getPost = async (id) => {
+        try {
+            const res = await axios.get(`/api/post/${id}`);
+            setValues({ 
+                title: res.data.post.title, 
+                tag: res.data.post.tag, 
+                description: res.data.post.description,
+                user: res.data.post.user,
+            });
+        } catch (err) {
+            console.log(err.response.message);
+        }
+    }
+
+    const editPost = async (id, title, tag, description) => { 
+        const config = { headers: {'Content-Type': 'application/json'} };
+        const body = JSON.stringify({ title, tag, description });
+        try {
+            const res = await axios.put(`/api/post/${id}`, body, config);        
+            toast.success(res.data.message);
+        } catch (err) {
+            console.log(err.response.message);
+        }
     }
 
     useEffect(() => {
-        handleGetPost(match.params.id)
+        getPost(match.params.id)
     }, [match.params.id]);
 
     const handleOnChange = e => setValues({ ...values, [e.target.name]: e.target.value });

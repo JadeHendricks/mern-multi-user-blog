@@ -1,12 +1,20 @@
-import React, { useContext } from 'react';
+import React from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 import svg from '../../assets/images/icons/sprite.svg'
 import placeholderPostImage from '../../assets/images/seven-img1.png';
 import { Link } from 'react-router-dom';
-import PostContext from '../../context/postContext/PostContext';
 
 const ProfileCard = ({ post: { _id, title, tag, description } }) => {
 
-    const { deletePost } = useContext(PostContext);
+    const deletePost = async (id) => { 
+        try {
+            await axios.delete(`/api/post/${id}`); 
+            toast.success('Post has been deleted');
+        } catch (err) {
+            console.log(err.response.message);
+        }
+    }
 
     const descriptionTrimmer = (desc) => {
         return desc.slice(0, 150) + '...';

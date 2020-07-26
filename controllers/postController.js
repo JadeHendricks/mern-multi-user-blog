@@ -151,7 +151,11 @@ exports.likePost = async (req, res) => {
 
         post.likes.unshift({ user: req.user.id });
         await post.save();
-        res.status(200).json(post.likes);
+        
+        res.status(200).json({
+            likes: post.likes,
+            results: post.likes.length
+        });
 
     } catch (err) {
         console.error(err.message);

@@ -13,7 +13,6 @@ import Navigation from './components/layouts/Navigation';
 import Footer from './components/layouts/Footer';
 import Loader from './components/layouts/Loader';
 import PrivateRoute from './components/routing/PrivateRoute';
-import Random from './components/layouts/Random';
 import CreatePost from './components/post/CreatePost';
 import EditPost from './components/post/EditPost';
 import Post from './components/post/Post';
@@ -45,7 +44,6 @@ function App (props) {
               <Route path='/edit-post/:id' history={props.history} exact component={ EditPost } />
               <Route path='/post/:id' history={props.history} exact component={ Post } />
               <Route path='/profile/:id' history={props.history} exact component={ AccountProfile } />
-              <PrivateRoute path='/random' exact component={ Random } />
             </Switch>
           </main>
           <Footer />
