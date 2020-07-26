@@ -1,8 +1,34 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
+import axios from 'axios';
 import svg from '../../assets/images/icons/sprite.svg'
+import { toast } from 'react-toastify';
+import AuthContext from '../../context/authContext/AuthContext';
 import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 
-const CommentPost = ({ comment: { user, comment } }) => {
+const CommentPost = ({ comment: { user, comment, _id }, postId }) => {
+
+    useEffect(() => {
+        // console.log(_id);
+    }, []);
+
+    const { loggedInUser } = useContext(AuthContext);
+
+    const isUsersData = () => {
+        if (loggedInUser && user) {
+            return loggedInUser._id === user;
+        }
+    }
+
+    const deleteComment = async (postId, commentId) => {
+        console.log('postId', postId);
+        console.log('commentId', commentId);
+        try {
+            await axios.delete(`/api/post/comment/${postId}/${commentId}`);
+            toast.success('Comment deleted')
+        } catch (err) {
+            console.log(err.reponse.message)
+        }
+    }
 
     return (
         <div className="comment-post">
@@ -15,9 +41,12 @@ const CommentPost = ({ comment: { user, comment } }) => {
                     { comment }
                 </p>
             </div>
-            <div className="comment-post__interaction">
-                <button className="button button--red">Delete Comment</button>  
-            </div>
+            { isUsersData() && (
+                <div className="comment-post__interaction">
+                    <button className="button button--red" onClick={ () => deleteComment(postId, _id) }>Delete Comment</button>  
+                </div>
+            ) }
+
         </div>
     )
 }

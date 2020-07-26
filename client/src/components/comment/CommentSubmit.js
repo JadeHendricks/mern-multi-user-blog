@@ -43,7 +43,7 @@ const CommentSubmit = ({ postId, comments }) => {
                     <span className="comment__total">{ comments && comments.length } Comments</span>
                 </div>
             </form>
-            { comments && comments.map( comment => <CommentPost key={ comment._id } comment={ comment }/>) }
+            { comments && comments.map( comment => <CommentPost key={ comment._id } postId={ postId } comment={ comment }/>) }
         </div>
     )
 }

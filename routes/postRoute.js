@@ -25,9 +25,12 @@ router
 
 router
     .route('/comment/:id')
-    .post(authController.protect, postController.addComment)
+    .post(authController.protect, postController.addComment);
+
+router
+    .route('/comment/:id/:comment_id')
     .delete(authController.protect, postController.deleteComment);
-    
+
 router
     .route('/:id')
     .get(authController.protect, postController.getPost)

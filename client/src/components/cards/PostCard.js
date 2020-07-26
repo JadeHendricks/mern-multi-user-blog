@@ -7,7 +7,7 @@ import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 import placeholderPostImage from '../../assets/images/seven-img1.png';
 import AuthContext from '../../context/authContext/AuthContext';
 
-const PostCard = ({ post: { _id, title, date, tag, description, user, likes } }) => {
+const PostCard = ({ post: { _id, title, date, tag, description, user, likes, comments } }) => {
 
     const descriptionTrimmer = (desc) => {
         return desc.slice(0, 150) + '...';
@@ -57,7 +57,7 @@ const PostCard = ({ post: { _id, title, date, tag, description, user, likes } })
                         <svg className="card__interaction-icon">
                             <use xlinkHref={`${svg}#icon-comment-o`}></use>
                         </svg>
-                    <span>11 comments</span>
+                        <span>{ comments && comments.length } comments</span>
                     </div>
                     <div className="card__interaction-block">
                         { !postIsLiked() ? (

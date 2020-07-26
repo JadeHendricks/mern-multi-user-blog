@@ -1,4 +1,5 @@
 const Post = require('../models/PostModel');
+const User = require('../models/UserModel');
 
 exports.getAllPosts = async (req, res) => { 
     try {
@@ -190,10 +191,11 @@ exports.unlikePost = async (req, res) => {
 
 exports.addComment = async (req, res) => { 
     try {
+        const user = await User.findById(req.user.id);
         const post = await Post.findById(req.params.id).populate('user', ['name', 'email', '_id']); 
 
         post.comments.unshift({
-            user: req.user.id,
+            user: user,
             comment: req.body.comment
         });
 
@@ -211,30 +213,25 @@ exports.addComment = async (req, res) => {
 }
 
 exports.deleteComment = async (req, res) => { 
-    const { commentId } = req.body;
     try {
         const post = await Post.findById(req.params.id); 
-        const comment = post.comments.find(comment => comment._id.toString() === commentId);
+        // Pull out comment
+        const comment = post.comments.find(comment => comment.id === req.params.comment_id);
+        // Make sure comment exists
         if (!comment) {
-            return res.status(404).json({ 
-                message: 'Comment does not exist' 
-            });
+          return res.status(404).json({ msg: 'Comment does not exist' });
         }
-        
+        // Check user
         if (comment.user.toString() !== req.user.id) {
-            return res.status(401).json({ 
-                message: 'User not authorized' 
-            });
+          return res.status(401).json({ msg: 'User not authorized' });
         }
-
-        const removeIndex = post.comments.map(comment => comment._id.toString()).indexOf(commentId);
+        // get remove index
+        const removeIndex = post.comments.map(comment => comment._id.toString()).indexOf(req.params.comment_id);
     
         post.comments.splice(removeIndex, 1);
         await post.save();
     
-        res.status(200).json({
-            message: 'Post has been deleted'
-        });
+        res.json(post.comments);
     
       } catch (err) {
         console.error(err.message);
