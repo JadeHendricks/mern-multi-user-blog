@@ -23,6 +23,10 @@ router
     .get(postController.getAllUsersPosts);
 
 router
+    .route('/comment/:id')
+    .post(authController.protect, postController.addComment);
+
+router
     .route('/:id')
     .get(authController.protect, postController.getPost)
     .put(authController.protect, postController.editPost)

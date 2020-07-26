@@ -151,7 +151,7 @@ exports.likePost = async (req, res) => {
 
         post.likes.unshift({ user: req.user.id });
         await post.save();
-        
+
         res.status(200).json({
             likes: post.likes,
             results: post.likes.length
@@ -186,4 +186,26 @@ exports.unlikePost = async (req, res) => {
         }
         res.status(500).send('Server Error');
     }
+}
+
+exports.addComment = async (req, res) => { 
+    try {
+        const post = await Post.findById(req.params.id).populate('user', ['name', 'email', '_id']); 
+
+        post.comments.unshift({
+            user: req.user.id,
+            comment: req.body.comment
+        });
+
+        await post.save();
+    
+        res.status(201).json({
+            comments: post.comments,
+            results: post.comments.length,
+        });
+    
+      } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+      }
 }

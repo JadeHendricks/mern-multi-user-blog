@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import Loader from '../layouts/Loader';
 import AuthContext from '../../context/authContext/AuthContext';
+import CommentSubmit from '../comment/CommentSubmit';
 import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 import placeholderPostImage from '../../assets/images/seven-img1.png';
 
@@ -12,7 +13,7 @@ const FullPost = ({ match, history }) => {
     const { loggedInUser } = useContext(AuthContext);
 
     const [post, setPost] = useState({});
-    const  { title, description, _id, user, likes } = post;
+    const  { title, description, _id, user, likes, comments } = post;
 
     const getPost = async (id) => {
         try {
@@ -89,36 +90,37 @@ const FullPost = ({ match, history }) => {
             </div>
             <div className="post__container">
                 <div className="post__header">
-                <div className="post__top">
-                    <div className="post__image-block">
-                        <img src={ placeholderPostImage } alt={ title } title={ title } />
+                    <div className="post__top">
+                        <div className="post__image-block">
+                            <img src={ placeholderPostImage } alt={ title } title={ title } />
+                        </div>
+                        <h1 className="post__title">{ title }</h1>
                     </div>
-                    <h1 className="post__title">{ title }</h1>
+                    <div className="post__user">
+                        <div className="post__user-block">
+                            <img className="post__user-icon" src={ placeholderUserImage } alt={ user && user.name } title={ user && user.name } />
+                            <span className="post__user-name">{ user && user.name }</span>
+                        </div>
+                        <div className="post__user-social">
+                            <svg className="post__user-social-icon">
+                                <use xlinkHref={`${svg}#icon-facebook-square`}></use>
+                            </svg>  
+                            <svg className="post__user-social-icon">
+                                <use xlinkHref={`${svg}#icon-linkedin-square`}></use>
+                            </svg>                                   
+                            <svg className="post__user-social-icon">
+                                <use xlinkHref={`${svg}#icon-twitter-square`}></use>
+                            </svg>                                   
+                        </div>
+                    </div>
                 </div>
-                <div className="post__user">
-                    <div className="post__user-block">
-                        <img className="post__user-icon" src={ placeholderUserImage } alt={ user && user.name } title={ user && user.name } />
-                        <span className="post__user-name">{ user && user.name }</span>
-                    </div>
-                    <div className="post__user-social">
-                        <svg className="post__user-social-icon">
-                            <use xlinkHref={`${svg}#icon-facebook-square`}></use>
-                        </svg>  
-                        <svg className="post__user-social-icon">
-                            <use xlinkHref={`${svg}#icon-linkedin-square`}></use>
-                        </svg>                                   
-                        <svg className="post__user-social-icon">
-                            <use xlinkHref={`${svg}#icon-twitter-square`}></use>
-                        </svg>                                   
-                    </div>
-                </div>
-            </div>
                 <div className="post__body">
-                <p>{ description } <br /> { description }</p>
-                <p>{ description } <br /> { description }</p>
+                    <p>{ description } <br /> { description }</p>
+                    <p>{ description } <br /> { description }</p>
+                </div>
+                <CommentSubmit postId={_id} comments={ comments } />
             </div>
-        </div>
-    </div> 
+        </div> 
     )
 }
 
