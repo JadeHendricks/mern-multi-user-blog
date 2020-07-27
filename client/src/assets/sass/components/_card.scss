@@ -20,6 +20,13 @@
         padding: 1rem;
         bottom: 2rem;
         right: 2rem;
+        &--red {
+            background-color: $red;  
+        }
+        &--yellow {
+            background-color: $yellow; 
+            color: $black;
+        }
     }
     &__details {
         padding: 3rem 2rem;
@@ -98,6 +105,65 @@
         justify-content: space-between;
         & .button {
             flex: 0 1 48%;
+        }
+    }
+}
+
+.all-userCards {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.card-user {
+    border-radius: 0.3rem;
+    overflow: hidden;
+    box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.1);
+    background-color: $white;
+    backface-visibility: hidden;
+    flex: 0 1 48%;
+    margin-top: 5rem;
+    &__header {
+        display: flex;
+        align-items: center;
+        padding: 3rem 1.5rem;
+    }
+    &__image {
+        margin-right: 1.5rem;
+        & img {
+            width: 12rem;
+            height: 12rem;
+            border-radius: 100%;
+            cursor: pointer;
+        }
+    }
+    &__title {
+        font-size: 3rem;
+        text-decoration: none;
+        color: $black;
+        cursor: pointer;
+        font-weight: 700;
+    }
+    &__date {
+        font-size: 1.8rem;
+        margin: 1rem 0 1.5rem 0;
+    }
+    &__footer {
+        background-color: $light-grey;
+        padding: 1.5rem;
+        border-top: 0.1rem solid darken($light-grey, 5%);
+        cursor: pointer;
+    }
+    &__social{
+        display: flex;
+        align-items: center;
+    }
+    &__social-icon {
+        width: 5rem;
+        height: 5rem;
+        fill: $black;
+        &:not(:last-child) {
+            margin-right: 1.5rem;
         }
     }
 }

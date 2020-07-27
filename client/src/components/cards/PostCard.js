@@ -57,7 +57,7 @@ const PostCard = ({ post: { _id, title, date, tag, description, user, likes, com
                         <svg className="card__interaction-icon">
                             <use xlinkHref={`${svg}#icon-comment-o`}></use>
                         </svg>
-                        <span>{ comments && comments.length } comments</span>
+                        <span>{ comments.length } { comments.length === 1 ? 'Comment' : 'Comments' }</span>
                     </div>
                     <div className="card__interaction-block">
                         { !postIsLiked() ? (
