@@ -46,7 +46,9 @@ const PostCard = ({ post: { _id, title, date, tag, description, user, likes, com
             <Link to={`/post/${_id}`}>
                 <div className="card__header">
                     <img className="card__image" src={ placeholderPostImage } alt={ title } title={ title } />
-                    <h5 className="card__tag">{ tag }</h5>
+                    <h5 className={ tag === 'travel' ? 'card__tag card__tag--orange': tag === 'funny' ? 'card__tag card__tag--yellow': 'card__tag'}>
+                        { tag }
+                    </h5>
                 </div>
             </Link>
             <div className="card__details">
@@ -54,7 +56,7 @@ const PostCard = ({ post: { _id, title, date, tag, description, user, likes, com
                 <p className="card__description">{ descriptionTrimmer(description) }</p>
                 <div className="card__interaction">
                     <div className="card__interaction-block">
-                        <svg className="card__interaction-icon">
+                        <svg className="card__interaction-icon card__interaction-icon-comment">
                             <use xlinkHref={`${svg}#icon-comment-o`}></use>
                         </svg>
                         <span>{ comments.length } { comments.length === 1 ? 'Comment' : 'Comments' }</span>

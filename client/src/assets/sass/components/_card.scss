@@ -20,8 +20,8 @@
         padding: 1rem;
         bottom: 2rem;
         right: 2rem;
-        &--red {
-            background-color: $red;  
+        &--orange {
+            background-color: $orange;  
         }
         &--yellow {
             background-color: $yellow; 
@@ -46,6 +46,9 @@
     }
     &__description {
         line-height: 1.4;
+        display: block;
+        height: 9rem;
+        overflow: hidden;
     }
     &__interaction {
         display: flex;
@@ -63,10 +66,13 @@
         }
     }
     &__interaction-icon {
-        fill: $green;
+        fill: $red;
         width: 2rem;
         height: 2rem;
         margin-right: 1rem;
+    }
+    &__interaction-icon-comment {
+        fill: $black;
     }
     &__user-link {
         color: $black;
