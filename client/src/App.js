@@ -17,6 +17,7 @@ import CreatePost from './components/post/CreatePost';
 import EditPost from './components/post/EditPost';
 import Post from './components/post/Post';
 import AccountProfile from './components/account/AccountProfile';
+import AllUsers from './components/layouts/AllUsers';
 
 import AuthState from "./context/authContext/AuthState";
 import PostState from "./context/postContext/PostState";
@@ -44,6 +45,7 @@ function App (props) {
               <Route path='/edit-post/:id' history={props.history} exact component={ EditPost } />
               <Route path='/post/:id' history={props.history} exact component={ Post } />
               <Route path='/profile/:id' history={props.history} exact component={ AccountProfile } />
+              <Route path='/users' exact component={ AllUsers } />
             </Switch>
           </main>
           <Footer />

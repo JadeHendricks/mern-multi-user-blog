@@ -21,6 +21,7 @@ const Navigation = () => {
             </div>
             { !isAuthenticated &&  (
                 <nav className="nav nav__user">
+                    <Link className="nav__el" to='/users'>All Users</Link>
                     <Link className="nav__el" to='/login'>Log in</Link>
                     <Link className="nav__el nav__el--cta" to='/register'>Register</Link>
                 </nav>
@@ -29,6 +30,7 @@ const Navigation = () => {
             { isAuthenticated && (
                 <nav className="nav nav__user">
                     <Link to='/create-post' className="nav__el button button--green">Create Post</Link>
+                    <Link className="nav__el" to='/users'>All Users</Link>
                     <Link className="nav__el" to={`/profile/${loggedInUser._id}`}>
                         <img className="nav__user-img" src={ placeholderUserImage } alt={ loggedInUser.name } title={ loggedInUser.name } />
                         <span>{ loggedInUser.name.split(' ')[0] }</span>
