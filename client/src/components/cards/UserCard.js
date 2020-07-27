@@ -4,7 +4,7 @@ import svg from '../../assets/images/icons/sprite.svg'
 import { Link } from 'react-router-dom';
 import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 
-const UserCard = ({ user: { createdAt, name, _id } }) => {
+const UserCard = ({ user: { createdAt, name, _id, socials } }) => {
     return (
         <div className="card-user">
             <div className="card-user__header">
@@ -18,17 +18,31 @@ const UserCard = ({ user: { createdAt, name, _id } }) => {
                 </div>
             </div>
             <div className="card-user__footer">
-                <div className="card-user__social">    
-                    <svg className="card-user__social-icon">
-                        <use xlinkHref={`${svg}#icon-facebook-square`}></use>
-                    </svg>       
-                    <svg className="card-user__social-icon">
-                        <use xlinkHref={`${svg}#icon-linkedin-square`}></use>
-                    </svg>       
-                    <svg className="card-user__social-icon">
-                        <use xlinkHref={`${svg}#icon-twitter-square`}></use>
-                    </svg>                            
-                </div>
+                { socials  && (
+                    <div className="card-user__social"> 
+                        { socials.facebook && (
+                            <a href={ socials.facebook } target='_blank' rel='noopener noreferrer'>
+                                <svg className="card-user__social-icon">
+                                    <use xlinkHref={`${svg}#icon-facebook-square`}></use>
+                                </svg>  
+                            </a>  
+                        ) }   
+                        { socials.linkedin && (
+                            <a href={ socials.linkedin } target='_blank' rel='noopener noreferrer'>
+                                <svg className="card-user__social-icon">
+                                    <use xlinkHref={`${svg}#icon-linkedin-square`}></use>
+                                </svg>  
+                            </a>     
+                        ) }
+                        { socials.twitter && (
+                            <a href={ socials.twitter } target='_blank' rel='noopener noreferrer'>
+                                <svg className="card-user__social-icon">
+                                    <use xlinkHref={`${svg}#icon-twitter-square`}></use>
+                                </svg>  
+                            </a>
+                        ) }                          
+                    </div>
+                ) }
             </div>
         </div>
     )

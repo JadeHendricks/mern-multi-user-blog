@@ -20,6 +20,17 @@ const userSchema = new mongoose.Schema({
         required: true,
         select: false
     },
+    socials: {
+        facebook: {
+            type: String
+        },
+        linkedin: {
+            type: String
+        },
+        twitter: {
+            type: String
+        }
+    },
     role: {
         type: String,
         enum: ['user', 'admin'],

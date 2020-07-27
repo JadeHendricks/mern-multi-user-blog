@@ -65,3 +65,30 @@ exports.getAllUsers = async (req, res) => {
         });
     }
 }
+exports.updateUserSocials = async (req, res) => {
+    try {
+        const { facebook, linkedin, twitter } = req.body;
+
+        const userFields = {};
+        userFields.socials = {};
+
+        if (facebook) userFields.socials.facebook = facebook;
+        if (linkedin) userFields.socials.linkedin = linkedin;
+        if (twitter) userFields.socials.twitter = twitter;
+
+        let user = await User.findOneAndUpdate(
+            { _id: req.user.id },
+            { $set: userFields },
+            { new: true, upsert: true }
+        );
+
+        res.status(200).json({
+            message: 'Your socials have been updated',
+            user
+        });
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error')
+    }
+}

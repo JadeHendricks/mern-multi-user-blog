@@ -101,17 +101,31 @@ const FullPost = ({ match, history }) => {
                             <img className="post__user-icon" src={ placeholderUserImage } alt={ user && user.name } title={ user && user.name } />
                             <span className="post__user-name">{ user && user.name }</span>
                         </div>
-                        <div className="post__user-social">
-                            <svg className="post__user-social-icon">
-                                <use xlinkHref={`${svg}#icon-facebook-square`}></use>
-                            </svg>  
-                            <svg className="post__user-social-icon">
-                                <use xlinkHref={`${svg}#icon-linkedin-square`}></use>
-                            </svg>                                   
-                            <svg className="post__user-social-icon">
-                                <use xlinkHref={`${svg}#icon-twitter-square`}></use>
-                            </svg>                                   
-                        </div>
+                        { user && user.socials && (
+                            <div className="post__user-social">
+                                { user.socials.facebook && (
+                                    <a href={user.socials.facebook} target='_blank' rel='noopener noreferrer'>
+                                        <svg className="post__user-social-icon">
+                                            <use xlinkHref={`${svg}#icon-facebook-square`}></use>
+                                        </svg>  
+                                    </a>
+                                ) }
+                                { user.socials.linkedin && (
+                                    <a href={user.socials.linkedin} target='_blank' rel='noopener noreferrer'>
+                                        <svg className="post__user-social-icon">
+                                            <use xlinkHref={`${svg}#icon-linkedin-square`}></use>
+                                        </svg>  
+                                    </a>
+                                ) }
+                                { user.socials.twitter && (
+                                    <a href={user.socials.twitter} target='_blank' rel='noopener noreferrer'>
+                                        <svg className="post__user-social-icon">
+                                            <use xlinkHref={`${svg}#icon-twitter-square`}></use>
+                                        </svg>  
+                                    </a>
+                                ) }                                  
+                            </div>
+                        ) }
                     </div>
                 </div>
                 <div className="post__body">

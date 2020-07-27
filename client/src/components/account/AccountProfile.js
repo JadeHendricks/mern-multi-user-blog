@@ -53,7 +53,6 @@ const Profile = ({ match }) => {
     useEffect(() => {
         getUser(match.params.id);
         getAllUsersPosts(match.params.id);
-        console.log(navigationState);
     }, [match.params.id, loggedInUser]);
 
     return (
@@ -71,17 +70,31 @@ const Profile = ({ match }) => {
                                     Lorem ipsum dolor sit amet consectetur adipisicing elit. 
                                     Corporis iusto quasi, quidem molestias aperiam in earum deleniti amet incidunt possimus.
                                 </p>
-                                <div className="user-header__socials">    
-                                    <svg className="user-header__socials-icon">
-                                        <use xlinkHref={`${svg}#icon-facebook-square`}></use>
-                                    </svg>                                  
-                                    <svg className="user-header__socials-icon">
-                                        <use xlinkHref={`${svg}#icon-linkedin-square`}></use>
-                                    </svg>                                  
-                                    <svg className="user-header__socials-icon">
-                                        <use xlinkHref={`${svg}#icon-twitter-square`}></use>
-                                    </svg>                                  
-                                </div>
+                                { user.socials && (
+                                    <div className="user-header__socials">    
+                                        { user.socials.facebook && (
+                                            <a href={user.socials.facebook} target='_blank' rel='noopener noreferrer'>
+                                                <svg className="user-header__socials-icon">
+                                                    <use xlinkHref={`${svg}#icon-facebook-square`}></use>
+                                                </svg>  
+                                            </a>
+                                        )}
+                                        { user.socials.linkedin && (
+                                            <a href={user.socials.linkedin} target='_blank' rel='noopener noreferrer'>
+                                                <svg className="user-header__socials-icon">
+                                                    <use xlinkHref={`${svg}#icon-linkedin-square`}></use>
+                                                </svg>
+                                            </a>
+                                        )}
+                                        { user.socials.twitter && (
+                                            <a href={user.socials.twitter} target='_blank' rel='noopener noreferrer'>
+                                                <svg className="user-header__socials-icon">
+                                                    <use xlinkHref={`${svg}#icon-twitter-square`}></use>
+                                                </svg>  
+                                            </a>  
+                                        )}                                                    
+                                    </div>
+                                ) }
                             </div>
                         </div>
                     </div>
@@ -93,18 +106,13 @@ const Profile = ({ match }) => {
                         <nav className="account-nav">
                             <ul className="account-nav__ul">
                                 <li className="account-nav__el"><a onClick={ handleNavigationState } name='all-posts' href="#">All posts ({ userPostsResults })</a></li>
-                                <li className="account-nav__el"><a onClick={ handleNavigationState } name='all-liked-posts' href="#!">Liked posts</a></li>
                                 { isUsersData() && <li className="account-nav__el"><a onClick={ handleNavigationState } name='account-settings' href="#!">Account settings</a></li> }
                             </ul>
                         </nav>
                     </aside>
                     <main className="account__view">
                         <h2 className="account__view-title">
-                            { 
-                                navigationState === 'all-posts' ? 'All Posts' : 
-                                navigationState === 'all-liked-posts' ? 'All Liked Posts' : 
-                                navigationState === 'account-settings' ? 'Account Settings' : null 
-                            }
+                            {  navigationState === 'all-posts' ? 'All Posts' : 'Account Settings' }
                         </h2>
                         { navigationState === 'all-posts' ? (
                             <section className="account-posts">
@@ -113,16 +121,7 @@ const Profile = ({ match }) => {
                                     { !isUsersData() && userPosts.map(post => <PostCard key={post._id} post={ post } />) }
                                 </div>
                             </section>
-                        ) :  navigationState === 'all-liked-posts' ? (
-                            <section className="account-liked-posts">
-                                <div className="cards cards--account">
-                                    <h1>account-liked-posts</h1>
-                                    {/* <PostCard /> */}
-                                </div>
-                            </section>
-                        ) : navigationState === 'account-settings' ? (
-                                <AccountSettings />
-                        ) : null }
+                        ) : <AccountSettings user={ user }/> }
                     </main>
                 </div>
             </div>

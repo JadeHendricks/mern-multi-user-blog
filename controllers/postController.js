@@ -26,7 +26,7 @@ exports.getAllPosts = async (req, res) => {
 
 exports.getPost = async (req, res) => { 
     try {
-        const post = await Post.findById(req.params.id).populate('user', ['name', 'email', '_id']);
+        const post = await Post.findById(req.params.id).populate('user', ['name', 'email', '_id', 'socials']);
         if (!post) {
           return res.status(404).json({ 
             message: 'Post not found' 

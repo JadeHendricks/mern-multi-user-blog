@@ -14,6 +14,10 @@ router
     .route('/:id')
     .get(userController.getUser);
 
+router
+    .route('/:id/socials')
+    .put(authController.protect, userController.updateUserSocials);
+
 //admin only example
 //router.put('/admin', requireSignin, adminOnlyRoutes, updateUser);
 
