@@ -19,6 +19,8 @@ const Profile = ({ match }) => {
 
     const { userPosts, userPostsResults } = allUsersPosts;
 
+    const [ navigationState, setNavigationState ] = useState('all-posts');
+
     const getUser = async (id) => {
         try {
             const res = await axios.get(`/api/user/${id}`);
@@ -46,9 +48,12 @@ const Profile = ({ match }) => {
         }
     }
 
+    const handleNavigationState = e => setNavigationState(e.target.name);
+
     useEffect(() => {
         getUser(match.params.id);
         getAllUsersPosts(match.params.id);
+        console.log(navigationState);
     }, [match.params.id, loggedInUser]);
 
     return (
@@ -87,26 +92,37 @@ const Profile = ({ match }) => {
                     <aside className="account__options">
                         <nav className="account-nav">
                             <ul className="account-nav__ul">
-                                <li className="account-nav__el"><a href="#">All posts ({ userPostsResults })</a></li>
-                                <li className="account-nav__el"><a href="#">Liked posts</a></li>
-                                { isUsersData() && <li className="account-nav__el"><a href="#">Account settings</a></li> }
+                                <li className="account-nav__el"><a onClick={ handleNavigationState } name='all-posts' href="#">All posts ({ userPostsResults })</a></li>
+                                <li className="account-nav__el"><a onClick={ handleNavigationState } name='all-liked-posts' href="#!">Liked posts</a></li>
+                                { isUsersData() && <li className="account-nav__el"><a onClick={ handleNavigationState } name='account-settings' href="#!">Account settings</a></li> }
                             </ul>
                         </nav>
                     </aside>
                     <main className="account__view">
-                        <h2 className="account__view-title">All Your Posts</h2>
-                        <section className="account-posts">
-                            <div className="cards cards--account">
-                                { isUsersData() && userPosts.map(post => <ProfileCard key={post._id} post={ post } />) }
-                                { !isUsersData() && userPosts.map(post => <PostCard key={post._id} post={ post } />) }
-                            </div>
-                        </section>
-                        <section className="account-liked-posts">
-                            <div className="cards cards--account">
-                                {/* <PostCard /> */}
-                            </div>
-                        </section>
-                        {/* <AccountSettings /> */}
+                        <h2 className="account__view-title">
+                            { 
+                                navigationState === 'all-posts' ? 'All Posts' : 
+                                navigationState === 'all-liked-posts' ? 'All Liked Posts' : 
+                                navigationState === 'account-settings' ? 'Account Settings' : null 
+                            }
+                        </h2>
+                        { navigationState === 'all-posts' ? (
+                            <section className="account-posts">
+                                <div className="cards cards--account">
+                                    { isUsersData() && userPosts.map(post => <ProfileCard key={post._id} post={ post } />) }
+                                    { !isUsersData() && userPosts.map(post => <PostCard key={post._id} post={ post } />) }
+                                </div>
+                            </section>
+                        ) :  navigationState === 'all-liked-posts' ? (
+                            <section className="account-liked-posts">
+                                <div className="cards cards--account">
+                                    <h1>account-liked-posts</h1>
+                                    {/* <PostCard /> */}
+                                </div>
+                            </section>
+                        ) : navigationState === 'account-settings' ? (
+                                <AccountSettings />
+                        ) : null }
                     </main>
                 </div>
             </div>
