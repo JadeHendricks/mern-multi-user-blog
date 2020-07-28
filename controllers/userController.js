@@ -65,6 +65,34 @@ exports.getAllUsers = async (req, res) => {
         });
     }
 }
+
+exports.updateMe = async (req, res) => {
+    try {
+        const { name, avatar } = req.body;
+
+        const userFields = {};
+
+        if (name) userFields.name = name;
+        if (avatar) userFields.avatar = avatar;
+
+        let user = await User.findOneAndUpdate(
+            { _id: req.user.id },
+            { $set: userFields },
+            { new: true, upsert: true }
+        );
+
+        res.status(200).json({
+            message: 'User details has been updated',
+            user
+        });
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error')
+    }
+}
+
+
 exports.updateUserSocials = async (req, res) => {
     try {
         const { facebook, linkedin, twitter } = req.body;

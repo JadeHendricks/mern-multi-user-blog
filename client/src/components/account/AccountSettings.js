@@ -3,17 +3,31 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 
-const AccountSettings = ({ user: { _id, name, email, socials } }) => {
+const AccountSettings = ({ user }) => {
 
     const [ userSocials, setUserSocials] = useState({ facebook: '', linkedin: '', twitter: '' });
     const {facebook, linkedin, twitter} = userSocials;
     const handleSocialsOnChange = e => setUserSocials({ ...userSocials, [e.target.name]: e.target.value });
 
+    const [ userDetails, setUserDetails] = useState({ name: '', avatar: '' });
+    const { name, avatar } = userDetails;
+    const handleUserOnChange = e => setUserDetails({ ...userDetails, [e.target.name]: e.target.value });
+
     const updateUserSocials = async (facebook, linkedin, twitter) => {
         const config = { headers: {'Content-Type': 'application/json'} };
         const body = JSON.stringify({ facebook, linkedin, twitter });
         try {
-            const res = await axios.put(`/api/user/${_id}/socials`, body, config);
+            const res = await axios.put(`/api/user/${user._id}/socials`, body, config);
+            toast.success(res.data.message);
+        } catch (err) {
+            console.log(err.response.message);
+        }
+    }
+    const updateUser = async (name, avatar) => {
+        const config = { headers: {'Content-Type': 'application/json'} };
+        const body = JSON.stringify({ name, avatar });
+        try {
+            const res = await axios.put(`/api/user/me`, body, config);
             toast.success(res.data.message);
         } catch (err) {
             console.log(err.response.message);
@@ -25,25 +39,34 @@ const AccountSettings = ({ user: { _id, name, email, socials } }) => {
         updateUserSocials(facebook, linkedin, twitter);
     }
 
+    const handleUserSubmit = e => {
+        e.preventDefault();
+        updateUser(name);
+    }
+
     useEffect(() => {
         setUserSocials({
-            facebook: socials.facebook,
-            twitter: socials.twitter,
-            linkedin: socials.linkedin
+            facebook: user.socials.facebook,
+            twitter: user.socials.twitter,
+            linkedin: user.socials.linkedin
+        });
+        setUserDetails({
+            name: user.name,
+            avatar: user.avatar || '',
         });
     }, []);
     
     return (
         <Fragment>
             <section className="account-settings">
-                <form className="form form--account">
+                <form className="form form--account" onSubmit={ handleUserSubmit }>
                     <div className="form__group">
                         <label className="form__label" htmlFor="name">Name</label>
-                        <input className="form__input" id="name" value={ name } name="name" type="text" placeholder="Name" />
+                        <input className="form__input" id="name" value={ name } onChange={ handleUserOnChange } name="name" type="text" placeholder="Name" />
                     </div>
                     <div className="form__group">
                         <label className="form__label" htmlFor="email">Email</label>
-                        <input className="form__input" id="email" value={ email } name="email" placeholder="yourname@example.com"></input>
+                        <input className="form__input" id="email" name="email" value={ user.email } placeholder="yourname@example.com" disabled></input>
                     </div>
                     <div className="form__group form__photo-upload">
                         <img className="form__user-photo" src={ placeholderUserImage } alt="User photo" />
