@@ -1,7 +1,6 @@
 import React, { Fragment, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 
 const PostForm = ({ match }) => {
     const [values, setValues] = useState({ title: '', tag: '', description: '', user: ''});
@@ -26,11 +25,11 @@ const PostForm = ({ match }) => {
     const editPost = async (id, title, tag, description, image) => { 
         const config = { headers: {'Content-Type': 'application/json'} };
         const body = new FormData();
+        body.append('id', id);
         body.append('title', title);
         body.append('tag', tag);
         body.append('description', description);
         body.append('image', image);
-
         try {
             const res = await axios.put(`/api/post/${id}`, body, config);        
             toast.success(res.data.message);
@@ -40,7 +39,7 @@ const PostForm = ({ match }) => {
     }
 
     useEffect(() => {
-        getPost(match.params.id)
+        getPost(match.params.id);
     }, [match.params.id]);
 
     const handleOnChange = e => setValues({ ...values, [e.target.name]: e.target.value });
@@ -72,11 +71,9 @@ const PostForm = ({ match }) => {
                     </div>
                     <div className="form__group">
                         <label className="form__label" htmlFor="tag">Post Tag</label>
-                        <select name="tag" id="tag" value={ tag} onChange={ handleOnChange } className="form__input">
-                            <option value="general">General</option>
-                            <option value="travel">Personal</option>
-                            <option value="funny">Funny</option>
-                        </select>
+                        <input type="radio" value="general" name="tag" onChange={ handleOnChange } checked={tag && tag === 'general'} /> general
+                        <input type="radio" value="travel" name="tag" onChange={ handleOnChange } checked={tag && tag === 'travel'} /> travel
+                        <input type="radio" value="funny" name="tag" onChange={ handleOnChange } checked={tag && tag === 'funny'} /> Funny
                     </div>
                     <div className="form__group">
                         <label className="form__label" htmlFor="description">Post Body</label>

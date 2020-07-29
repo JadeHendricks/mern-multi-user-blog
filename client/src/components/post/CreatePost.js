@@ -53,11 +53,9 @@ const PostForm = () => {
                     </div>
                     <div className="form__group">
                         <label className="form__label" htmlFor="tag">Post Tag</label>
-                        <select name="tag" id="tag" onChange={ handleOnChange } className="form__input">
-                            <option value="general" defaultValue>General</option>
-                            <option value="travel">Personal</option>
-                            <option value="funny">Funny</option>
-                        </select>
+                        <input type="radio" value="general" name="tag" onChange={ handleOnChange } checked={tag && tag === 'general'} /> general
+                        <input type="radio" value="travel" name="tag" onChange={ handleOnChange } checked={tag && tag === 'travel'} /> travel
+                        <input type="radio" value="funny" name="tag" onChange={ handleOnChange } checked={tag && tag === 'funny'} /> Funny
                     </div>
                     <div className="form__group">
                         <label className="form__label" htmlFor="description">Post Body</label>

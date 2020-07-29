@@ -142,7 +142,7 @@ exports.getAllUsersPosts = async (req, res) => {
 
 exports.editPost = async (req, res) => {
 
-    const { title, tag, description } = req.body;
+    const { id, title, tag, description } = req.body;
 
     const postFields = {};
 
@@ -153,9 +153,9 @@ exports.editPost = async (req, res) => {
 
     try {
         const post = await Post.findOneAndUpdate(
-            { user: req.user.id },
+            { _id: id },
             { $set: postFields },
-            { new: true, upsert: true }
+            { new: true}
           );
 
         if (!post) {
