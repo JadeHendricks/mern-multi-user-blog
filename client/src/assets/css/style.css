@@ -233,6 +233,7 @@ strong {
     .card-user__image img {
       width: 12rem;
       height: 12rem;
+      object-fit: cover;
       border-radius: 100%;
       cursor: pointer; }
   .card-user__title {
@@ -561,7 +562,6 @@ strong {
     display: block;
     margin-left: auto; }
   .comment__total {
-    display: inline;
     float: right;
     font-size: 1.8rem; }
 
@@ -576,6 +576,7 @@ strong {
     .comment-post__icon img {
       width: 8rem;
       height: 8rem;
+      object-fit: cover;
       border-radius: 100%; }
   .comment-post__information {
     flex: 1;
@@ -714,7 +715,9 @@ strong {
     flex: 0 0 20rem; }
     .user-header__image img {
       width: 20rem;
-      height: 20rem; }
+      height: 20rem;
+      border-radius: 100%;
+      object-fit: cover; }
   .user-header__info {
     flex: 0 0 50%;
     margin: 0 4rem;
