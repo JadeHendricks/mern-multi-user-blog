@@ -34,7 +34,7 @@ router
 router
     .route('/:id')
     .get(authController.protect, postController.getPost)
-    .put(authController.protect, postController.editPost)
+    .put(authController.protect, postController.uploadPostPhoto, postController.editPost)
     .delete(authController.protect, postController.deletePost);
 
 module.exports = router;

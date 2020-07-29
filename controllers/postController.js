@@ -149,7 +149,7 @@ exports.editPost = async (req, res) => {
     if (title) postFields.title = title;
     if (tag) postFields.tag = tag;
     if (description) postFields.description = description;
-
+    if (req.file) postFields.image = req.file.filename;
 
     try {
         const post = await Post.findOneAndUpdate(

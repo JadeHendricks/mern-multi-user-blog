@@ -7,6 +7,8 @@ const PostForm = ({ match }) => {
     const [values, setValues] = useState({ title: '', tag: '', description: '', user: ''});
     const { title, tag, description, user } = values;
 
+    const [ image, setImage] = useState();
+
     const getPost = async (id) => {
         try {
             const res = await axios.get(`/api/post/${id}`);
@@ -21,9 +23,14 @@ const PostForm = ({ match }) => {
         }
     }
 
-    const editPost = async (id, title, tag, description) => { 
+    const editPost = async (id, title, tag, description, image) => { 
         const config = { headers: {'Content-Type': 'application/json'} };
-        const body = JSON.stringify({ title, tag, description });
+        const body = new FormData();
+        body.append('title', title);
+        body.append('tag', tag);
+        body.append('description', description);
+        body.append('image', image);
+
         try {
             const res = await axios.put(`/api/post/${id}`, body, config);        
             toast.success(res.data.message);
@@ -40,7 +47,7 @@ const PostForm = ({ match }) => {
 
     const handleSubmit = e => {
         e.preventDefault();
-        editPost(match.params.id, title, tag, description);
+        editPost(match.params.id, title, tag, description, image);
         setValues({ title: '', tag: '', description: '', user: ''});
     }
 
@@ -79,8 +86,11 @@ const PostForm = ({ match }) => {
                         { user.avatar && (
                             <img className="form__user-photo" src={require(`../../assets/images/users/${user.avatar}`)} alt={ user.name } title={ user.name } />
                         )}
-                        <input className="form__upload" type="file" accept="image/*" id="photo" name="photo" />
-                        <label htmlFor="photo">Choose a blog post image</label>
+                        <input className="form__upload" type="file" accept="image/*" id="image" name="image" onChange={ e => {
+                            const file = e.target.files[0];
+                            setImage(file);
+                        } } />
+                        <label htmlFor="image">Choose a blog post image</label>
                     </div>
                     <div className="form__group">
                         <button className="button button--green">Update</button>
