@@ -3,11 +3,9 @@ import axios from 'axios';
 import svg from '../../assets/images/icons/sprite.svg'
 import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
-import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
-import placeholderPostImage from '../../assets/images/seven-img1.png';
 import AuthContext from '../../context/authContext/AuthContext';
 
-const PostCard = ({ post: { _id, title, date, tag, description, user, likes, comments } }) => {
+const PostCard = ({ post: { _id, title, image, date, tag, description, user, likes, comments } }) => {
 
     const descriptionTrimmer = (desc) => {
         return desc.slice(0, 150) + '...';
@@ -49,7 +47,9 @@ const PostCard = ({ post: { _id, title, date, tag, description, user, likes, com
         <div className="card">
             <Link to={`/post/${_id}`}>
                 <div className="card__header">
-                    <img className="card__image" src={ placeholderPostImage } alt={ title } title={ title } />
+                    { image && (
+                        <img className="card__image" src={require(`../../assets/images/posts/${image}`)} alt={ title } title={ title } />
+                    ) }
                     <h5 className={ tag === 'travel' ? 'card__tag card__tag--orange': tag === 'funny' ? 'card__tag card__tag--yellow': 'card__tag'}>
                         { tag }
                     </h5>

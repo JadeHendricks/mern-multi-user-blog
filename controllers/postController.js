@@ -1,6 +1,33 @@
 const Post = require('../models/PostModel');
 const User = require('../models/UserModel');
 
+const multer = require('multer');
+
+const multerStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'client/src/assets/images/posts')
+    },
+    filename: (req, file, cb) => {
+        const ext = file.mimetype.split('/')[1];
+        cb(null, `post-${req.user.id}-${Date.now()}.${ext}`)
+    }
+});
+
+const multerFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith('image')) {
+        cb(null, true);
+    } else {
+        cb('Not an Image! Please upload only images.', false);
+    }
+}
+
+const upload = multer({ 
+    storage: multerStorage,
+    fileFilter: multerFilter
+});
+
+exports.uploadPostPhoto = upload.single('image');
+
 exports.getAllPosts = async (req, res) => { 
     try {
         const posts = await Post.find().populate('user', ['name', 'email', 'avatar', '_id']).sort({ 'date': '-1' });
@@ -49,8 +76,17 @@ exports.getPost = async (req, res) => {
 
 exports.createPost = async (req, res) => { 
     const { title, tag, description } = req.body;
+    const postFields = {};
+
+    if (title) postFields.title = title;
+    if (tag) postFields.tag = tag;
+    if (description) postFields.description = description;
+    if (req.user._id) postFields.user = req.user._id;
+    if (req.file) postFields.image = req.file.filename;
+
     try {
-        const post = await Post.create({ title, tag, description, user: req.user._id });
+        const post = await Post.create(postFields);
+        console.log(post);
         res.status(201).json({
             message: `Post "${title}", has been created`,
             post

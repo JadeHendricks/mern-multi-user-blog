@@ -5,6 +5,10 @@ const postSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
     },
+    image: {
+        type: String,
+        default: 'default.jpg'
+    },
     title: {
         type: String,
         trim: true,

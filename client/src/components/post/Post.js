@@ -12,7 +12,7 @@ const FullPost = ({ match, history }) => {
     const { loggedInUser } = useContext(AuthContext);
 
     const [post, setPost] = useState({});
-    const  { title, description, _id, user, likes, comments } = post;
+    const  { title, description, image, _id, user, likes, comments } = post;
 
     const getPost = async (id) => {
         try {
@@ -91,7 +91,9 @@ const FullPost = ({ match, history }) => {
                 <div className="post__header">
                     <div className="post__top">
                         <div className="post__image-block">
-                            <img src={ placeholderPostImage } alt={ title } title={ title } />
+                            { image && (
+                                <img src={require(`../../assets/images/posts/${image}`)} alt={ title } title={ title } />
+                            ) }
                         </div>
                         <h1 className="post__title">{ title }</h1>
                     </div>

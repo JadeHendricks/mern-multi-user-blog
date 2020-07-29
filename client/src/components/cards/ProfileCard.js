@@ -6,7 +6,7 @@ import placeholderPostImage from '../../assets/images/seven-img1.png';
 import AuthContext from '../../context/authContext/AuthContext';
 import { Link } from 'react-router-dom';
 
-const ProfileCard = ({ post: { _id, title, tag, description, comments, likes } }) => {
+const ProfileCard = ({ post: { _id, title, image, tag, description, comments, likes } }) => {
 
     const { loggedInUser } = useContext(AuthContext);
 
@@ -54,7 +54,9 @@ const ProfileCard = ({ post: { _id, title, tag, description, comments, likes } }
         <div className="card">
             <Link to={`/post/${_id}`}>
             <div className="card__header">
-                <img className="card__image" src={ placeholderPostImage } alt={ title } title={ title } />
+                { image && (
+                    <img className="card__image" src={require(`../../assets/images/posts/${image}`)} alt={ title } title={ title } />
+                ) }
                 <h5 className={ tag === 'travel' ? 'card__tag card__tag--orange': tag === 'funny' ? 'card__tag card__tag--yellow': 'card__tag'}>
                     { tag }
                 </h5>

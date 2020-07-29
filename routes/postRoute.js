@@ -9,7 +9,7 @@ const { Router } = require('express');
 router
     .route('/')
     .get(postController.getAllPosts)
-    .post(authController.protect, postController.createPost);
+    .post(authController.protect, postController.uploadPostPhoto, postController.createPost);
 
 router
     .route('/like/:id')

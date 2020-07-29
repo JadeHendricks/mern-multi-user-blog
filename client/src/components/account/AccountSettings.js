@@ -78,7 +78,6 @@ const AccountSettings = ({ user }) => {
                         { user.avatar && ( <img className="form__user-photo" src={require(`../../assets/images/users/${user.avatar}`)} alt={ user.name } title={ user.name } />) }
                         <input className="form__upload" type="file" accept="image/*" id="avatar" name="avatar" onChange={ e => {
                             const file = e.target.files[0];
-                            console.log(file);
                             setAvatar(file);
                         } } />
                         <label htmlFor="avatar">Choose a new profile picture</label>
