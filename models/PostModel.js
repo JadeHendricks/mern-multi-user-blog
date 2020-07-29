@@ -32,7 +32,10 @@ const postSchema = new mongoose.Schema({
     ],
     comments: [
         {
-          user: {
+          avatar: {
+              type: String
+          },
+          userId: {
               type: String
           },
           name: {

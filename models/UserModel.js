@@ -3,7 +3,8 @@ const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
     avatar: {
-        type: String
+        type: String,
+        default: 'default.jpg'
     },
     name: {
         type: String,

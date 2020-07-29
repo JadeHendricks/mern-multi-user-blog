@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom';
 import Loader from '../layouts/Loader';
 import AuthContext from '../../context/authContext/AuthContext';
 import CommentSubmit from '../comment/CommentSubmit';
-import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 import placeholderPostImage from '../../assets/images/seven-img1.png';
 
 const FullPost = ({ match, history }) => {
@@ -98,7 +97,9 @@ const FullPost = ({ match, history }) => {
                     </div>
                     <div className="post__user">
                         <div className="post__user-block">
-                            <img className="post__user-icon" src={ placeholderUserImage } alt={ user && user.name } title={ user && user.name } />
+                            { user && user.avatar && (
+                                <img className="form__user-photo" src={require(`../../assets/images/users/${user.avatar}`)} alt={ user && user.name } title={ user && user.name } />
+                            )}
                             <span className="post__user-name">{ user && user.name }</span>
                         </div>
                         { user && user.socials && (

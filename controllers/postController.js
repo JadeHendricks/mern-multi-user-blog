@@ -3,7 +3,7 @@ const User = require('../models/UserModel');
 
 exports.getAllPosts = async (req, res) => { 
     try {
-        const posts = await Post.find().populate('user', ['name', 'email', '_id']).sort({ 'date': '-1' });
+        const posts = await Post.find().populate('user', ['name', 'email', 'avatar', '_id']).sort({ 'date': '-1' });
         
         if (!posts) {
             return res.status(404).json({
@@ -26,7 +26,7 @@ exports.getAllPosts = async (req, res) => {
 
 exports.getPost = async (req, res) => { 
     try {
-        const post = await Post.findById(req.params.id).populate('user', ['name', 'email', '_id', 'socials']);
+        const post = await Post.findById(req.params.id).populate('user', ['name', 'email', 'avatar', '_id', 'socials']);
         if (!post) {
           return res.status(404).json({ 
             message: 'Post not found' 
@@ -90,7 +90,7 @@ exports.deletePost = async (req, res) => {
 
 exports.getAllUsersPosts = async (req, res) => { 
     try {
-        const usersPosts = await Post.find({'user': req.params.id}).populate('user', ['name', 'email', '_id']);
+        const usersPosts = await Post.find({'user': req.params.id}).populate('user', ['name', 'email', 'avatar','_id']);
         res.status(200).json({
             message: 'success',
             results: usersPosts.length,
@@ -197,7 +197,8 @@ exports.addComment = async (req, res) => {
         const newComment = {
           comment: req.body.comment,
           name: user.name,
-          user: req.user.id
+          userId: req.user.id,
+          avatar: user.avatar
         };
 
         post.comments.unshift(newComment);
@@ -217,17 +218,17 @@ exports.addComment = async (req, res) => {
 exports.deleteComment = async (req, res) => { 
     try {
         const post = await Post.findById(req.params.id); 
-        // Pull out comment
-        const comment = post.comments.find(comment => comment.id === req.params.comment_id);
-        // Make sure comment exists
+
+        const comment = post.comments.find(comment => comment._id.toString() === req.params.comment_id);
+
         if (!comment) {
           return res.status(404).json({ msg: 'Comment does not exist' });
         }
-        // Check user
-        if (comment.user.toString() !== req.user.id) {
+
+        if (comment.userId.toString() !== req.user.id) {
           return res.status(401).json({ msg: 'User not authorized' });
         }
-        // get remove index
+
         const removeIndex = post.comments.map(comment => comment._id.toString()).indexOf(req.params.comment_id);
     
         post.comments.splice(removeIndex, 1);

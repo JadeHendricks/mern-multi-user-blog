@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
+import defaultImage from '../../assets/images/users/default.jpg';
 
 const AccountSettings = ({ user }) => {
 
@@ -9,9 +9,10 @@ const AccountSettings = ({ user }) => {
     const {facebook, linkedin, twitter} = userSocials;
     const handleSocialsOnChange = e => setUserSocials({ ...userSocials, [e.target.name]: e.target.value });
 
-    const [ userDetails, setUserDetails] = useState({ name: '', avatar: '' });
-    const { name, avatar } = userDetails;
-    const handleUserOnChange = e => setUserDetails({ ...userDetails, [e.target.name]: e.target.value });
+    const [ name, setName] = useState();
+    const [ avatar, setAvatar] = useState();
+    
+    // const handleUserOnChange = e => setUserDetails({ ...userDetails, [e.target.name]: e.target.value });
 
     const updateUserSocials = async (facebook, linkedin, twitter) => {
         const config = { headers: {'Content-Type': 'application/json'} };
@@ -23,9 +24,13 @@ const AccountSettings = ({ user }) => {
             console.log(err.response.message);
         }
     }
+
     const updateUser = async (name, avatar) => {
         const config = { headers: {'Content-Type': 'application/json'} };
-        const body = JSON.stringify({ name, avatar });
+        const body = new FormData();
+        body.append('name', name);
+        body.append('avatar', avatar);
+
         try {
             const res = await axios.put(`/api/user/me`, body, config);
             toast.success(res.data.message);
@@ -41,7 +46,7 @@ const AccountSettings = ({ user }) => {
 
     const handleUserSubmit = e => {
         e.preventDefault();
-        updateUser(name);
+        updateUser(name, avatar);
     }
 
     useEffect(() => {
@@ -50,10 +55,8 @@ const AccountSettings = ({ user }) => {
             twitter: user.socials.twitter,
             linkedin: user.socials.linkedin
         });
-        setUserDetails({
-            name: user.name,
-            avatar: user.avatar || '',
-        });
+
+        setName(user.name);
     }, []);
     
     return (
@@ -62,16 +65,23 @@ const AccountSettings = ({ user }) => {
                 <form className="form form--account" onSubmit={ handleUserSubmit }>
                     <div className="form__group">
                         <label className="form__label" htmlFor="name">Name</label>
-                        <input className="form__input" id="name" value={ name } onChange={ handleUserOnChange } name="name" type="text" placeholder="Name" />
+                        <input className="form__input" id="name" value={ name } onChange={ e => {
+                            const value = e.target.value;
+                            setName(value);
+                        } } name="name" type="text" placeholder="Name" />
                     </div>
                     <div className="form__group">
                         <label className="form__label" htmlFor="email">Email</label>
                         <input className="form__input" id="email" name="email" value={ user.email } placeholder="yourname@example.com" disabled></input>
                     </div>
                     <div className="form__group form__photo-upload">
-                        <img className="form__user-photo" src={ placeholderUserImage } alt="User photo" />
-                        <input className="form__upload" type="file" accept="image/*" id="photo" name="photo" />
-                        <label htmlFor="photo">Choose a new profile picture</label>
+                        { user.avatar && ( <img className="form__user-photo" src={require(`../../assets/images/users/${user.avatar}`)} alt={ user.name } title={ user.name } />) }
+                        <input className="form__upload" type="file" accept="image/*" id="avatar" name="avatar" onChange={ e => {
+                            const file = e.target.files[0];
+                            console.log(file);
+                            setAvatar(file);
+                        } } />
+                        <label htmlFor="avatar">Choose a new profile picture</label>
                     </div>
                     <div className="form__group">
                         <button type="submit" className="button button--green">Update Account</button>

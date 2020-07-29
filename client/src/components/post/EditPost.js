@@ -76,7 +76,9 @@ const PostForm = ({ match }) => {
                         <textarea className="form__input form__textarea" onChange={ handleOnChange } value={ description } id="description" name="description" placeholder="Post goes here"></textarea>
                     </div>
                     <div className="form__group form__photo-upload">
-                        <img className="form__user-photo" src={ placeholderUserImage } alt={ user.name } title={ user.name } />
+                        { user.avatar && (
+                            <img className="form__user-photo" src={require(`../../assets/images/users/${user.avatar}`)} alt={ user.name } title={ user.name } />
+                        )}
                         <input className="form__upload" type="file" accept="image/*" id="photo" name="photo" />
                         <label htmlFor="photo">Choose a blog post image</label>
                     </div>

@@ -4,7 +4,7 @@ import CommentPost from './CommentPost';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 
-const CommentSubmit = ({ postId, comments }) => {
+const CommentSubmit = ({ postId, postUser, comments }) => {
 
     const [ comment, setComment] = useState('');
 
@@ -43,7 +43,7 @@ const CommentSubmit = ({ postId, comments }) => {
                     <span className="comment__total">{ comments && comments.length } Comments</span>
                 </div>
             </form>
-            { comments && comments.map( comment => <CommentPost key={ comment._id } postId={ postId } comment={ comment }/>) }
+            { comments && comments.map( comment => <CommentPost key={ comment._id } postId={ postId } postUser={ postUser } comment={ comment }/>) }
         </div>
     )
 }

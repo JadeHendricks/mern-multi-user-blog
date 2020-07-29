@@ -10,7 +10,8 @@ const ProfileCard = ({ post: { _id, title, tag, description, comments, likes } }
 
     const { loggedInUser } = useContext(AuthContext);
 
-    const deletePost = async (id) => { 
+    const deletePost = async (e, id) => { 
+        e.preventDefault()
         try {
             await axios.delete(`/api/post/${id}`); 
             toast.success('Post has been deleted');
@@ -88,7 +89,7 @@ const ProfileCard = ({ post: { _id, title, tag, description, comments, likes } }
             <div className="card__user">
                 <div className="card__user-options">
                     <Link to={`/edit-post/${_id}`} className="button button--yellow">Edit post</Link>
-                    <Link onClick={ () => deletePost(_id) } className="button button--red">Delete post</Link>
+                    <Link to='/' onClick={ () => deletePost(_id) } className="button button--red">Delete post</Link>
                 </div>
             </div>
         </div>

@@ -41,6 +41,10 @@ const PostCard = ({ post: { _id, title, date, tag, description, user, likes, com
         } 
     }
 
+    useEffect(() => {
+        console.log(user);
+    }, []);
+
     return (
         <div className="card">
             <Link to={`/post/${_id}`}>
@@ -77,7 +81,9 @@ const PostCard = ({ post: { _id, title, date, tag, description, user, likes, com
             </div>
             <Link to={`/profile/${user._id}`} className="card__user-link">
                 <div className="card__user">
-                    <img className="card__user-image" src={ placeholderUserImage } alt={ user.name } title={ user.name } />
+                    { user.avatar && (
+                        <img className="card__user-image" src={require(`../../assets/images/users/${user.avatar}`)} alt={ user.name } title={ user.name } />
+                    ) }
                     <div className="card__user-info">
                         <div>{ user.name }</div>
                         <div>Posted on: <Moment format="DD/MM/YYYY">{ date }</Moment></div>

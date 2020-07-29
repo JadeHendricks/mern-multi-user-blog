@@ -4,12 +4,15 @@ import svg from '../../assets/images/icons/sprite.svg'
 import { Link } from 'react-router-dom';
 import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 
-const UserCard = ({ user: { createdAt, name, _id, socials } }) => {
+const UserCard = ({ user: { createdAt, name, _id, avatar, socials } }) => {
     return (
         <div className="card-user">
             <div className="card-user__header">
                 <Link to={`/profile/${_id}`} className="card-user__image">
-                    <img src={ placeholderUserImage } alt={ name } title={ name } />
+                    { avatar && (
+                        <img src={require(`../../assets/images/users/${avatar}`)} alt={ name } title={ name } />
+                    ) }
+
                 </Link>
                 <div className="card-user__userInfo">
                     <Link to={`/profile/${_id}`} className="card-user__title">{ name }</Link>
