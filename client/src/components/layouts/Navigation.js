@@ -26,7 +26,7 @@ const Navigation = () => {
                 </nav>
             )}
 
-            { isAuthenticated && (
+            { isAuthenticated && loggedInUser && (
                 <nav className="nav nav__user">
                     <Link className="nav__el" to='/users'>All Users</Link>
                     <Link className="nav__el" to='/most-popular-posts'>Popular Posts</Link>

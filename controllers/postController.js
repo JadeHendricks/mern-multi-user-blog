@@ -86,7 +86,7 @@ exports.createPost = async (req, res) => {
 
     try {
         const post = await Post.create(postFields);
-        console.log(post);
+        
         res.status(201).json({
             message: `Post "${title}", has been created`,
             post
