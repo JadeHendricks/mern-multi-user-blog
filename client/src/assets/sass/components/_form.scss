@@ -95,12 +95,15 @@
     }
     &__radio {
         margin-bottom: 1.5rem;
+        &:last-child {
+            margin-bottom: 3rem;  
+        }
         input[type="radio"] {
           position: absolute;
           opacity: 0;
           + .form__radio-label {
               color: $grey;
-              font-weight: 700;
+              font-weight: 500;
               font-size: 1.6rem;
               text-transform: capitalize;
             &:before {

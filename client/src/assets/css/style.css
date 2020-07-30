@@ -350,12 +350,14 @@ strong {
 
 .form__radio {
   margin-bottom: 1.5rem; }
+  .form__radio:last-child {
+    margin-bottom: 3rem; }
   .form__radio input[type="radio"] {
     position: absolute;
     opacity: 0; }
     .form__radio input[type="radio"] + .form__radio-label {
       color: #777777;
-      font-weight: 700;
+      font-weight: 500;
       font-size: 1.6rem;
       text-transform: capitalize; }
       .form__radio input[type="radio"] + .form__radio-label:before {
