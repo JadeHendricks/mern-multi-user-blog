@@ -50,12 +50,13 @@ const AccountSettings = ({ user }) => {
     }
 
     useEffect(() => {
-        setUserSocials({
-            facebook: user.socials.facebook,
-            twitter: user.socials.twitter,
-            linkedin: user.socials.linkedin
-        });
-
+        if (user.socials) {
+            setUserSocials({
+                facebook: user.socials.facebook || '',
+                twitter: user.socials.twitter || '',
+                linkedin: user.socials.linkedin || ''
+            });
+        }
         setName(user.name);
     }, []);
     
