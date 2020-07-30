@@ -53,9 +53,18 @@ const PostForm = () => {
                     </div>
                     <div className="form__group">
                         <label className="form__label" htmlFor="tag">Post Tag</label>
-                        <input type="radio" value="general" name="tag" onChange={ handleOnChange } checked={tag && tag === 'general'} /> general
-                        <input type="radio" value="travel" name="tag" onChange={ handleOnChange } checked={tag && tag === 'travel'} /> travel
-                        <input type="radio" value="funny" name="tag" onChange={ handleOnChange } checked={tag && tag === 'funny'} /> Funny
+                        <div class="form__radio">
+                            <input type="radio" id="general" value="general" name="tag" onChange={ handleOnChange } checked={tag && tag === 'general'} />
+                            <label for="general" className="form__radio-label">general</label>
+                        </div>
+                        <div class="form__radio">
+                            <input type="radio" id="travel" value="travel" name="tag" onChange={ handleOnChange } checked={tag && tag === 'travel'} />
+                            <label for="travel" className="form__radio-label">travel</label>
+                        </div>
+                        <div class="form__radio">
+                            <input type="radio" id="funny" value="funny" name="tag" onChange={ handleOnChange } checked={tag && tag === 'funny'} />
+                            <label for="funny" className="form__radio-label">funny</label>
+                        </div>
                     </div>
                     <div className="form__group">
                         <label className="form__label" htmlFor="description">Post Body</label>
