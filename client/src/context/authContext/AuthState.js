@@ -27,7 +27,7 @@ const AuthState = props => {
       }
     } catch (err) { 
       //could be made better //TODO
-      if (window.location.href === 'http://localhost:3000/' || window.location.href === 'http://localhost:3000/signup' || window.location.href.startsWith('http://localhost:3000/auth/')) {
+      if (window.location.href === 'http://localhost:3000/' || window.location.href === 'http://localhost:3000/users'|| window.location.href === 'http://localhost:3000/most-popular-posts'  || window.location.href === 'http://localhost:3000/register' || window.location.href.startsWith('http://localhost:3000/auth/')) {
         dispatch({ type: AUTH_ERROR });
         return;
       } else {
@@ -55,6 +55,7 @@ const AuthState = props => {
         dispatch({ type: LOGIN_SUCCESS });
         toast.success('Login successful, welcome to the Mern Authentication Boilerplate.');
         loadUser();
+        props.history.push('/');
     } catch (err) {
       toast.error(err.response.data.message);
       dispatch({ type: AUTH_ERROR });

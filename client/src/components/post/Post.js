@@ -34,17 +34,21 @@ const FullPost = ({ match, history }) => {
 
     const likePost = async (id) => {
         try {
-            await axios.put(`/api/post/like/${id}`);  
+            const res = await axios.put(`/api/post/like/${id}`);  
+            toast.success(res.data.message);
         } catch (err) {
-            console.log(err.response.message);   
+            console.error(err.response.data.message);   
+            toast.error(err.response.data.message);
         }
     }
 
     const unLikePost = async (id) => {
         try {
-            await axios.put(`/api/post/unlike/${id}`);  
+            const res = await axios.put(`/api/post/unlike/${id}`);  
+            toast.success(res.data.message);
         } catch (err) {
-            console.log(err.response.message);  
+            console.error(err.response.data.message);   
+            toast.error(err.response.data.message);
         } 
     }
 

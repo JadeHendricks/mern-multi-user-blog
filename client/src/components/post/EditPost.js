@@ -2,7 +2,7 @@ import React, { Fragment, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-const PostForm = ({ match }) => {
+const PostForm = ({ match, history }) => {
     const [values, setValues] = useState({ title: '', tag: '', description: '', user: ''});
     const { title, tag, description, user } = values;
 
@@ -33,6 +33,7 @@ const PostForm = ({ match }) => {
         try {
             const res = await axios.put(`/api/post/${id}`, body, config);        
             toast.success(res.data.message);
+            history.push(`/post/${id}`);
         } catch (err) {
             console.log(err.response.message);
         }

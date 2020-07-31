@@ -21,6 +21,7 @@ const Navigation = () => {
             { !isAuthenticated &&  (
                 <nav className="nav nav__user">
                     <Link className="nav__el" to='/users'>All Users</Link>
+                    <Link className="nav__el" to='/most-popular-posts'>Popular Posts</Link>
                     <Link className="nav__el" to='/login'>Log in</Link>
                     <Link className="nav__el nav__el--cta" to='/register'>Register</Link>
                 </nav>

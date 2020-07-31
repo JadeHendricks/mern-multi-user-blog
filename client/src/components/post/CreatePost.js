@@ -3,7 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 
-const PostForm = () => {
+const PostForm = ({ history }) => {
     const [values, setValues] = useState({ title: '', tag: '', description: ''});
     const { title, tag, description } = values;
 
@@ -19,6 +19,7 @@ const PostForm = () => {
         try {
             const res = await axios.post('/api/post', body, config);
             toast.success(res.data.message);
+            history.push(`/post/${res.data.post._id}`);
         } catch (err) {
             console.log(err.response.message);
         }

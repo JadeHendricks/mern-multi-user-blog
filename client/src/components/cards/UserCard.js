@@ -2,7 +2,6 @@ import React from 'react';
 import Moment from 'react-moment';
 import svg from '../../assets/images/icons/sprite.svg'
 import { Link } from 'react-router-dom';
-import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 
 const UserCard = ({ user: { createdAt, name, _id, avatar, socials } }) => {
     return (

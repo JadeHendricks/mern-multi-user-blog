@@ -182,7 +182,7 @@ exports.likePost = async (req, res) => {
 
         if (post.likes.filter(like => like.user.toString() === req.user.id).length > 0) {
           return res.status(400).json({ 
-              message: 'Post already liked' 
+              message: 'Post has already been liked.' 
           });
         }
 
@@ -190,6 +190,7 @@ exports.likePost = async (req, res) => {
         await post.save();
 
         res.status(200).json({
+            message: 'Post has been liked.',
             likes: post.likes,
             results: post.likes.length
         });
@@ -197,9 +198,11 @@ exports.likePost = async (req, res) => {
     } catch (err) {
         console.error(err.message);
         if (err.kind === 'ObjectId') {
-          return res.status(404).json({ msg: 'Post not found' })
+          return res.status(404).json({ message: 'Post not found' })
         }
-        res.status(500).send('Server Error');
+        res.status(401).json({
+            message: 'Please log in to like this post'
+        });
     }
 }
 
@@ -208,20 +211,26 @@ exports.unlikePost = async (req, res) => {
         const post = await Post.findById(req.params.id);
         if (post.likes.filter(like => like.user.toString() === req.user.id).length === 0) {
             return res.status(400).json({ 
-                message: 'Post has not yet been liked' 
+                message: 'Post has not yet been liked.' 
             });
         }
         const removeIndex = post.likes.map(like => like.user.toString()).indexOf(req.user.id);
         post.likes.splice(removeIndex, 1);
         await post.save();
-        res.status(200).json(post.likes);
+        res.status(200).json({ 
+            message: 'Post has been disliked.',
+            likes: post.likes,
+            results: post.likes.length
+        });
 
     } catch (err) {
         console.error(err.message);
         if (err.kind === 'ObjectId') {
-          return res.status(404).json({ msg: 'Post not found' })
+          return res.status(404).json({ message: 'Post not found' })
         }
-        res.status(500).send('Server Error');
+        res.status(401).json({
+            message: 'Please log in to unlike this post'
+        });
     }
 }
 
@@ -247,7 +256,9 @@ exports.addComment = async (req, res) => {
     
       } catch (err) {
         console.error(err.message);
-        res.status(500).send('Server Error');
+        res.status(401).json({
+            message: 'Please log in to submit a comment'
+        });
       }
 }
 

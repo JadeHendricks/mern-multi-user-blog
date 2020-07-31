@@ -33,7 +33,7 @@ router
 
 router
     .route('/:id')
-    .get(authController.protect, postController.getPost)
+    .get(postController.getPost)
     .put(authController.protect, postController.uploadPostPhoto, postController.editPost)
     .delete(authController.protect, postController.deletePost);
 

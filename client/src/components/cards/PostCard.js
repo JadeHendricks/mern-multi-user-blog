@@ -1,8 +1,9 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useContext } from 'react';
 import axios from 'axios';
 import svg from '../../assets/images/icons/sprite.svg'
 import Moment from 'react-moment';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import AuthContext from '../../context/authContext/AuthContext';
 
 const PostCard = ({ post: { _id, title, image, date, tag, description, user, likes, comments } }) => {
@@ -25,17 +26,21 @@ const PostCard = ({ post: { _id, title, image, date, tag, description, user, lik
 
     const likePost = async (id) => {
         try {
-            await axios.put(`/api/post/like/${id}`);  
+            const res = await axios.put(`/api/post/like/${id}`);  
+            toast.success(res.data.message);
         } catch (err) {
-            console.log(err.response.message);   
+            console.error(err.response.data.message);   
+            toast.error(err.response.data.message);
         }
     }
 
     const unLikePost = async (id) => {
         try {
-            await axios.put(`/api/post/unlike/${id}`);  
+            const res = await axios.put(`/api/post/unlike/${id}`);  
+            toast.success(res.data.message);
         } catch (err) {
-            console.log(err.response.message);  
+            console.error(err.response.data.message);   
+            toast.error(err.response.data.message);
         } 
     }
 
