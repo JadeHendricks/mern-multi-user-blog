@@ -21,11 +21,13 @@ import AllUsers from './components/layouts/AllUsers';
 import MostPopularPosts from './components/layouts/MostPopularPosts';
 
 import AuthState from "./context/authContext/AuthState";
+import PostState from "./context/postContext/PostState";
 
 function App (props) {
   return (
     <Router>
       <AuthState>
+      <PostState>
         <Fragment>
           <Loader />
           <ToastContainer autoClose={ 4000 } pauseOnHover={ false } />
@@ -48,6 +50,7 @@ function App (props) {
           </main>
           <Footer />
         </Fragment>
+      </PostState>
       </AuthState>
     </Router>
 

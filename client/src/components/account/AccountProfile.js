@@ -4,8 +4,6 @@ import ProfileCard from '../cards/ProfileCard';
 import PostCard from '../cards/PostCard';
 import AccountSettings from './AccountSettings';
 import axios from 'axios';
-import { toast } from 'react-toastify';
-import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 import AuthContext from '../../context/authContext/AuthContext';
 
 const Profile = ({ match }) => {

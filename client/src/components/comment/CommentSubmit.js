@@ -1,25 +1,15 @@
 import React, { useState, useContext } from 'react';
-import axios from 'axios';
 import CommentPost from './CommentPost';
-import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import AuthContext from '../../context/authContext/AuthContext';
+import PostContext from '../../context/postContext/PostContext';
 
 const CommentSubmit = ({ postId, postUser, comments }) => {
     const { isAuthenticated } = useContext(AuthContext);
+    const { createComment } = useContext(PostContext);
+
     const [ comment, setComment] = useState('');
-
-    const createComment = (id, comment) => {
-        const config = { headers: {'Content-Type': 'application/json'} };
-        const body = JSON.stringify(comment);
-        try {
-            axios.post(`/api/post/comment/${id}`, body, config);
-            toast.success('Comment added');
-        } catch (err) {
-            console.log(err.response.message);
-        }
-    }
-
+    
     const handleOnChange = e => setComment({ ...comment, [e.target.name]: e.target.value });
 
     const handleSubmit = e => {

@@ -1,24 +1,15 @@
 import React, { useContext } from 'react';
-import axios from 'axios';
 import Moment from 'react-moment';
-import { toast } from 'react-toastify';
 import AuthContext from '../../context/authContext/AuthContext';
+import PostContext from '../../context/postContext/PostContext';
 
 const CommentPost = ({ comment: { userId, avatar, comment, name, date, _id }, postId }) => {
     const { loggedInUser } = useContext(AuthContext);
+    const { deleteComment } = useContext(PostContext);
 
     const isUsersData = () => {
         if (loggedInUser && userId) {
             return loggedInUser._id === userId;
-        }
-    }
-
-    const deleteComment = async (postId, commentId) => {
-        try {
-            await axios.delete(`/api/post/comment/${postId}/${commentId}`);
-            toast.success('Comment deleted')
-        } catch (err) {
-            console.log(err.reponse.message)
         }
     }
 

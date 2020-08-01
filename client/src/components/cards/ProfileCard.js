@@ -1,54 +1,13 @@
 import React, { useContext } from 'react';
-import axios from 'axios';
-import { toast } from 'react-toastify';
 import svg from '../../assets/images/icons/sprite.svg'
-import placeholderPostImage from '../../assets/images/seven-img1.png';
 import AuthContext from '../../context/authContext/AuthContext';
+import PostContext from '../../context/postContext/PostContext';
 import { Link } from 'react-router-dom';
 
 const ProfileCard = ({ post: { _id, title, image, tag, description, comments, likes } }) => {
 
     const { loggedInUser } = useContext(AuthContext);
-
-    const deletePost = async (e, id) => { 
-        e.preventDefault()
-        try {
-            await axios.delete(`/api/post/${id}`); 
-            toast.success('Post has been deleted');
-        } catch (err) {
-            console.log(err.response.message);
-        }
-    }
-
-    const postIsLiked = () => {
-        if (likes && loggedInUser) {
-            const isLiked = likes.filter(like => like.user === loggedInUser._id);
-            if (isLiked.length > 0) {
-                return true;
-            }
-            return false;
-        }
-    }
-
-    const likePost = async (id) => {
-        try {
-            await axios.put(`/api/post/like/${id}`);  
-        } catch (err) {
-            console.log(err.response.message);   
-        }
-    }
-
-    const unLikePost = async (id) => {
-        try {
-            await axios.put(`/api/post/unlike/${id}`);  
-        } catch (err) {
-            console.log(err.response.message);  
-        } 
-    }
-
-    const descriptionTrimmer = (desc) => {
-        return desc.slice(0, 150) + '...';
-    }
+    const { deletePost, likePost, unLikePost, postIsLiked, descriptionTrimmer } = useContext(PostContext);
 
     return (
         <div className="card">
@@ -75,7 +34,7 @@ const ProfileCard = ({ post: { _id, title, image, tag, description, comments, li
                         <span>{ comments.length } { comments.length === 1 ? 'Comment' : 'Comments' }</span>
                     </div>
                     <div className="card__interaction-block">
-                        { !postIsLiked() ? (
+                        { !postIsLiked(likes, loggedInUser) ? (
                             <svg className="card__interaction-icon" onClick={ () => likePost(_id) }>
                                 <use xlinkHref={`${svg}#icon-heart-o`}></use>
                             </svg>
