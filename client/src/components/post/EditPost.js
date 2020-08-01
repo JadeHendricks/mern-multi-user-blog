@@ -5,22 +5,22 @@ import PostContext from '../../context/postContext/PostContext';
 
 const PostForm = ({ match }) => {
     const { editPost } = useContext(PostContext);
-    const [values, setValues] = useState({ title: '', tag: '', description: '', user: ''});
-    const { title, tag, description, user } = values;
+    const [values, setValues] = useState({ image: '', title: '', tag: '', description: ''});
+    const { image, title, tag, description } = values;
 
-    const [ image, setImage] = useState();
+    const [ blogimage, setBlogImage] = useState();
 
     const getPost = async (id) => {
         try {
             const res = await axios.get(`/api/post/${id}`);
             setValues({ 
+                image: res.data.post.image,
                 title: res.data.post.title, 
                 tag: res.data.post.tag, 
-                description: res.data.post.description,
-                user: res.data.post.user,
+                description: res.data.post.description
             });
         } catch (err) {
-            console.log(err.response.data.message);
+            console.log(err);
             toast.error(err.response.data.message);
         }
     }
@@ -33,7 +33,7 @@ const PostForm = ({ match }) => {
 
     const handleSubmit = e => {
         e.preventDefault();
-        editPost(match.params.id, title, tag, description, image);
+        editPost(match.params.id, title, tag, description, blogimage);
         setValues({ title: '', tag: '', description: '', user: ''});
     }
 
@@ -76,14 +76,14 @@ const PostForm = ({ match }) => {
                         <textarea className="form__input form__textarea" onChange={ handleOnChange } value={ description } id="description" name="description" placeholder="Post goes here"></textarea>
                     </div>
                     <div className="form__group form__photo-upload">
-                        { user.avatar && (
-                            <img className="form__user-photo" src={require(`../../assets/images/users/${user.avatar}`)} alt={ user.name } title={ user.name } />
+                        { image && title && (
+                            <img className="form__user-photo" src={require(`../../assets/images/posts/${image}`)} alt={ title } title={ title } />
                         )}
-                        <input className="form__upload" type="file" accept="image/*" id="image" name="image" onChange={ e => {
+                        <input className="form__upload" type="file" accept="image/*" id="blogimage" name="blogimage" onChange={ e => {
                             const file = e.target.files[0];
-                            setImage(file);
+                            setBlogImage(file);
                         } } />
-                        <label htmlFor="image">Choose a blog post image</label>
+                        <label htmlFor="blogimage">Choose a blog post image</label>
                     </div>
                     <div className="form__group">
                         <button className="button button--green">Update</button>

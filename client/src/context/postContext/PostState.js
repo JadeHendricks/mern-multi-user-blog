@@ -23,14 +23,14 @@ const PostState = props => {
     }
   }
 
-  const editPost = async (id, title, tag, description, image) => { 
+  const editPost = async (id, title, tag, description, blogimage) => { 
     const config = { headers: {'Content-Type': 'application/json'} };
     const body = new FormData();
     body.append('id', id);
     body.append('title', title);
     body.append('tag', tag);
     body.append('description', description);
-    body.append('image', image);
+    body.append('image', blogimage);
     try {
         const res = await axios.put(`/api/post/${id}`, body, config);        
         toast.success(res.data.message);
