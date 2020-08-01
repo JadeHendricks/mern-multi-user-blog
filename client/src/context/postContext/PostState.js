@@ -70,36 +70,6 @@ const PostState = props => {
     }
   }
 
-  const postIsLiked = (likes, loggedInUser) => {
-    if (likes && loggedInUser) {
-        const isLiked = likes.filter(like => like.user === loggedInUser._id);
-        if (isLiked.length > 0) {
-            return true;
-        }
-        return false;
-    }
-}
-
-  const likePost = async (id) => {
-      try {
-          const res = await axios.put(`/api/post/like/${id}`);  
-          toast.success(res.data.message);
-      } catch (err) {
-          console.error(err.response.data.message);   
-          toast.error(err.response.data.message);
-      }
-  }
-
-  const unLikePost = async (id) => {
-      try {
-          const res = await axios.put(`/api/post/unlike/${id}`);  
-          toast.success(res.data.message);
-      } catch (err) {
-          console.error(err.response.data.message);   
-          toast.error(err.response.data.message);
-      } 
-  }
-
   const descriptionTrimmer = (desc) => {
     return desc.slice(0, 150) + '...';
   }
@@ -109,9 +79,6 @@ const PostState = props => {
       deletePost,
       createComment,
       deleteComment,
-      postIsLiked,
-      likePost,
-      unLikePost,
       descriptionTrimmer,
       editPost,
       createPost

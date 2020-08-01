@@ -1,13 +1,10 @@
 import React, { useContext } from 'react';
 import svg from '../../assets/images/icons/sprite.svg'
-import AuthContext from '../../context/authContext/AuthContext';
 import PostContext from '../../context/postContext/PostContext';
 import { Link } from 'react-router-dom';
 
-const ProfileCard = ({ post: { _id, title, image, tag, description, comments, likes } }) => {
-
-    const { loggedInUser } = useContext(AuthContext);
-    const { deletePost, likePost, unLikePost, postIsLiked, descriptionTrimmer } = useContext(PostContext);
+const ProfileCard = ({ post: { _id, title, image, tag, description, comments } }) => {
+    const { deletePost, descriptionTrimmer } = useContext(PostContext);
 
     return (
         <div className="card">
@@ -32,18 +29,6 @@ const ProfileCard = ({ post: { _id, title, image, tag, description, comments, li
                             <use xlinkHref={`${svg}#icon-comment-o`}></use>
                         </svg>   
                         <span>{ comments.length } { comments.length === 1 ? 'Comment' : 'Comments' }</span>
-                    </div>
-                    <div className="card__interaction-block">
-                        { !postIsLiked(likes, loggedInUser) ? (
-                            <svg className="card__interaction-icon" onClick={ () => likePost(_id) }>
-                                <use xlinkHref={`${svg}#icon-heart-o`}></use>
-                            </svg>
-                        ) : (
-                            <svg className="card__interaction-icon" onClick={ () => unLikePost(_id) }>
-                                <use xlinkHref={`${svg}#icon-heart`}></use>
-                            </svg>
-                        ) }  
-                        <span>{ likes.length } { likes.length === 1 ? 'Like' : 'Likes' }</span>
                     </div>
                 </div>
             </div>
