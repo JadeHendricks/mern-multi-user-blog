@@ -82,6 +82,7 @@ const AuthState = props => {
       dispatch({ type: LOGOUT });
       if (res.data.message === 'success') {
         setTimeout(() => {
+          props.history.push('/')
           window.location.reload(true);
         }, 4000);
       }
