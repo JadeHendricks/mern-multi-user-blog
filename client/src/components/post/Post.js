@@ -36,7 +36,7 @@ const FullPost = ({ match, history }) => {
                             <button className="button" onClick={ () => unLikePost(_id) }>Unlike Post</button> :
                             <button className="button" onClick={ () => likePost(_id) }>Like Post</button>
                         }
-                        { isUsersData(loggedInUser, user) && (
+                        { user && loggedInUser && isUsersData(loggedInUser._id, user._id) && (
                             <Fragment>
                                 <Link to={`/edit-post/${_id}`} className="button button--yellow">Edit Post</Link>
                                 <button className="button button--red" onClick={ () => deletePost(_id) }>Delete Post</button>
