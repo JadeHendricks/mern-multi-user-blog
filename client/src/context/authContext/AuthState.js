@@ -139,6 +139,12 @@ const AuthState = props => {
     }
   }
 
+  const isUsersData = (loggedInUserId, userId) => {
+    if (loggedInUserId && userId) {
+        return loggedInUserId === userId;
+    }
+  }
+
   const [state, dispatch] = useReducer(AuthReducer, initialState);
 
   return (
@@ -152,7 +158,8 @@ const AuthState = props => {
       resetPassword,
       forgotPassword,
       activateAccount,
-      loadUser
+      loadUser,
+      isUsersData
     }}>
       { props.children }
     </AuthContext.Provider>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import PostCard from '../cards/PostCard'
+import PostCard from '../cards/PostCard';
+import { toast } from 'react-toastify';
 
 const MostPopularPosts = () => {
     
@@ -12,7 +13,8 @@ const MostPopularPosts = () => {
             const mostPopularPosts = res.data.posts.sort((a, b) => b.likes.length - a.likes.length).slice(0, 6);
             setPosts(mostPopularPosts);
         } catch (err) {
-            console.log(err.response.message);
+            console.error(err.response.data.message);
+            toast.error(err.response.data.message);
         }
     }
 

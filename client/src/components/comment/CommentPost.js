@@ -2,16 +2,9 @@ import React, { useContext } from 'react';
 import Moment from 'react-moment';
 import AuthContext from '../../context/authContext/AuthContext';
 import PostContext from '../../context/postContext/PostContext';
-
 const CommentPost = ({ comment: { userId, avatar, comment, name, date, _id }, postId }) => {
-    const { loggedInUser } = useContext(AuthContext);
+    const { loggedInUser, isUsersData } = useContext(AuthContext);
     const { deleteComment } = useContext(PostContext);
-
-    const isUsersData = () => {
-        if (loggedInUser && userId) {
-            return loggedInUser._id === userId;
-        }
-    }
 
     return (
         <div className="comment-post">
@@ -27,7 +20,7 @@ const CommentPost = ({ comment: { userId, avatar, comment, name, date, _id }, po
                     { comment }
                 </p>
             </div>
-            { isUsersData() && (
+            { isUsersData(loggedInUser, userId) && (
                 <div className="comment-post__interaction">
                     <button className="button button--red" onClick={ () => deleteComment(postId, _id) }>Delete Comment</button>  
                 </div>

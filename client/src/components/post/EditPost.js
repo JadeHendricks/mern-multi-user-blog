@@ -1,8 +1,10 @@
 import React, { Fragment, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import PostContext from '../../context/postContext/PostContext';
 
-const PostForm = ({ match, history }) => {
+const PostForm = ({ match }) => {
+    const { editPost } = useContext(PostContext);
     const [values, setValues] = useState({ title: '', tag: '', description: '', user: ''});
     const { title, tag, description, user } = values;
 
@@ -18,24 +20,8 @@ const PostForm = ({ match, history }) => {
                 user: res.data.post.user,
             });
         } catch (err) {
-            console.log(err.response.message);
-        }
-    }
-
-    const editPost = async (id, title, tag, description, image) => { 
-        const config = { headers: {'Content-Type': 'application/json'} };
-        const body = new FormData();
-        body.append('id', id);
-        body.append('title', title);
-        body.append('tag', tag);
-        body.append('description', description);
-        body.append('image', image);
-        try {
-            const res = await axios.put(`/api/post/${id}`, body, config);        
-            toast.success(res.data.message);
-            history.push(`/post/${id}`);
-        } catch (err) {
-            console.log(err.response.message);
+            console.log(err.response.data.message);
+            toast.error(err.response.data.message);
         }
     }
 

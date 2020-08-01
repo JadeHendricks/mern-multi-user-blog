@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import PostCard from '../cards/PostCard'
 
 const Base = () => {
-
     const [posts, setPosts] = useState([]);
 
     const getAllPosts = async () => { 
@@ -11,7 +11,8 @@ const Base = () => {
             const res = await axios.get('/api/post');
             setPosts(res.data.posts);
         } catch (err) {
-            console.log(err.response.message);
+            console.error(err.response.data.message);
+            toast.error(err.response.data.message);
         }
     }
 

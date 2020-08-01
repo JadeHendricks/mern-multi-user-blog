@@ -4,12 +4,14 @@ import ProfileCard from '../cards/ProfileCard';
 import PostCard from '../cards/PostCard';
 import AccountSettings from './AccountSettings';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import AuthContext from '../../context/authContext/AuthContext';
 
 const Profile = ({ match }) => {
-    const { loggedInUser } = useContext(AuthContext);
+    const { loggedInUser, isUsersData } = useContext(AuthContext);
 
     const [ user, setUser ] = useState({});
+    
     const [ allUsersPosts, setAllUsersPosts ] = useState({
         userPosts: [],
         results: ''
@@ -24,7 +26,8 @@ const Profile = ({ match }) => {
             const res = await axios.get(`/api/user/${id}`);
             setUser(res.data.user);
         } catch (err) {
-            console.log(err.response.message);
+            console.error(err.response.data.message);
+            toast.error(err.response.data.message);
         }
     }
 
@@ -36,13 +39,8 @@ const Profile = ({ match }) => {
                 userPostsResults: res.data.results
             });
         } catch (err) {
-            console.log(err.response.message);
-        }
-    }
-
-    const isUsersData = () => {
-        if (loggedInUser) {
-            return loggedInUser._id === user._id;
+            console.error(err.response.data.message);
+            toast.error(err.response.data.message);
         }
     }
 
@@ -106,7 +104,7 @@ const Profile = ({ match }) => {
                         <nav className="account-nav">
                             <ul className="account-nav__ul">
                                 <li className="account-nav__el"><a onClick={ handleNavigationState } name='all-posts' href="#">All posts ({ userPostsResults })</a></li>
-                                { isUsersData() && <li className="account-nav__el"><a onClick={ handleNavigationState } name='account-settings' href="#!">Account settings</a></li> }
+                                { isUsersData(loggedInUser._id, user._id) && <li className="account-nav__el"><a onClick={ handleNavigationState } name='account-settings' href="#!">Account settings</a></li> }
                             </ul>
                         </nav>
                     </aside>
@@ -117,8 +115,8 @@ const Profile = ({ match }) => {
                         { navigationState === 'all-posts' ? (
                             <section className="account-posts">
                                 <div className="cards cards--account">
-                                    { isUsersData() && userPosts.map(post => <ProfileCard key={post._id} post={ post } />) }
-                                    { !isUsersData() && userPosts.map(post => <PostCard key={post._id} post={ post } />) }
+                                    { isUsersData(loggedInUser._id, user._id) && userPosts.map(post => <ProfileCard key={post._id} post={ post } />) }
+                                    { !isUsersData(loggedInUser._id, user._id) && userPosts.map(post => <PostCard key={post._id} post={ post } />) }
                                 </div>
                             </section>
                         ) : <AccountSettings user={ user }/> }

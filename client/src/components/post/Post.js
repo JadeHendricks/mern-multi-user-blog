@@ -3,13 +3,13 @@ import svg from '../../assets/images/icons/sprite.svg'
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
-import Loader from '../layouts/Loader';
 import AuthContext from '../../context/authContext/AuthContext';
+import PostContext from '../../context/postContext/PostContext';
 import CommentSubmit from '../comment/CommentSubmit';
-import placeholderPostImage from '../../assets/images/seven-img1.png';
 
 const FullPost = ({ match, history }) => {
-    const { loggedInUser } = useContext(AuthContext);
+    const { loggedInUser, isUsersData } = useContext(AuthContext);
+    const { deletePost, likePost, unLikePost, postIsLiked } = useContext(PostContext);
 
     const [post, setPost] = useState({});
     const  { title, description, image, _id, user, likes, comments } = post;
@@ -19,52 +19,8 @@ const FullPost = ({ match, history }) => {
             const res = await axios.get(`/api/post/${id}`);
             setPost(res.data.post);
         } catch (err) {
-            console.log(err.response.message);
-        }
-    }
-
-    const deletePost = async (id) => { 
-        try {
-            await axios.delete(`/api/post/${id}`); 
-            toast.success('Post has been deleted');
-        } catch (err) {
-            console.log(err.response.message);
-        }
-    }
-
-    const likePost = async (id) => {
-        try {
-            const res = await axios.put(`/api/post/like/${id}`);  
-            toast.success(res.data.message);
-        } catch (err) {
-            console.error(err.response.data.message);   
+            console.error(err.response.data.message);
             toast.error(err.response.data.message);
-        }
-    }
-
-    const unLikePost = async (id) => {
-        try {
-            const res = await axios.put(`/api/post/unlike/${id}`);  
-            toast.success(res.data.message);
-        } catch (err) {
-            console.error(err.response.data.message);   
-            toast.error(err.response.data.message);
-        } 
-    }
-
-    const isUsersData = () => {
-        if (loggedInUser && user) {
-            return loggedInUser._id === user._id;
-        }
-    }
-
-    const postIsLiked = () => {
-        if (likes && loggedInUser) {
-            const isLiked = likes.filter(like => like.user === loggedInUser._id);
-            if (isLiked.length > 0) {
-                return true;
-            }
-            return false;
         }
     }
 
@@ -76,11 +32,11 @@ const FullPost = ({ match, history }) => {
         <div className="post">
             <div className="post__banner">
                     <div className="author-options">
-                        { postIsLiked() ? 
+                        { postIsLiked(likes, loggedInUser) ? 
                             <button className="button" onClick={ () => unLikePost(_id) }>Unlike Post</button> :
                             <button className="button" onClick={ () => likePost(_id) }>Like Post</button>
                         }
-                        { isUsersData() && (
+                        { isUsersData(loggedInUser, user) && (
                             <Fragment>
                                 <Link to={`/edit-post/${_id}`} className="button button--yellow">Edit Post</Link>
                                 <button className="button button--red" onClick={ () => deletePost(_id) }>Delete Post</button>

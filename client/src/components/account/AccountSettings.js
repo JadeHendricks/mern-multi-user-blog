@@ -21,7 +21,8 @@ const AccountSettings = ({ user }) => {
             const res = await axios.put(`/api/user/${user._id}/socials`, body, config);
             toast.success(res.data.message);
         } catch (err) {
-            console.log(err.response.message);
+            console.error(err.response.data.message);
+            toast.error(err.response.data.message);
         }
     }
 
@@ -35,7 +36,8 @@ const AccountSettings = ({ user }) => {
             const res = await axios.put(`/api/user/me`, body, config);
             toast.success(res.data.message);
         } catch (err) {
-            console.log(err.response.message);
+            console.error(err.response.data.message);
+            toast.error(err.response.data.message);
         }
     }
 
