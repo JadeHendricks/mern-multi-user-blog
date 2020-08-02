@@ -45,9 +45,9 @@ exports.getAllPosts = async (req, res) => {
         
     } catch (err) {
         console.error(err);
-        res.status(404).json({
-            message: err
-        }); 
+        res.status(500).json({
+            message: err.message
+        });
     }
 }
 
@@ -64,12 +64,12 @@ exports.getPost = async (req, res) => {
             post
         });
       } catch (err) {
-        console.error(err.message);
+        console.error(err);
         if (err.kind === 'ObjectId') {
           return res.status(404).json({ message: 'Post not found' })
         }
         res.status(500).json({
-            message: err
+            message: err.message
         });
       }
 }
@@ -92,9 +92,9 @@ exports.createPost = async (req, res) => {
             post
         });   
     } catch (err) {
-        console.error(err.message);
+        console.error(err);
         res.status(500).json({
-            message: err
+            message: err.message
         });
     }
 }
@@ -104,22 +104,23 @@ exports.deletePost = async (req, res) => {
         const post = await Post.findById(req.params.id); 
 
         if (!post) {
-            return res.status(404).json({ message: 'Post not found' })
+            return res.status(404).json({ message: 'Post not found.' })
         }
         // Check user
         if (post.user.toString() !== req.user.id) {
-            return res.status(401).json({ message: 'This post does not belong to you' });
+            return res.status(401).json({ message: 'This post does not belong to you.' });
         }
         await post.remove();
-        res.json({ message: 'Post removed' });
+        res.status(200).json({ message: 'Post has been deleted.' });
 
     } catch (err) {
-        console.error(err.message);
+        console.error(err);
         if (err.kind === 'ObjectId') {
             return res.status(404).json({ message: 'Post not found' })
         }
-        res.status(500).json({
-            message: err
+
+        return res.status(500).json({
+            message: err.message
         });
     }
 }
@@ -133,15 +134,14 @@ exports.getAllUsersPosts = async (req, res) => {
             posts: usersPosts
         });
     } catch (err) {
-        console.error(err.message);
+        console.error(err);
         res.status(500).json({
-            message: err
+            message: err.message
         });
     }
 }
 
 exports.editPost = async (req, res) => {
-
     const { id, title, tag, description } = req.body;
 
     const postFields = {};
@@ -169,10 +169,10 @@ exports.editPost = async (req, res) => {
             post
         });  
     } catch (err) {
-        console.error(err.message);
+        console.error(err);
         res.status(500).json({
-            message: err
-        }); 
+            message: err.message
+        });
     }
 }
 
@@ -180,7 +180,13 @@ exports.addComment = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id); 
         const user = await User.findById(req.user.id);
-    
+
+        if (!user || !post) {
+            return res.status(404).json({
+                message: 'User or Post data not found.'
+            })
+        }
+
         const newComment = {
           comment: req.body.comment,
           name: user.name,
@@ -192,14 +198,15 @@ exports.addComment = async (req, res) => {
         await post.save();
     
         res.status(201).json({
+            message: 'Comment has been added.',
             comments: post.comments,
             results: post.comments.length,
         });
     
       } catch (err) {
-        console.error(err.message);
-        res.status(401).json({
-            message: 'Please log in to submit a comment'
+        console.error(err);
+        res.status(500).json({
+            message: err.message
         });
       }
 }
@@ -207,7 +214,6 @@ exports.addComment = async (req, res) => {
 exports.deleteComment = async (req, res) => { 
     try {
         const post = await Post.findById(req.params.id); 
-
         const comment = post.comments.find(comment => comment._id.toString() === req.params.comment_id);
 
         if (!comment) {
@@ -223,10 +229,14 @@ exports.deleteComment = async (req, res) => {
         post.comments.splice(removeIndex, 1);
         await post.save();
     
-        res.json(post.comments);
+        res.status(200).json({
+            message: 'Comment has been deleted.'
+        });
     
       } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        console.error(err);
+        res.status(500).json({
+            message: err.message
+        });
       }
 }

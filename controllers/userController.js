@@ -43,8 +43,8 @@ exports.getMe = async (req, res) => {
 
     } catch (err) {
         console.error(err);
-        res.status(400).json({
-            message: err
+        res.status(500).json({
+            message: err.message
         });
     }
 }
@@ -65,8 +65,8 @@ exports.getUser = async (req, res) => {
 
     } catch (err) {
         console.error(err);
-        res.status(400).json({
-            message: err
+        res.status(500).json({
+            message: err.message
         });
     }
 }
@@ -87,8 +87,8 @@ exports.getAllUsers = async (req, res) => {
 
     } catch (err) {
         console.error(err);
-        res.status(404).json({
-            message: err
+        res.status(500).json({
+            message: err.message
         });
     }
 }
@@ -113,8 +113,10 @@ exports.updateMe = async (req, res) => {
         });
 
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error')
+        console.error(err);
+        res.status(500).json({
+            message: err.message
+        });
     }
 }
 
@@ -142,7 +144,9 @@ exports.updateUserSocials = async (req, res) => {
         });
 
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error')
+        console.error(err);
+        res.status(500).json({
+            message: err.message
+        });
     }
 }

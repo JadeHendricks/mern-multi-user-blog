@@ -20,7 +20,7 @@ const CommentPost = ({ comment: { userId, avatar, comment, name, date, _id }, po
                     { comment }
                 </p>
             </div>
-            { isUsersData(loggedInUser, userId) && (
+            { loggedInUser && userId && isUsersData(loggedInUser._id, userId) && (
                 <div className="comment-post__interaction">
                     <button className="button button--red" onClick={ () => deleteComment(postId, _id) }>Delete Comment</button>  
                 </div>

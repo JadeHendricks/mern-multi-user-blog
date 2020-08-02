@@ -1,6 +1,5 @@
 import React from "react";
 import PostContext from './PostContext';
-import PostReducer from './PostReducer';
 import { toast } from 'react-toastify';
 import { withRouter } from 'react-router-dom';
 import axios from 'axios';
@@ -19,7 +18,8 @@ const PostState = props => {
         toast.success(res.data.message);
         props.history.push(`/post/${res.data.post._id}`);
     } catch (err) {
-        console.log(err.response.data.message);
+        console.error(err);
+        toast.error(err.response.data.message);
     }
   }
 
@@ -36,37 +36,39 @@ const PostState = props => {
         toast.success(res.data.message);
         props.history.push(`/post/${id}`);
     } catch (err) {
-        console.log(err.response.data.message);
+        console.error(err);
+        toast.error(err.response.data.message);
     }
   }
 
   const deletePost = async (id) => { 
     try {
         await axios.delete(`/api/post/${id}`); 
-        toast.success('Post has been deleted');
+        toast.success('Post has been deleted.');
     } catch (err) {
-        console.log(err.response.data.message);
+        console.log(err);
         toast.error(err.response.data.message);
     }
-}
+  }
   
-  const createComment = (id, comment) => {
+  const createComment = async (id, comment) => {
     const config = { headers: {'Content-Type': 'application/json'} };
-    const body = JSON.stringify(comment);
     try {
-        axios.post(`/api/post/comment/${id}`, body, config);
-        toast.success('Comment added');
+        const res = await axios.post(`/api/post/comment/${id}`, comment, config);
+        toast.success(res.data.message);
     } catch (err) {
-        console.log(err.response.message);
+        console.error(err);
+        toast.error(err.response.data.message);
     }
-}
+  }
 
   const deleteComment = async (postId, commentId) => {
     try {
-        await axios.delete(`/api/post/comment/${postId}/${commentId}`);
-        toast.success('Comment deleted')
+        const res = await axios.delete(`/api/post/comment/${postId}/${commentId}`);
+        toast.success(res.data.message);
     } catch (err) {
-        console.log(err.reponse.message)
+        console.error(err);
+        toast.error(err.response.data.message);
     }
   }
 

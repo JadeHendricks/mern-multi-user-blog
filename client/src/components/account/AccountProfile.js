@@ -104,7 +104,7 @@ const Profile = ({ match }) => {
                         <nav className="account-nav">
                             <ul className="account-nav__ul">
                                 <li className="account-nav__el"><a onClick={ handleNavigationState } name='all-posts' href="#">All posts ({ userPostsResults })</a></li>
-                                { isUsersData(loggedInUser._id, user._id) && <li className="account-nav__el"><a onClick={ handleNavigationState } name='account-settings' href="#!">Account settings</a></li> }
+                                { loggedInUser && user && isUsersData(loggedInUser._id, user._id) && <li className="account-nav__el"><a onClick={ handleNavigationState } name='account-settings' href="#!">Account settings</a></li> }
                             </ul>
                         </nav>
                     </aside>
@@ -115,8 +115,8 @@ const Profile = ({ match }) => {
                         { navigationState === 'all-posts' ? (
                             <section className="account-posts">
                                 <div className="cards cards--account">
-                                    { isUsersData(loggedInUser._id, user._id) && userPosts.map(post => <ProfileCard key={post._id} post={ post } />) }
-                                    { !isUsersData(loggedInUser._id, user._id) && userPosts.map(post => <PostCard key={post._id} post={ post } />) }
+                                    { loggedInUser && user && isUsersData(loggedInUser._id, user._id) && userPosts.map(post => <ProfileCard key={post._id} post={ post } />) }
+                                    { loggedInUser && user && !isUsersData(loggedInUser._id, user._id) && userPosts.map(post => <PostCard key={post._id} post={ post } />) }
                                 </div>
                             </section>
                         ) : <AccountSettings user={ user }/> }

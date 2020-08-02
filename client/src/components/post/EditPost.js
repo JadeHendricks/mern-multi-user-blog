@@ -5,7 +5,7 @@ import PostContext from '../../context/postContext/PostContext';
 
 const PostForm = ({ match }) => {
     const { editPost } = useContext(PostContext);
-    const [values, setValues] = useState({ image: '', title: '', tag: '', description: ''});
+    const [ values, setValues ] = useState({ image: '', title: '', tag: '', description: ''});
     const { image, title, tag, description } = values;
 
     const [ blogimage, setBlogImage] = useState();
@@ -20,12 +20,13 @@ const PostForm = ({ match }) => {
                 description: res.data.post.description
             });
         } catch (err) {
-            console.log(err);
+            console.log(err.response.data.message);
             toast.error(err.response.data.message);
         }
     }
 
     useEffect(() => {
+        setValues({ title: '', tag: '', description: '', user: ''});
         getPost(match.params.id);
     }, [match.params.id]);
 
@@ -34,7 +35,6 @@ const PostForm = ({ match }) => {
     const handleSubmit = e => {
         e.preventDefault();
         editPost(match.params.id, title, tag, description, blogimage);
-        setValues({ title: '', tag: '', description: '', user: ''});
     }
 
     return (
@@ -86,7 +86,7 @@ const PostForm = ({ match }) => {
                         <label htmlFor="blogimage">Choose a blog post image</label>
                     </div>
                     <div className="form__group">
-                        <button className="button button--green">Update</button>
+                        <button className="button button--green">Update Post</button>
                     </div>
                 </form>
             </div>

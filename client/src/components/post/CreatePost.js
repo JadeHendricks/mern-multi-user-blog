@@ -1,6 +1,5 @@
 import React, { Fragment, useContext, useState } from 'react';
 import PostContext from '../../context/postContext/PostContext';
-import placeholderUserImage from '../../assets/images/jade-hendricks.jpg';
 import noImageFound from '../../assets/images/posts/default.jpg';
 
 const PostForm = () => {
@@ -41,7 +40,7 @@ const PostForm = () => {
                     <div className="form__group">
                         <label className="form__label" htmlFor="tag">Post Tag</label>
                         <div class="form__radio">
-                            <input type="radio" id="general" value="general" name="tag" onChange={ handleOnChange } checked={tag && tag === 'general'} />
+                            <input type="radio" id="general" value="general" name="tag" onChange={ handleOnChange } checked={tag && tag === 'general'} checked />
                             <label for="general" className="form__radio-label">general</label>
                         </div>
                         <div class="form__radio">
@@ -66,7 +65,7 @@ const PostForm = () => {
                         <label htmlFor="image">Choose a blog post image</label>
                     </div>
                     <div className="form__group">
-                        <button className="button button--green">Post</button>
+                        <button className="button button--green">Create Post</button>
                     </div>
                 </form>
             </div>

@@ -10,10 +10,10 @@ const MostPopularPosts = () => {
     const getAllPosts = async () => { 
         try {
             const res = await axios.get('/api/post');
-            const mostPopularPosts = res.data.posts.sort((a, b) => b.likes.length - a.likes.length).slice(0, 6);
+            const mostPopularPosts = res.data.posts.sort((a, b) => b.comments.length - a.comments.length).slice(0, 6);
             setPosts(mostPopularPosts);
         } catch (err) {
-            console.error(err.response.data.message);
+            console.err(err);
             toast.error(err.response.data.message);
         }
     }

@@ -42,8 +42,8 @@ exports.register = async (req, res) => {
 
     } catch (err) {
         console.error(err);
-        return res.status(404).json({
-            message: err
+        res.status(500).json({
+            message: err.message
         });
     }
 }
@@ -103,8 +103,8 @@ exports.login = async (req, res) => {
 
     } catch (err) {
         console.error(err);
-        res.status(400).json({
-            message: err
+        res.status(500).json({
+            message: err.message
         });
     }
 }
@@ -222,10 +222,10 @@ exports.forgotPassword = async (req, res) => {
              message: `Email has been sent to ${email}. Follow the instructions to reset your password`
          });
     } catch (err) {
-        console.error(err.message);
+        console.error(err);
         res.status(500).json({
-            message: 'Server Error'
-        })
+            message: err.message
+        });
     }
 }
 
@@ -254,8 +254,8 @@ exports.resetPassword = async (req, res) => {
             })
         }   
     } catch (err) {
-        console.error(err.message);
-        res.status(401).json({
+        console.error(err);
+        res.status(500).json({
             message: err.message
         });
     }
