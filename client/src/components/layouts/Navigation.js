@@ -5,7 +5,6 @@ import { withRouter } from 'react-router-dom';
 import SiteLogoW from '../../assets/images/logo-white.png';
 
 const Navigation = () => {
-
     const { isAuthenticated, loggedInUser, logout } = useContext(AuthContext);
 
     const onLogout = () => logout();

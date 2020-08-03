@@ -12,7 +12,7 @@ const PostState = props => {
     users: [],
     user: {},
     userPosts: [],
-    loading: true
+    userLoading: true
   };
 
   const [state, dispatch] = useReducer(UserReducer, initialState);
@@ -61,7 +61,7 @@ const PostState = props => {
       users: state.users,
       user: state.user,
       userPosts: state.userPosts,
-      loading: state.loading,
+      userLoading: state.userLoading,
       getAllUsers,
       getUser,
       getAllUsersPosts

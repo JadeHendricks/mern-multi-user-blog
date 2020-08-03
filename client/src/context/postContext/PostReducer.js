@@ -1,4 +1,4 @@
-import { GET_ALL_POSTS, CREATE_COMMENT  } from '../types';
+import { GET_ALL_POSTS, GET_POST, CREATE_COMMENT  } from '../types';
   
 export default ( state, action ) => {
     switch (action.type) {
@@ -6,13 +6,19 @@ export default ( state, action ) => {
             return {
                 ...state,
                 posts: action.payload,
-                loading: false,
+                postLoading: false,
+            }
+        case GET_POST: 
+            return {
+                ...state,
+                post: action.payload,
+                postLoading: false,
             }
         case CREATE_COMMENT: 
             return {
                 ...state,
                 post: { ...state.post, comments: action.payload },
-                loading: false,
+                postLoading: false,
             }
         default: 
         return state;

@@ -6,19 +6,19 @@ export default ( state, action ) => {
             return {
                 ...state,
                 users: action.payload,
-                loading: false,
+                userLoading: false,
             }
         case GET_USER: 
             return {
                 ...state,
                 user: action.payload,
-                loading: false
+                userLoading: false
             }
         case GET_ALL_USERS_POSTS: 
             return {
                 ...state,
                 userPosts: action.payload,
-                loading: false
+                userLoading: false
             }
         default: 
         return state;

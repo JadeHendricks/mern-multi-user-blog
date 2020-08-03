@@ -14,9 +14,7 @@ const PostCard = ({ post: { _id, title, image, date, tag, description, user, lik
         <div className="card">
             <Link to={`/post/${_id}`}>
                 <div className="card__header">
-                    { image && (
-                        <img className="card__image" src={require(`../../assets/images/posts/${image}`)} alt={ title } title={ title } />
-                    ) }
+                    <img className="card__image" src={require(`../../assets/images/posts/${image}`)} alt={ title } title={ title } />
                     <h5 className={ tag === 'travel' ? 'card__tag card__tag--orange': tag === 'funny' ? 'card__tag card__tag--yellow': 'card__tag'}>
                         { tag }
                     </h5>
@@ -46,19 +44,15 @@ const PostCard = ({ post: { _id, title, image, date, tag, description, user, lik
                     </div>
                 </div>
             </div>
-            { user && (
-                <Link to={`/profile/${user._id}`} className="card__user-link">
-                    <div className="card__user">
-                        { user.avatar && (
-                            <img className="card__user-image" src={require(`../../assets/images/users/${user.avatar}`)} alt={ user.name } title={ user.name } />
-                        ) }
-                        <div className="card__user-info">
-                            <div>{ user.name }</div>
-                            <div>Posted on: <Moment format="DD/MM/YYYY">{ date }</Moment></div>
-                        </div>
+            <Link to={`/profile/${user._id}`} className="card__user-link">
+                <div className="card__user">
+                        <img className="card__user-image" src={require(`../../assets/images/users/${user?.avatar}`)} alt={ user.name } title={ user.name } />
+                    <div className="card__user-info">
+                        <div>{ user.name }</div>
+                        <div>Posted on: <Moment format="DD/MM/YYYY">{ date }</Moment></div>
                     </div>
-                </Link>
-            )}
+                </div>
+            </Link>
         </div>
     )
 }

@@ -4,14 +4,14 @@ import PostReducer from './PostReducer';
 import { toast } from 'react-toastify';
 import { withRouter } from 'react-router-dom';
 import axios from 'axios';
-import { GET_ALL_POSTS, CREATE_COMMENT } from "../types";
+import { GET_ALL_POSTS, CREATE_COMMENT, GET_POST } from "../types";
 
 const PostState = props => {
 
   const initialState = {
     posts: [],
-    post: null,
-    loading: true
+    post: {},
+    postLoading: true
   };
 
   const [state, dispatch] = useReducer(PostReducer, initialState);
@@ -25,6 +25,19 @@ const PostState = props => {
         });
     } catch (err) {
       console.error(err);
+        toast.error(err.response.data.message);
+    }
+  }
+
+  const getPost = async (id) => {
+    try {
+        const res = await axios.get(`/api/post/${id}`);
+        dispatch({
+          type: GET_POST,
+          payload: res.data.post
+        })
+    } catch (err) {
+        console.error(err);
         toast.error(err.response.data.message);
     }
   }
@@ -138,8 +151,9 @@ const PostState = props => {
       posts: state.posts,
       post: state.post,
       comments: state.comments,
-      loading: state.loading,
+      postLoading: state.postLoading,
       getAllPosts,
+      getPost,
       deletePost,
       createComment,
       deleteComment,

@@ -1,7 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import defaultImage from '../../assets/images/users/default.jpg';
 
 const AccountSettings = ({ user }) => {
 

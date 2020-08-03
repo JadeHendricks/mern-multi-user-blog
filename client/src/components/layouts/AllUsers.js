@@ -1,22 +1,27 @@
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useContext, Fragment } from 'react';
 import UserCard from '../cards/UserCard';
 import UserContext from '../../context/userContext/UserContext';
 
 const AllUsers = () => {
-    const { getAllUsers, users } = useContext(UserContext);
+    const { getAllUsers, users, userLoading} = useContext(UserContext);
 
     useEffect(() => {
         getAllUsers();
     }, []);
     
     return (
-        <section className="all-user">
-            <div className="container">
-                <div className="all-userCards">
-                    { users?.map(user => <UserCard key={ user._id } user={ user }/>) }
-                </div>
-            </div>
-        </section>
+        <Fragment>
+            { userLoading ? (<h1>LOADING</h1>) : (
+                <section className="all-user">
+                    <div className="container">
+                        <div className="all-userCards">
+                            { users?.map(user => <UserCard key={ user._id } user={ user }/>) }
+                        </div>
+                    </div>
+                </section>
+            ) }
+        </Fragment>
+
     )
 }
 

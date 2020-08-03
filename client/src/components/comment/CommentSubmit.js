@@ -6,7 +6,7 @@ import PostContext from '../../context/postContext/PostContext';
 
 const CommentSubmit = ({ postId, postUser, comments }) => {
     const { isAuthenticated } = useContext(AuthContext);
-    const { createComment, post } = useContext(PostContext);
+    const { createComment } = useContext(PostContext);
 
     const [ comment, setComment] = useState('');
     
@@ -23,7 +23,7 @@ const CommentSubmit = ({ postId, postUser, comments }) => {
                 <h3 className="comment__title">Submit a comment</h3>
                 <Link className="comment__auth" to='/login'>Not logged in? Log in to submit a comment</Link>
             </div>
-            { isAuthenticated  && (
+            { isAuthenticated && (
                 <form className="comment-form" onSubmit={ handleSubmit }>
                     <div className="form__group">
                         <textarea id="comment" name="comment" className="form__input form__textarea" onChange={ handleOnChange } placeholder="Comment..."></textarea>
@@ -32,11 +32,11 @@ const CommentSubmit = ({ postId, postUser, comments }) => {
                         <button type="submit" className="button button--green">Submit comment</button>
                     </div>
                     <div className="form__group">
-                        <span className="comment__total">{ post?.comments.length } Comments</span>
+                        <span className="comment__total">{ comments?.length } { comments?.length === 1 ? 'Comment' : 'Comments'}</span>
                     </div>
                 </form>
             )}
-            { post?.comments.map( comment => <CommentPost key={ comment._id } postId={ postId } postUser={ postUser } comment={ comment }/>) }
+            { comments?.map( comment => <CommentPost key={ comment._id } postId={ postId } postUser={ postUser } comment={ comment }/>) }
         </div>
     )
 }

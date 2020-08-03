@@ -3,7 +3,7 @@ import PostCard from '../cards/PostCard'
 import PostContext from '../../context/postContext/PostContext';
 
 const Base = () => {
-    const { getAllPosts, posts, loading } = useContext(PostContext)
+    const { getAllPosts, posts, postLoading } = useContext(PostContext);
 
     useEffect(() => {
         getAllPosts();
@@ -11,7 +11,7 @@ const Base = () => {
 
     return (
         <Fragment>
-            { loading ? 'LOADING!': (
+            { postLoading ? (<h1>LOADING</h1>): (
                 <section className="all-posts">
                     <div className="container">
                         <div className="cards">

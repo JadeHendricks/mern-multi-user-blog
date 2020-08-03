@@ -15,7 +15,7 @@ const AuthState = props => {
 
   const initialState = {
     isAuthenticated: null,
-    loading: true,
+    authLoading: true,
     loggedInUser: null
   };
 
@@ -151,7 +151,7 @@ const AuthState = props => {
   return (
     <AuthContext.Provider value={{
       isAuthenticated: state.isAuthenticated,
-      loading: state.loading,
+      authLoading: state.authLoading,
       loggedInUser: state.loggedInUser,
       register,
       login,
