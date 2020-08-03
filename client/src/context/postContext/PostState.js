@@ -4,7 +4,7 @@ import PostReducer from './PostReducer';
 import { toast } from 'react-toastify';
 import { withRouter } from 'react-router-dom';
 import axios from 'axios';
-import { GET_ALL_POSTS } from "../types";
+import { GET_ALL_POSTS, CREATE_COMMENT } from "../types";
 
 const PostState = props => {
 
@@ -24,7 +24,7 @@ const PostState = props => {
           payload: res.data.posts
         });
     } catch (err) {
-        console.error(err.response.data.message);
+      console.error(err);
         toast.error(err.response.data.message);
     }
   }
@@ -79,6 +79,10 @@ const PostState = props => {
     try {
         const res = await axios.post(`/api/post/comment/${id}`, comment, config);
         toast.success(res.data.message);
+        dispatch({
+          type: CREATE_COMMENT,
+          payload: res.data.comment
+        })
     } catch (err) {
         console.error(err);
         toast.error(err.response.data.message);
@@ -133,6 +137,7 @@ const PostState = props => {
     <PostContext.Provider value={{
       posts: state.posts,
       post: state.post,
+      comments: state.comments,
       loading: state.loading,
       getAllPosts,
       deletePost,

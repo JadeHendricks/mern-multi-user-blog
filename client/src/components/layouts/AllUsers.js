@@ -1,20 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { toast } from 'react-toastify';
+import React, { useEffect, useContext, useState } from 'react';
 import UserCard from '../cards/UserCard';
+import UserContext from '../../context/userContext/UserContext';
 
 const AllUsers = () => {
-    const [users, setUsers] = useState([]);
-
-    const getAllUsers = async () => {
-        try {
-            const res = await axios.get('api/user');
-            setUsers(res.data.users);
-        } catch (err) {
-            console.error(err.response.data.message);
-            toast.error(err.response.data.message);
-        }
-    }
+    const { getAllUsers, users } = useContext(UserContext);
 
     useEffect(() => {
         getAllUsers();
@@ -24,7 +13,7 @@ const AllUsers = () => {
         <section className="all-user">
             <div className="container">
                 <div className="all-userCards">
-                    { users.map(user => <UserCard key={ user._id } user={ user }/>) }
+                    { users?.map(user => <UserCard key={ user._id } user={ user }/>) }
                 </div>
             </div>
         </section>

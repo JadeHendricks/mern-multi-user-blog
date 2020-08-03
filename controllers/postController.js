@@ -257,7 +257,7 @@ exports.addComment = async (req, res) => {
     
         res.status(201).json({
             message: 'Comment has been added.',
-            comments: post.comments,
+            comment: post.comments,
             results: post.comments.length,
         });
     

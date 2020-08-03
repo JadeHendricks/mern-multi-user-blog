@@ -1,23 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useContext, useEffect } from 'react';
 import PostCard from '../cards/PostCard';
-import { toast } from 'react-toastify';
+import PostContext from '../../context/postContext/PostContext';
 
 const MostPopularPosts = () => {
+    const { getAllPosts, posts } = useContext(PostContext);
     
-    const [posts, setPosts] = useState([]);
-
-    const getAllPosts = async () => { 
-        try {
-            const res = await axios.get('/api/post');
-            const mostPopularPosts = res.data.posts.sort((a, b) => b.comments.length - a.comments.length).slice(0, 6);
-            setPosts(mostPopularPosts);
-        } catch (err) {
-            console.err(err);
-            toast.error(err.response.data.message);
-        }
-    }
-
     useEffect(() => {
         getAllPosts();
     }, [])
@@ -26,7 +13,7 @@ const MostPopularPosts = () => {
         <section className="all-posts">
             <div className="container">
                 <div className="cards">
-                    { posts.map(post => <PostCard key={ post._id } post={ post } /> ) }
+                    { posts?.sort((a, b) => b.likes.length - a.likes.length).slice(0, 6).map(post => <PostCard key={ post._id } post={ post } /> ) }
                 </div>
             </div>
         </section>

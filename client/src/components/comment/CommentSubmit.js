@@ -6,7 +6,7 @@ import PostContext from '../../context/postContext/PostContext';
 
 const CommentSubmit = ({ postId, postUser, comments }) => {
     const { isAuthenticated } = useContext(AuthContext);
-    const { createComment } = useContext(PostContext);
+    const { createComment, post } = useContext(PostContext);
 
     const [ comment, setComment] = useState('');
     
@@ -32,11 +32,11 @@ const CommentSubmit = ({ postId, postUser, comments }) => {
                         <button type="submit" className="button button--green">Submit comment</button>
                     </div>
                     <div className="form__group">
-                        <span className="comment__total">{ comments && comments.length } Comments</span>
+                        <span className="comment__total">{ post?.comments.length } Comments</span>
                     </div>
                 </form>
             )}
-            { comments && comments.map( comment => <CommentPost key={ comment._id } postId={ postId } postUser={ postUser } comment={ comment }/>) }
+            { post?.comments.map( comment => <CommentPost key={ comment._id } postId={ postId } postUser={ postUser } comment={ comment }/>) }
         </div>
     )
 }

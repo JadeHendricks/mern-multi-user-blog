@@ -3,6 +3,7 @@ import Moment from 'react-moment';
 import AuthContext from '../../context/authContext/AuthContext';
 import PostContext from '../../context/postContext/PostContext';
 const CommentPost = ({ comment: { userId, avatar, comment, name, date, _id }, postId }) => {
+    
     const { loggedInUser, isUsersData } = useContext(AuthContext);
     const { deleteComment } = useContext(PostContext);
 

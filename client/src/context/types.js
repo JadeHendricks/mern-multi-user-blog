@@ -8,16 +8,9 @@ export const LOGOUT = 'LOGOUT';
 // POSTS
 export const GET_POST = 'GET_POST';
 export const GET_ALL_POSTS = 'GET_ALLPOSTS';
-export const CREATE_POST = 'CREATE_POST';
-export const EDIT_POST = 'EDIT_POST';
-export const POST_ERROR = 'POST_ERROR';
-export const DELETE_POST = 'DELETE_POST';
-export const UPDATE_LIKES = 'UPDATE_LIKES';
-export const GET_USERS_POSTS = 'GET_USERS_POSTS';
-export const CLEAR_POST = 'CLEAR_POST';
+export const CREATE_COMMENT = 'CREATE_COMMENT';
 
 // USERS
-export const GET_USER = 'GET_USER';
 export const GET_ALL_USERS = 'GET_ALL_USERS';
-export const USER_ERROR = 'USER_ERROR';
-export const CLEAR_USER = 'CLEAR_USER';
+export const GET_ALL_USERS_POSTS = 'GET_ALL_USERS_POSTS';
+export const GET_USER = 'GET_USER';
