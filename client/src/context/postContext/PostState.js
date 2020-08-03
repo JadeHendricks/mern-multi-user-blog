@@ -1,10 +1,33 @@
-import React from "react";
+import React, { useReducer } from "react";
 import PostContext from './PostContext';
+import PostReducer from './PostReducer';
 import { toast } from 'react-toastify';
 import { withRouter } from 'react-router-dom';
 import axios from 'axios';
+import { GET_ALL_POSTS } from "../types";
 
 const PostState = props => {
+
+  const initialState = {
+    posts: [],
+    post: null,
+    loading: true
+  };
+
+  const [state, dispatch] = useReducer(PostReducer, initialState);
+
+  const getAllPosts = async () => { 
+    try {
+        const res = await axios.get('/api/post');
+        dispatch({
+          type: GET_ALL_POSTS,
+          payload: res.data.posts
+        });
+    } catch (err) {
+        console.error(err.response.data.message);
+        toast.error(err.response.data.message);
+    }
+  }
 
   const createPost = async (title, tag, description, image) => { 
     const config = { headers: {'Content-Type': 'application/json'} };
@@ -72,18 +95,55 @@ const PostState = props => {
     }
   }
 
+  const postIsLiked = (likes, loggedInUser) => {	
+    if (likes && loggedInUser) {	
+        const isLiked = likes.filter(like => like.user === loggedInUser._id);	
+        if (isLiked.length > 0) {	
+            return true;	
+        }	
+        return false;	
+    }	
+}	
+
+  const likePost = async (id) => {	
+      try {	
+          const res = await axios.put(`/api/post/like/${id}`);  	
+          toast.success(res.data.message);	
+      } catch (err) {	
+          console.error(err.response.data.message);   	
+          toast.error(err.response.data.message);	
+      }	
+  }	
+
+  const unLikePost = async (id) => {	
+      try {	
+          const res = await axios.put(`/api/post/unlike/${id}`);  	
+          toast.success(res.data.message);	
+      } catch (err) {	
+          console.error(err.response.data.message);   	
+          toast.error(err.response.data.message);	
+      } 	
+  }
+
   const descriptionTrimmer = (desc) => {
     return desc.slice(0, 150) + '...';
   }
 
   return (
     <PostContext.Provider value={{
+      posts: state.posts,
+      post: state.post,
+      loading: state.loading,
+      getAllPosts,
       deletePost,
       createComment,
       deleteComment,
       descriptionTrimmer,
       editPost,
-      createPost
+      createPost,
+      postIsLiked,
+      likePost,
+      unLikePost
     }}>
       { props.children }
     </PostContext.Provider>

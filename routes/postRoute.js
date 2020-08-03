@@ -22,6 +22,14 @@ router
     .route('/comment/:id/:comment_id')
     .delete(authController.protect, postController.deleteComment);
 
+router	
+    .route('/like/:id')	
+    .put(authController.protect, postController.likePost)	
+
+router	
+    .route('/unlike/:id')	
+    .put(authController.protect, postController.unlikePost)
+
 router
     .route('/:id')
     .get(postController.getPost)

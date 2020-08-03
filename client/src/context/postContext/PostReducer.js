@@ -1,28 +1,13 @@
-import { LOGIN_SUCCESS, USER_LOADED, AUTH_ERROR, LOGOUT  } from '../types';
+import { GET_ALL_POSTS  } from '../types';
   
 export default ( state, action ) => {
     switch (action.type) {
-        case USER_LOADED: 
+        case GET_ALL_POSTS: 
             return {
                 ...state,
-                isAuthenticated: true,
+                posts: action.payload,
                 loading: false,
-                loggedInUser: action.payload
             }
-        case LOGIN_SUCCESS:
-            return {
-                ...state,
-                isAuthenticated: true,
-                loading: false
-            };
-        case AUTH_ERROR:
-        case LOGOUT:
-            return {
-                ...state,
-                isAuthenticated: false,
-                loading: true,
-                loggedInUser: null
-            };
         default: 
         return state;
     }

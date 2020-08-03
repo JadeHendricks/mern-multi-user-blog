@@ -23,6 +23,14 @@ const postSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    likes: [	
+        {	
+          user: {	
+            type: mongoose.Schema.Types.ObjectId,	
+            ref: 'user'	
+          }	
+        }	
+    ],
     comments: [
         {
           avatar: {

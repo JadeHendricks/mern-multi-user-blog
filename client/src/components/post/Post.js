@@ -9,10 +9,10 @@ import CommentSubmit from '../comment/CommentSubmit';
 
 const FullPost = ({ match, history }) => {
     const { loggedInUser, isUsersData } = useContext(AuthContext);
-    const { deletePost } = useContext(PostContext);
+    const { deletePost, likePost, unLikePost, postIsLiked } = useContext(PostContext);
 
     const [post, setPost] = useState({});
-    const  { title, description, image, _id, user, comments } = post;
+    const  { title, description, image, _id, user, likes, comments } = post;
 
     const getPost = async (id) => {
         try {
@@ -32,6 +32,10 @@ const FullPost = ({ match, history }) => {
         <div className="post">
             <div className="post__banner">
                     <div className="author-options">
+                        { postIsLiked(likes, loggedInUser) ? 	
+                            <button className="button" onClick={ () => unLikePost(_id) }>Unlike Post</button> :	
+                            <button className="button" onClick={ () => likePost(_id) }>Like Post</button>	
+                        }
                         { user && loggedInUser && isUsersData(loggedInUser._id, user._id) && (
                             <Fragment>
                                 <Link to={`/edit-post/${_id}`} className="button button--yellow">Edit Post</Link>
