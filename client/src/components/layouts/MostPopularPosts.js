@@ -6,7 +6,9 @@ const MostPopularPosts = () => {
     const { getAllPosts, posts, postLoading } = useContext(PostContext);
     
     useEffect(() => {
-        getAllPosts();
+        if (posts.length === 0) {
+            getAllPosts();
+        }
     }, [])
 
     return (

@@ -72,7 +72,7 @@ const Profile = ({ match }) => {
                             <aside className="account__options">
                                 <nav className="account-nav">
                                     <ul className="account-nav__ul">
-                                        <li className="account-nav__el"><a onClick={ handleNavigationState } name='all-posts' href="#">All posts ({ 10 })</a></li>
+                                        <li className="account-nav__el"><a onClick={ handleNavigationState } name='all-posts' href="#">All posts ({ userPosts?.length })</a></li>
                                         { isUsersData(loggedInUser?._id, user._id) && <li className="account-nav__el"><a onClick={ handleNavigationState } name='account-settings' href="#!">Account settings</a></li> }
                                     </ul>
                                 </nav>

@@ -14,8 +14,7 @@ const PostForm = () => {
 
     const handleSubmit = e => {
         e.preventDefault();
-        createPost(title, tag, description, image);
-        setValues({ ...values, title: '', tag: '', description: '' });
+        createPost(e, title, tag, description, image);
     }
 
     return (
@@ -32,7 +31,7 @@ const PostForm = () => {
                         nemo quisquam ea eos saepe quidem ipsum assumenda omnis.
                     </p>
                 </div>
-                <form className="form form--createPost" onSubmit={ handleSubmit }>
+                <form className="form form--createPost" onSubmit={ (e) => handleSubmit(e) }>
                     <div className="form__group">
                         <label className="form__label" htmlFor="title">Post Title</label>
                         <input className="form__input" id="title" onChange={ handleOnChange } name="title" type="text" placeholder="Title goes here" />

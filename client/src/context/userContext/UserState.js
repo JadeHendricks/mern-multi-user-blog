@@ -4,7 +4,7 @@ import UserReducer from './UserReducer';
 import { toast } from 'react-toastify';
 import { withRouter } from 'react-router-dom';
 import axios from 'axios';
-import { GET_ALL_USERS, GET_ALL_USERS_POSTS, GET_USER } from "../types";
+import { GET_ALL_USERS, GET_ALL_USERS_POSTS, GET_USER, UPDATE_USER, USER_ERROR } from "../types";
 
 const PostState = props => {
 
@@ -25,7 +25,7 @@ const PostState = props => {
           payload: res.data.users
         })
     } catch (err) {
-        console.error(err);
+        dispatch({ type: USER_ERROR });
         toast.error(err.response.data.message);
     }
   }
@@ -38,7 +38,7 @@ const PostState = props => {
           payload: res.data.user
         });
     } catch (err) {
-        console.error(err);
+        dispatch({ type: USER_ERROR });
         toast.error(err.response.data.message);
     }
   }
@@ -51,7 +51,42 @@ const PostState = props => {
           payload: res.data.posts
         });
     } catch (err) {
-        console.error(err);
+        dispatch({ type: USER_ERROR });
+        toast.error(err.response.data.message);
+    }
+  }
+
+  const updateUserSocials = async (facebook, linkedin, twitter, userID) => {
+    const config = { headers: {'Content-Type': 'application/json'} };
+    const body = JSON.stringify({ facebook, linkedin, twitter });
+    try {
+        const res = await axios.put(`/api/user/${userID}/socials`, body, config);
+        toast.success(res.data.message);
+        dispatch({
+          type: UPDATE_USER,
+          payload: res.data.user
+        });
+    } catch (err) {
+        dispatch({ type: USER_ERROR });
+        toast.error(err.response.data.message);
+    }
+  }
+
+  const updateUser = async (name, avatar) => {
+    const config = { headers: {'Content-Type': 'application/json'} };
+    const body = new FormData();
+    body.append('name', name);
+    body.append('avatar', avatar);
+
+    try {
+        const res = await axios.put(`/api/user/me`, body, config);
+        toast.success(res.data.message);
+        dispatch({
+          type: UPDATE_USER,
+          payload: res.data.user
+        });
+    } catch (err) {
+        dispatch({ type: USER_ERROR });
         toast.error(err.response.data.message);
     }
   }
@@ -64,7 +99,9 @@ const PostState = props => {
       userLoading: state.userLoading,
       getAllUsers,
       getUser,
-      getAllUsersPosts
+      getAllUsersPosts,
+      updateUserSocials,
+      updateUser
     }}>
       { props.children }
     </UserContext.Provider>

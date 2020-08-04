@@ -9,8 +9,11 @@ export const LOGOUT = 'LOGOUT';
 export const GET_POST = 'GET_POST';
 export const GET_ALL_POSTS = 'GET_ALLPOSTS';
 export const CREATE_COMMENT = 'CREATE_COMMENT';
+export const POST_ERROR = 'POST_ERROR';
 
 // USERS
 export const GET_ALL_USERS = 'GET_ALL_USERS';
 export const GET_ALL_USERS_POSTS = 'GET_ALL_USERS_POSTS';
 export const GET_USER = 'GET_USER';
+export const UPDATE_USER = 'UPDATE_USER';
+export const USER_ERROR = 'USER_ERROR';

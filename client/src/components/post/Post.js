@@ -22,7 +22,7 @@ const FullPost = ({ match, history }) => {
                 <div className="post">
                     <div className="post__banner">
                         <div className="author-options">
-                            { postIsLiked(likes, loggedInUser) ? 	
+                            { _id && postIsLiked(likes, loggedInUser) ? 	
                                 <button className="button" onClick={ () => unLikePost(_id) }>Unlike Post</button> :	
                                 <button className="button" onClick={ () => likePost(_id) }>Like Post</button>	
                             }

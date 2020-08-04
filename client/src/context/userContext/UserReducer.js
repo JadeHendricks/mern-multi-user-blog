@@ -1,4 +1,4 @@
-import { GET_ALL_USERS, GET_ALL_USERS_POSTS, GET_USER  } from '../types';
+import { GET_ALL_USERS, GET_ALL_USERS_POSTS, GET_USER, UPDATE_USER, USER_ERROR } from '../types';
   
 export default ( state, action ) => {
     switch (action.type) {
@@ -18,6 +18,19 @@ export default ( state, action ) => {
             return {
                 ...state,
                 userPosts: action.payload,
+                userLoading: false
+            }
+        case UPDATE_USER: 
+            return {
+                ...state,
+                user: action.payload,
+                userLoading: false
+            }
+        case USER_ERROR: 
+            return {
+                ...state,
+                user: {},
+                users: [],
                 userLoading: false
             }
         default: 

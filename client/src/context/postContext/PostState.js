@@ -4,7 +4,7 @@ import PostReducer from './PostReducer';
 import { toast } from 'react-toastify';
 import { withRouter } from 'react-router-dom';
 import axios from 'axios';
-import { GET_ALL_POSTS, CREATE_COMMENT, GET_POST } from "../types";
+import { GET_ALL_POSTS, CREATE_COMMENT, GET_POST, POST_ERROR } from "../types";
 
 const PostState = props => {
 
@@ -24,8 +24,8 @@ const PostState = props => {
           payload: res.data.posts
         });
     } catch (err) {
-      console.error(err);
-        toast.error(err.response.data.message);
+      dispatch({ type: POST_ERROR });
+      toast.error(err.response.data.message);
     }
   }
 
@@ -37,7 +37,7 @@ const PostState = props => {
           payload: res.data.post
         })
     } catch (err) {
-        console.error(err);
+        dispatch({ type: POST_ERROR });
         toast.error(err.response.data.message);
     }
   }
@@ -54,7 +54,7 @@ const PostState = props => {
         toast.success(res.data.message);
         props.history.push(`/post/${res.data.post._id}`);
     } catch (err) {
-        console.error(err);
+        dispatch({ type: POST_ERROR });
         toast.error(err.response.data.message);
     }
   }
@@ -72,7 +72,7 @@ const PostState = props => {
         toast.success(res.data.message);
         props.history.push(`/post/${id}`);
     } catch (err) {
-        console.error(err);
+        dispatch({ type: POST_ERROR });
         toast.error(err.response.data.message);
     }
   }
@@ -82,7 +82,7 @@ const PostState = props => {
         await axios.delete(`/api/post/${id}`); 
         toast.success('Post has been deleted.');
     } catch (err) {
-        console.log(err);
+        dispatch({ type: POST_ERROR });
         toast.error(err.response.data.message);
     }
   }
@@ -97,7 +97,7 @@ const PostState = props => {
           payload: res.data.comment
         })
     } catch (err) {
-        console.error(err);
+        dispatch({ type: POST_ERROR });
         toast.error(err.response.data.message);
     }
   }
@@ -107,7 +107,7 @@ const PostState = props => {
         const res = await axios.delete(`/api/post/comment/${postId}/${commentId}`);
         toast.success(res.data.message);
     } catch (err) {
-        console.error(err);
+        dispatch({ type: POST_ERROR });
         toast.error(err.response.data.message);
     }
   }
@@ -127,7 +127,7 @@ const PostState = props => {
           const res = await axios.put(`/api/post/like/${id}`);  	
           toast.success(res.data.message);	
       } catch (err) {	
-          console.error(err.response.data.message);   	
+          console.error(err);   	
           toast.error(err.response.data.message);	
       }	
   }	
@@ -137,7 +137,7 @@ const PostState = props => {
           const res = await axios.put(`/api/post/unlike/${id}`);  	
           toast.success(res.data.message);	
       } catch (err) {	
-          console.error(err.response.data.message);   	
+          console.error(err);   	
           toast.error(err.response.data.message);	
       } 	
   }
