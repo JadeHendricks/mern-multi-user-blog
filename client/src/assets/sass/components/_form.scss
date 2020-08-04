@@ -30,7 +30,7 @@
 
 .forgot-password-form, .reset-password-form {
     margin: 0 auto;
-    margin-top: 8rem;
+    margin-top: 4rem;
     max-width: 80rem;
     background-color: $white;
     box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
@@ -45,6 +45,22 @@
         color: $grey; 
         margin-bottom: 4rem;
     }
+}
+
+@media screen and (max-width: 767px) {
+    .forgot-password-form, .reset-password-form {
+        padding: 3rem;
+        &__title {
+            margin: 1.5rem 0 1rem 0;
+            color: $green;
+        }
+        &__description {
+            font-size: 1.6rem;
+            color: $grey; 
+            margin-bottom: 2.5rem;
+        }
+    }
+    
 }
 
 .comment-form {

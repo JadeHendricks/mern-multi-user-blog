@@ -422,7 +422,7 @@ strong {
 
 .forgot-password-form, .reset-password-form {
   margin: 0 auto;
-  margin-top: 8rem;
+  margin-top: 4rem;
   max-width: 80rem;
   background-color: #ffffff;
   box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
@@ -435,6 +435,17 @@ strong {
     font-size: 1.8rem;
     color: #777777;
     margin-bottom: 4rem; }
+
+@media screen and (max-width: 767px) {
+  .forgot-password-form, .reset-password-form {
+    padding: 3rem; }
+    .forgot-password-form__title, .reset-password-form__title {
+      margin: 1.5rem 0 1rem 0;
+      color: #55c57a; }
+    .forgot-password-form__description, .reset-password-form__description {
+      font-size: 1.6rem;
+      color: #777777;
+      margin-bottom: 2.5rem; } }
 
 .comment-form {
   padding-bottom: 2rem; }
