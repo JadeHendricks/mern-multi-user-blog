@@ -33,3 +33,37 @@
         color: #999;
     }
 }
+
+@media screen and (max-width: 767px) {
+    .footer {
+        padding: 4rem 2rem;
+        font-size: 1.2rem;
+        display: block;
+        &__logo {
+            width: 100%;
+            & img {
+                display: block;
+                margin: 0 auto;
+                height: 3rem;
+            }
+        }
+        &__nav { 
+            justify-content: center;
+            margin: 1rem 0 1rem 0;
+            & li {
+                margin-left: 1rem; 
+            }
+            & a {
+                color: $grey;
+                text-decoration: none !important;
+                -webkit-transition: all 0.2s;
+                transition: all 0.2s;
+            }
+        }
+        &__copyright {
+            justify-self: none;
+            text-align: center;
+            color: #999;
+        }
+    }
+}
