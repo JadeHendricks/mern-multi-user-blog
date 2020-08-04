@@ -12,8 +12,6 @@ const FullPost = ({ match, history }) => {
 
     useEffect(() => {
         getPost(match.params.id);
-        console.log('authLoading', authLoading);
-        console.log('postLoading', postLoading);
     }, [match.params.id]);
 
     return (
@@ -22,16 +20,21 @@ const FullPost = ({ match, history }) => {
                 <div className="post">
                     <div className="post__banner">
                         <div className="author-options">
-                            { _id && postIsLiked(likes, loggedInUser) ? 	
-                                <button className="button" onClick={ () => unLikePost(_id) }>Unlike Post</button> :	
-                                <button className="button" onClick={ () => likePost(_id) }>Like Post</button>	
-                            }
-                            { loggedInUser && isUsersData(loggedInUser._id, user._id) && (
+                            { post._id && (
                                 <Fragment>
-                                    <Link to={`/edit-post/${_id}`} className="button button--yellow">Edit Post</Link>
-                                    <button className="button button--red" onClick={ () => deletePost(_id) }>Delete Post</button>
+                                    { postIsLiked(likes, loggedInUser) ? 	
+                                        <button className="button" onClick={ () => unLikePost(_id) }>Unlike Post</button> :	
+                                        <button className="button" onClick={ () => likePost(_id) }>Like Post</button>	
+                                    }
+                                    { loggedInUser && isUsersData(loggedInUser._id, user._id) && (
+                                        <Fragment>
+                                            <Link to={`/edit-post/${_id}`} className="button button--yellow">Edit Post</Link>
+                                            <button className="button button--red" onClick={ () => deletePost(_id) }>Delete Post</button>
+                                        </Fragment>
+                                    )}
                                 </Fragment>
                             )}
+
                         </div>
                         <div className="back-button">
                             <button className="button button--white" onClick={ () => history.goBack() }>Go back</button>
@@ -47,10 +50,10 @@ const FullPost = ({ match, history }) => {
                             </div>
                             <div className="post__user">
                                 <div className="post__user-block">
-                                    { user.avatar && ( <img className="form__user-photo" src={require(`../../assets/images/users/${user.avatar}`)} alt={ user.name } title={ user.name } /> )}
-                                    <span className="post__user-name">{ user.name }</span>
+                                    { user && ( <img className="form__user-photo" src={require(`../../assets/images/users/${user?.avatar}`)} alt={ user?.name } title={ user?.name } /> )}
+                                    <span className="post__user-name">{ user?.name }</span>
                                 </div>
-                                { user.socials && (
+                                { user?.socials && (
                                     <div className="post__user-social">
                                         { user.socials.facebook && (
                                             <a href={user.socials.facebook} target='_blank' rel='noopener noreferrer'>
