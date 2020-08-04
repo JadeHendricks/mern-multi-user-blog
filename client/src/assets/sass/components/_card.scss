@@ -199,6 +199,12 @@
 }
 
 @media screen and (max-width: 590px) {
+    .cards--account {
+        & .card {
+            flex: 0 1 100%;
+            margin-bottom: 4rem;
+        }
+    }
     .all-posts {
         padding: 2rem 0;
     }

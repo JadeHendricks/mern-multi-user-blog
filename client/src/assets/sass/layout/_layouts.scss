@@ -47,6 +47,52 @@
     }
 }
 
+@media screen and (max-width: 1200px) {
+    .account {
+        display: flex;
+        flex-direction: column;
+        padding: 4rem 0;
+        &__options {
+            background-image: linear-gradient(to right bottom, #7dd56f, #28b487);
+            flex: 0 0 1;
+            margin-right: 0;
+            padding: 1.5rem;
+        }
+        &__view {
+            margin-top: 4rem;
+            flex: 1;
+        }
+    }
+    
+    .account-nav {
+        &__ul {
+            list-style-type: none;
+        }
+        &__el {
+            font-size: 1.6rem;
+            padding: 1.5rem 0;
+        }
+    }
+}
+
+@media screen and (max-width: 991px) {
+    .account {
+        padding: 2rem 0;
+        &__options {
+            padding: 1rem;
+        }
+    }
+    .account-nav {
+        &__ul {
+            list-style-type: none;
+        }
+        &__el {
+            font-size: 1.6rem;
+            padding: 1.5rem 0;
+        }
+    }
+}
+
 .user-header {
     display: flex;
     align-items: center;
@@ -79,6 +125,58 @@
         width: 4rem;
         &:not(:last-child) {
             margin-right: 2rem;
+        }
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .user-header {
+        &__image {
+            flex: 0 0 15rem;
+            & img {
+                width: 15rem;
+                height: 15rem;
+            }
+        }
+        &__info {
+            margin: 0 2rem;
+        }
+        &__info-name {
+            font-size: 2.6rem;
+        }
+        &__info-description {
+            font-size: 1.6rem;
+        }
+        &__socials-icon {
+            fill: $white;
+            height: 3rem;
+            width: 3rem;
+            &:not(:last-child) {
+                margin-right: 1.5rem;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 580px) {
+    .user-header {
+        display: block;
+        &__image {
+            flex: 0 0 1;
+            & img {
+                display: block;
+                margin: 0 auto;
+                width: 15rem;
+                height: 15rem;
+            }
+        }
+        &__info {
+            margin: 0 2rem;
+            text-align: center;
+        }
+        &__info-name {
+            margin-top: 2rem;
+            font-size: 2.6rem;
         }
     }
 }

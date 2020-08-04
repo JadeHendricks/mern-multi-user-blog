@@ -271,6 +271,9 @@ strong {
     margin-bottom: 4rem; } }
 
 @media screen and (max-width: 590px) {
+  .cards--account .card {
+    flex: 0 1 100%;
+    margin-bottom: 4rem; }
   .all-posts {
     padding: 2rem 0; }
   .card {
@@ -1038,6 +1041,36 @@ strong {
   text-decoration: none;
   color: #ffffff; }
 
+@media screen and (max-width: 1200px) {
+  .account {
+    display: flex;
+    flex-direction: column;
+    padding: 4rem 0; }
+    .account__options {
+      background-image: linear-gradient(to right bottom, #7dd56f, #28b487);
+      flex: 0 0 1;
+      margin-right: 0;
+      padding: 1.5rem; }
+    .account__view {
+      margin-top: 4rem;
+      flex: 1; }
+  .account-nav__ul {
+    list-style-type: none; }
+  .account-nav__el {
+    font-size: 1.6rem;
+    padding: 1.5rem 0; } }
+
+@media screen and (max-width: 991px) {
+  .account {
+    padding: 2rem 0; }
+    .account__options {
+      padding: 1rem; }
+  .account-nav__ul {
+    list-style-type: none; }
+  .account-nav__el {
+    font-size: 1.6rem;
+    padding: 1.5rem 0; } }
+
 .user-header {
   display: flex;
   align-items: center; }
@@ -1065,6 +1098,42 @@ strong {
     width: 4rem; }
     .user-header__socials-icon:not(:last-child) {
       margin-right: 2rem; }
+
+@media screen and (max-width: 767px) {
+  .user-header__image {
+    flex: 0 0 15rem; }
+    .user-header__image img {
+      width: 15rem;
+      height: 15rem; }
+  .user-header__info {
+    margin: 0 2rem; }
+  .user-header__info-name {
+    font-size: 2.6rem; }
+  .user-header__info-description {
+    font-size: 1.6rem; }
+  .user-header__socials-icon {
+    fill: #ffffff;
+    height: 3rem;
+    width: 3rem; }
+    .user-header__socials-icon:not(:last-child) {
+      margin-right: 1.5rem; } }
+
+@media screen and (max-width: 580px) {
+  .user-header {
+    display: block; }
+    .user-header__image {
+      flex: 0 0 1; }
+      .user-header__image img {
+        display: block;
+        margin: 0 auto;
+        width: 15rem;
+        height: 15rem; }
+    .user-header__info {
+      margin: 0 2rem;
+      text-align: center; }
+    .user-header__info-name {
+      margin-top: 2rem;
+      font-size: 2.6rem; } }
 
 .header {
   background-color: #444444;
