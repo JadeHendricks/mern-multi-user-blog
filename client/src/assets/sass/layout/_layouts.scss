@@ -1,22 +1,3 @@
-.all-posts {
-    padding: 6rem 0;
-}
-.cards {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
-.cards--account {
-    & .card {
-        flex: 0 1 48%;
-        margin-bottom: 6rem;
-    }
-}
-.card {
-    flex: 0 1 30%;
-    margin-bottom: 6rem;
-}
-
 .account {
     display: flex;
     padding: 6rem 0;
