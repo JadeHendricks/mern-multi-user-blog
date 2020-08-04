@@ -276,6 +276,7 @@
     }
     &__image {
         margin-right: 1.5rem;
+        flex: 0 0 12rem;
         & img {
             width: 12rem;
             height: 12rem;
@@ -284,8 +285,11 @@
             cursor: pointer;
         }
     }
+    &__userInfo {
+        flex: 1;
+    }
     &__title {
-        font-size: 3rem;
+        font-size: 2.8rem;
         text-decoration: none;
         color: $black;
         cursor: pointer;
@@ -297,12 +301,10 @@
     }
     &__footer {
         background-color: $light-grey;
-        padding: 1.5rem;
         border-top: 0.1rem solid darken($light-grey, 5%);
         cursor: pointer;
-        height: 100%;
-    }
-    &__social{
+        height: 6.5rem;
+        padding: 1.5rem;
         display: flex;
         align-items: center;
     }
@@ -313,5 +315,51 @@
         &:not(:last-child) {
             margin-right: 1.5rem;
         }
+    }
+}
+
+@media screen and (max-width: 991px) {
+    .card-user {
+        margin-top: 4rem;
+        &__header {
+            display: flex;
+            align-items: flex-start;
+            padding: 2rem 1rem;
+        }
+        &__image {
+            flex: 0 0 9rem;
+            & img {
+                width: 9rem;
+                height: 9rem;
+            }
+        }
+        &__title {
+            font-size: 1.8rem;
+        }
+        &__date {
+            font-size: 1.4rem;
+            margin: 0 0 1.5rem 0;
+        }
+        &__footer {
+            height: 5rem;
+            padding: 1rem;
+        }
+        &__social-icon {
+            width: 4rem;
+            height: 4rem;
+            &:not(:last-child) {
+                margin-right: 0.5rem;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 580px) {
+    .card-user {
+        flex: 0 1 100%;
+        margin-top: 3rem;
+    }
+    &__title {
+        font-size: 1.8rem;
     }
 }

@@ -329,15 +329,18 @@ strong {
     align-items: center;
     padding: 3rem 1.5rem; }
   .card-user__image {
-    margin-right: 1.5rem; }
+    margin-right: 1.5rem;
+    flex: 0 0 12rem; }
     .card-user__image img {
       width: 12rem;
       height: 12rem;
       object-fit: cover;
       border-radius: 100%;
       cursor: pointer; }
+  .card-user__userInfo {
+    flex: 1; }
   .card-user__title {
-    font-size: 3rem;
+    font-size: 2.8rem;
     text-decoration: none;
     color: #444444;
     cursor: pointer;
@@ -347,11 +350,10 @@ strong {
     margin: 1rem 0 1.5rem 0; }
   .card-user__footer {
     background-color: #f7f7f7;
-    padding: 1.5rem;
     border-top: 0.1rem solid #eaeaea;
     cursor: pointer;
-    height: 100%; }
-  .card-user__social {
+    height: 6.5rem;
+    padding: 1.5rem;
     display: flex;
     align-items: center; }
   .card-user__social-icon {
@@ -360,6 +362,39 @@ strong {
     fill: #444444; }
     .card-user__social-icon:not(:last-child) {
       margin-right: 1.5rem; }
+
+@media screen and (max-width: 991px) {
+  .card-user {
+    margin-top: 4rem; }
+    .card-user__header {
+      display: flex;
+      align-items: flex-start;
+      padding: 2rem 1rem; }
+    .card-user__image {
+      flex: 0 0 9rem; }
+      .card-user__image img {
+        width: 9rem;
+        height: 9rem; }
+    .card-user__title {
+      font-size: 1.8rem; }
+    .card-user__date {
+      font-size: 1.4rem;
+      margin: 0 0 1.5rem 0; }
+    .card-user__footer {
+      height: 5rem;
+      padding: 1rem; }
+    .card-user__social-icon {
+      width: 4rem;
+      height: 4rem; }
+      .card-user__social-icon:not(:last-child) {
+        margin-right: 0.5rem; } }
+
+@media screen and (max-width: 580px) {
+  .card-user {
+    flex: 0 1 100%;
+    margin-top: 3rem; }
+  __title {
+    font-size: 1.8rem; } }
 
 .login-form {
   margin: 6rem auto 8rem auto;
@@ -626,6 +661,16 @@ strong {
   .button--red {
     background-color: #cd2d2d;
     color: #ffffff; }
+
+@media screen and (max-width: 991px) {
+  .button {
+    font-size: 1.6rem;
+    padding: 1rem 1.5rem; } }
+
+@media screen and (max-width: 580px) {
+  .button {
+    font-size: 1.2rem;
+    padding: 1rem 1.2rem; } }
 
 .post__banner {
   height: 50rem;
