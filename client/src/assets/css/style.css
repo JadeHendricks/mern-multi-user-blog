@@ -703,15 +703,14 @@ strong {
   position: relative;
   background-image: linear-gradient(to right bottom, #7dd56f, #28b487); }
   .post__banner .author-options {
+    display: flex;
     position: absolute;
-    right: 5rem;
-    bottom: 5rem; }
+    top: 2rem;
+    left: 2rem; }
+    .post__banner .author-options .button {
+      width: 20rem; }
     .post__banner .author-options .button:not(:last-child) {
       margin-right: 1rem; }
-  .post__banner .back-button {
-    position: absolute;
-    left: 5rem;
-    bottom: 5rem; }
   .post__banner--edit {
     background-image: linear-gradient(to right bottom, #fcd983, #f7c74f); }
 
@@ -737,7 +736,7 @@ strong {
   margin-right: 2.5rem; }
   .post__image-block img {
     width: 100%;
-    height: auto; }
+    height: 100%; }
 
 .post__title {
   flex: 1;
@@ -789,6 +788,53 @@ strong {
     font-size: 2rem; }
     .post__body p:not(:last-child) {
       margin-bottom: 4rem; }
+
+@media screen and (max-width: 991px) {
+  .post__banner .author-options {
+    display: flex;
+    left: 0;
+    width: 100%; }
+    .post__banner .author-options .button {
+      width: 21%;
+      margin: 2%; }
+  .post__header {
+    margin: 3rem 0 1.5rem 0; }
+  .post__top {
+    display: flex;
+    margin-bottom: 4rem; }
+  .post__title {
+    font-size: 4rem; }
+  .post__body {
+    padding: 2.5rem 2rem; }
+    .post__body p {
+      font-size: 1.8rem; } }
+
+@media screen and (max-width: 767px) {
+  .post__banner .author-options .button {
+    font-size: 1.2rem; }
+  .post__banner .back-button {
+    position: absolute;
+    left: 5rem;
+    bottom: 5rem; }
+  .post__header {
+    margin: 3rem 0 1.5rem 0; }
+  .post__body {
+    padding: 2rem; }
+    .post__body p {
+      font-size: 1.6rem; } }
+
+@media screen and (max-width: 580px) {
+  .post__top {
+    display: block;
+    margin-bottom: 4rem; }
+  .post__image-block {
+    display: block;
+    margin: 0 auto;
+    width: 20rem; }
+  .post__title {
+    margin-top: 2.5rem;
+    text-align: center;
+    font-size: 2.5rem; } }
 
 .comment {
   margin: 4rem 0;

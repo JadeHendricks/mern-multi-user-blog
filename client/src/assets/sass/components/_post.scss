@@ -4,17 +4,16 @@
         position: relative;
         background-image: linear-gradient(to right bottom, #7dd56f, #28b487);
         & .author-options {
+            display: flex;
             position: absolute;
-            right: 5rem;
-            bottom: 5rem;
+            top: 2rem;
+            left: 2rem;
+            & .button {
+                width: 20rem;
+            }
             & .button:not(:last-child) {
                 margin-right: 1rem;
             }
-        }
-        & .back-button {
-            position: absolute;
-            left: 5rem;
-            bottom: 5rem;
         }
         &--edit {
             background-image: linear-gradient(to right bottom, #fcd983, #f7c74f);  
@@ -42,7 +41,7 @@
         margin-right: 2.5rem;
         & img {
             width: 100%;
-            height: auto;
+            height: 100%;
         }
     }
     &__title {
@@ -98,6 +97,83 @@
             &:not(:last-child) {
                 margin-bottom: 4rem;
             }
+        }
+    }
+}
+
+@media screen and (max-width: 991px) {
+    .post {
+        &__banner {
+            & .author-options {
+                display: flex;
+                left: 0;
+                width: 100%;
+                & .button {
+                    width: 21%;
+                    margin: 2%;
+                }
+            }
+        }
+        &__header {
+            margin: 3rem 0 1.5rem 0;
+        }
+        &__top {
+            display: flex;
+            margin-bottom: 4rem;
+        }
+        &__title {
+            font-size: 4rem;
+        }
+        &__body {
+            padding: 2.5rem 2rem;
+            & p {
+                font-size: 1.8rem;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .post {
+        &__banner {
+            & .author-options {
+                & .button {
+                    font-size: 1.2rem;
+                }
+            }
+            & .back-button {
+                position: absolute;
+                left: 5rem;
+                bottom: 5rem;
+            }
+        }
+        &__header {
+            margin: 3rem 0 1.5rem 0;
+        }
+        &__body {
+            padding: 2rem;
+            & p {
+                font-size: 1.6rem;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 580px) {
+    .post {
+        &__top {
+            display: block;
+            margin-bottom: 4rem;
+        }
+        &__image-block {
+            display: block;
+            margin: 0 auto;
+            width: 20rem;
+        }
+        &__title {
+            margin-top: 2.5rem;
+            text-align: center;
+            font-size: 2.5rem;
         }
     }
 }
