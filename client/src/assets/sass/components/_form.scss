@@ -218,6 +218,10 @@
 
 @media screen and (max-width: 767px) {
     .form {
+        &--createPost {
+            padding: 3rem;
+            margin-bottom: 0;
+        }
         &__group {
             margin-bottom: 2rem;
         }
@@ -225,9 +229,23 @@
             font-size: 1.6rem;
             font-weight: 500;
         }
+        &__upload {
+            & + label {
+                font-size: 1.6rem;
+            }
+        }
+        &__photo-upload {
+            display: flex;
+            align-items: center;
+            font-size: 1.6rem;
+        }
+        &__user-photo {
+            height: 6rem;
+            width: 6rem;
+            margin-right: 1.5rem;
+        }
         &__useraccount-block {
             margin-bottom: 3rem;
-    
             & a {
                 font-size: 1.4rem;
                 font-weight: 500;
@@ -243,6 +261,11 @@
         }
         &__label {
             font-size: 1.4rem;
+        }
+        &__upload {
+            & + label {
+                font-size: 1.2rem;
+            }
         }
         &__useraccount-block {
             margin-bottom: 2rem;

@@ -577,11 +577,24 @@ strong {
       transform: translateY(-2px); }
 
 @media screen and (max-width: 767px) {
+  .form--createPost {
+    padding: 3rem;
+    margin-bottom: 0; }
   .form__group {
     margin-bottom: 2rem; }
   .form__label {
     font-size: 1.6rem;
     font-weight: 500; }
+  .form__upload + label {
+    font-size: 1.6rem; }
+  .form__photo-upload {
+    display: flex;
+    align-items: center;
+    font-size: 1.6rem; }
+  .form__user-photo {
+    height: 6rem;
+    width: 6rem;
+    margin-right: 1.5rem; }
   .form__useraccount-block {
     margin-bottom: 3rem; }
     .form__useraccount-block a {
@@ -593,6 +606,8 @@ strong {
     margin-bottom: 2rem; }
   .form__label {
     font-size: 1.4rem; }
+  .form__upload + label {
+    font-size: 1.2rem; }
   .form__useraccount-block {
     margin-bottom: 2rem;
     display: block; }
