@@ -1,6 +1,5 @@
 .login-form {
-    margin: 0 auto;
-    margin-top: 8rem;
+    margin: 6rem auto 8rem auto;
     max-width: 65rem;
     background-color: $white;
     box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
@@ -10,6 +9,23 @@
         margin: 2.5rem 0 4rem 0;
         color: $green;
     }
+}
+
+@media screen and (max-width: 767px) {
+    .login-form {
+        margin: 4rem auto 6rem auto;
+        padding: 3rem 5rem;
+    }
+}
+@media screen and (max-width: 580px) {
+    .login-form {
+        margin: 4rem auto 6rem auto;
+        padding: 2rem;
+        &__title {
+            margin: 2rem 0;
+            font-size: 1.8rem;
+        }
+    } 
 }
 
 .forgot-password-form, .reset-password-form {
@@ -34,6 +50,7 @@
 .comment-form {
     padding-bottom: 2rem;
 }
+
 .form {
     &--createPost {
         background-color: $white;
@@ -194,6 +211,49 @@
             font-weight: 700;
             &:hover {
                 transform: translateY(-2px);
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .form {
+        &__group {
+            margin-bottom: 2rem;
+        }
+        &__label {
+            font-size: 1.6rem;
+            font-weight: 500;
+        }
+        &__useraccount-block {
+            margin-bottom: 3rem;
+    
+            & a {
+                font-size: 1.4rem;
+                font-weight: 500;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 580px) {
+    .form {
+        &__group {
+            margin-bottom: 2rem;
+        }
+        &__label {
+            font-size: 1.4rem;
+        }
+        &__useraccount-block {
+            margin-bottom: 2rem;
+            display: block;
+            & a {
+                font-size: 1.2rem;
+                font-weight: 700;
+                display: block;
+                &:not(last-child) {
+                    margin-bottom: 1rem;
+                }
             }
         }
     }

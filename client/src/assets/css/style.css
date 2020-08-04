@@ -362,8 +362,7 @@ strong {
       margin-right: 1.5rem; }
 
 .login-form {
-  margin: 0 auto;
-  margin-top: 8rem;
+  margin: 6rem auto 8rem auto;
   max-width: 65rem;
   background-color: #ffffff;
   box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
@@ -372,6 +371,19 @@ strong {
   .login-form__title {
     margin: 2.5rem 0 4rem 0;
     color: #55c57a; }
+
+@media screen and (max-width: 767px) {
+  .login-form {
+    margin: 4rem auto 6rem auto;
+    padding: 3rem 5rem; } }
+
+@media screen and (max-width: 580px) {
+  .login-form {
+    margin: 4rem auto 6rem auto;
+    padding: 2rem; }
+    .login-form__title {
+      margin: 2rem 0;
+      font-size: 1.8rem; } }
 
 .forgot-password-form, .reset-password-form {
   margin: 0 auto;
@@ -528,6 +540,33 @@ strong {
     font-weight: 700; }
     .form__useraccount-block a:hover {
       transform: translateY(-2px); }
+
+@media screen and (max-width: 767px) {
+  .form__group {
+    margin-bottom: 2rem; }
+  .form__label {
+    font-size: 1.6rem;
+    font-weight: 500; }
+  .form__useraccount-block {
+    margin-bottom: 3rem; }
+    .form__useraccount-block a {
+      font-size: 1.4rem;
+      font-weight: 500; } }
+
+@media screen and (max-width: 580px) {
+  .form__group {
+    margin-bottom: 2rem; }
+  .form__label {
+    font-size: 1.4rem; }
+  .form__useraccount-block {
+    margin-bottom: 2rem;
+    display: block; }
+    .form__useraccount-block a {
+      font-size: 1.2rem;
+      font-weight: 700;
+      display: block; }
+      .form__useraccount-block a:not(last-child) {
+        margin-bottom: 1rem; } }
 
 .create-post {
   max-width: 80rem;
