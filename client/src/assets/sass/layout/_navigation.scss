@@ -1,10 +1,10 @@
 .nav {
     display: flex;
     &--posts {
-        flex: 0 1 40%;
+        flex: 0 1 20%;
     }
     &__user {
-        flex: 0 1 40%;
+        flex: 0 1 80%;
         justify-content: flex-end;
     }
     &__user-img {
@@ -42,6 +42,84 @@
                 color: $grey;
                 text-shadow: none;
                 border-color: $light-grey;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 1400px) {
+    .nav {
+        &__el {
+            font-size: 1.6rem;
+            &:not(:last-child) {
+                margin-right: 2.5rem;
+            }
+            &--cta {
+                padding: 1rem 2rem;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 1200px) {
+    .nav {
+        &--posts {
+            flex: 0 1 25%;
+        }
+        &__user {
+            flex: 0 1 75%;
+        }
+        &__el {
+            font-size: 1.4rem;
+            &:not(:last-child) {
+                margin-right: 2rem;
+            }
+            &--cta {
+                padding: 1rem 1.5rem;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .nav {
+        &--posts {
+            flex: 0 1 100%;
+            margin-bottom: 2rem;
+        }
+        &__user {
+            flex: 0 1 100%;
+        }
+        &__el {
+            font-size: 1.2rem;
+            &:not(:last-child) {
+                margin-right: 2rem;
+            }
+            &--cta {
+                padding: 1rem;
+            }
+        }
+        & .button--green {
+            padding: 1rem;
+        }
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .nav {
+        width: 100%;
+        display: block;
+        &--posts {
+            margin-bottom: 0;
+            & > .header__logo {
+                margin-bottom: 2rem;
+            }
+        }
+        &__el {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            &:not(:last-child) {
+                margin-right: 0;
             }
         }
     }

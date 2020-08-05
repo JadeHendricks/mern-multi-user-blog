@@ -12,18 +12,24 @@
     <body>
         <header class="header">
             <nav class="nav nav--posts">
-                <a href="/" class="nav__el">All Posts</a>
+                <div class="header__logo">
+                    <a href="/">
+                        <img src="./images/logo-white.png" alt="Multi User Blog" title="Multi User Blog">
+                    </a>
+                </div>
+                <a class="nav__el" href="/">All Posts</a>
             </nav>
-            <div class="header__logo">
-                <img src="./images/logo-white.png" alt="" />
-            </div>
             <nav class="nav nav__user">
                 <a class="nav__el" href="/users">All Users</a>
                 <a class="nav__el" href="/most-popular-posts">Popular Posts</a>
-                <a class="nav__el" href="/login">Log in</a>
-                <a class="nav__el nav__el--cta" href="/register">Register</a>
-            </nav>
-        </header>
+                <a class="nav__el" href="/profile/5f14f9836ac32726cc3c12fd">
+                <img class="nav__user-img" src="./images/jade-hendricks.jpg" alt="James Bond" title="James Bond">
+                <span>James</span>
+            </a>
+            <a class="nav__el button button--green" href="/create-post">Create Post</a>
+            <a class="nav__el nav__el--logout">Log out</a>
+        </nav>
+    </header>
         <main class="main">
             <section class="all-posts">
                 <div class="container">
