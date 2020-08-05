@@ -15,20 +15,22 @@ const ForgotPassword = () => {
     }
     
     return (
-        <div className="forgot-password-form">
-            <h2 className="forgot-password-form__title">Forgot password?</h2>
-            <p className="forgot-password-form__description">
-                Enter in your email and a reset link will be sent for you to change your password.
-            </p>
-            <form className="form form--forgotpassword" onSubmit={ handleOnSubmit }>
-                <div className="form__group">
-                    <label className="form__label" htmlFor="email">Email address</label>
-                    <input className="form__input" id="email" onClick={ handleOnChange } name="email" type="email" placeholder="you@example.com" />
-                </div>
-                <div className="form__group">
-                    <button className="button button--green">Send</button>
-                </div>
-            </form>
+        <div className="container">
+            <div className="forgot-password-form">
+                <h2 className="forgot-password-form__title">Forgot password?</h2>
+                <p className="forgot-password-form__description">
+                    Enter in your email and a reset link will be sent for you to change your password.
+                </p>
+                <form className="form form--forgotpassword" onSubmit={ handleOnSubmit }>
+                    <div className="form__group">
+                        <label className="form__label" htmlFor="email">Email address</label>
+                        <input className="form__input" id="email" onClick={ handleOnChange } name="email" type="email" placeholder="you@example.com" />
+                    </div>
+                    <div className="form__group">
+                        <button className="button button--green">Send</button>
+                    </div>
+                </form>
+            </div>
         </div>
     )
 }

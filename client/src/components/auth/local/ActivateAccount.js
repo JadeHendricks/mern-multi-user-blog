@@ -22,16 +22,18 @@ const ActivateAccount = ({ match }) => {
     }
     
     return (
-        <div className="forgot-password-form">
-            <h2 className="forgot-password-form__title">Hello { name && name.split(' ')[0] }, activate your account now!</h2>
-            <p className="forgot-password-form__description">
-                By clicking activate, your account with be verified and ready to use.
-            </p>
-            <form className="form form--activateaccount">
-                <div className="form__group">
-                    <button className="button button--green" onClick={ handleActivationClick }>Activate</button>
-                </div>
-            </form>
+        <div className="container">
+            <div className="forgot-password-form">
+                <h2 className="forgot-password-form__title">Hello { name && name.split(' ')[0] }, activate your account now!</h2>
+                <p className="forgot-password-form__description">
+                    By clicking activate, your account with be verified and ready to use.
+                </p>
+                <form className="form form--activateaccount">
+                    <div className="form__group">
+                        <button className="button button--green" onClick={ handleActivationClick }>Activate</button>
+                    </div>
+                </form>
+            </div>
         </div>
     )
 }

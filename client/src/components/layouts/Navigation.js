@@ -12,11 +12,11 @@ const Navigation = () => {
     return (
         <header className="header">
             <nav className="nav nav--posts">
+                <div className="header__logo">
+                    <Link to='/'><img src={ SiteLogoW } alt="Multi User Blog" title="Multi User Blog"/></Link>
+                </div>
                 <Link to='/' className="nav__el">All Posts</Link>
             </nav>
-            <div className="header__logo">
-                <Link to='/'><img src={ SiteLogoW } alt="Multi User Blog" title="Multi User Blog"/></Link>
-            </div>
             { !isAuthenticated &&  (
                 <nav className="nav nav__user">
                     <Link className="nav__el" to='/users'>All Users</Link>

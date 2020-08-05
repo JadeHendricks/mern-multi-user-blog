@@ -22,6 +22,7 @@ const FullPost = ({ match, history }) => {
                         <div className="author-options">
                             { post._id && (
                                 <Fragment>
+                                    <button className="button button--white" onClick={ () => history.goBack() }>Go back</button>
                                     { postIsLiked(likes, loggedInUser) ? 	
                                         <button className="button" onClick={ () => unLikePost(_id) }>Unlike Post</button> :	
                                         <button className="button" onClick={ () => likePost(_id) }>Like Post</button>	
@@ -34,57 +35,55 @@ const FullPost = ({ match, history }) => {
                                     )}
                                 </Fragment>
                             )}
-
-                        </div>
-                        <div className="back-button">
-                            <button className="button button--white" onClick={ () => history.goBack() }>Go back</button>
                         </div>
                     </div>
-                    <div className="post__container">
-                        <div className="post__header">
-                            <div className="post__top">
-                                <div className="post__image-block">
-                                    { image && ( <img src={require(`../../assets/images/posts/${image}`)} alt={ title } title={ title } /> )}
-                                </div>
-                                <h1 className="post__title">{ title }</h1>
-                            </div>
-                            <div className="post__user">
-                                <div className="post__user-block">
-                                    { user && ( <img className="form__user-photo" src={require(`../../assets/images/users/${user?.avatar}`)} alt={ user?.name } title={ user?.name } /> )}
-                                    <span className="post__user-name">{ user?.name }</span>
-                                </div>
-                                { user?.socials && (
-                                    <div className="post__user-social">
-                                        { user.socials.facebook && (
-                                            <a href={user.socials.facebook} target='_blank' rel='noopener noreferrer'>
-                                                <svg className="post__user-social-icon">
-                                                    <use xlinkHref={`${svg}#icon-facebook-square`}></use>
-                                                </svg>  
-                                            </a>
-                                        ) }
-                                        { user.socials.linkedin && (
-                                            <a href={user.socials.linkedin} target='_blank' rel='noopener noreferrer'>
-                                                <svg className="post__user-social-icon">
-                                                    <use xlinkHref={`${svg}#icon-linkedin-square`}></use>
-                                                </svg>  
-                                            </a>
-                                        ) }
-                                        { user.socials.twitter && (
-                                            <a href={user.socials.twitter} target='_blank' rel='noopener noreferrer'>
-                                                <svg className="post__user-social-icon">
-                                                    <use xlinkHref={`${svg}#icon-twitter-square`}></use>
-                                                </svg>  
-                                            </a>
-                                        ) }                                  
+                    <div className="container">
+                        <div className="post__container">
+                            <div className="post__header">
+                                <div className="post__top">
+                                    <div className="post__image-block">
+                                        { image && ( <img src={require(`../../assets/images/posts/${image}`)} alt={ title } title={ title } /> )}
                                     </div>
-                                ) }
+                                    <h1 className="post__title">{ title }</h1>
+                                </div>
+                                <div className="post__user">
+                                    <div className="post__user-block">
+                                        { user && ( <img className="form__user-photo" src={require(`../../assets/images/users/${user?.avatar}`)} alt={ user?.name } title={ user?.name } /> )}
+                                        <span className="post__user-name">{ user?.name }</span>
+                                    </div>
+                                    { user?.socials && (
+                                        <div className="post__user-social">
+                                            { user.socials.facebook && (
+                                                <a href={user.socials.facebook} target='_blank' rel='noopener noreferrer'>
+                                                    <svg className="post__user-social-icon">
+                                                        <use xlinkHref={`${svg}#icon-facebook-square`}></use>
+                                                    </svg>  
+                                                </a>
+                                            ) }
+                                            { user.socials.linkedin && (
+                                                <a href={user.socials.linkedin} target='_blank' rel='noopener noreferrer'>
+                                                    <svg className="post__user-social-icon">
+                                                        <use xlinkHref={`${svg}#icon-linkedin-square`}></use>
+                                                    </svg>  
+                                                </a>
+                                            ) }
+                                            { user.socials.twitter && (
+                                                <a href={user.socials.twitter} target='_blank' rel='noopener noreferrer'>
+                                                    <svg className="post__user-social-icon">
+                                                        <use xlinkHref={`${svg}#icon-twitter-square`}></use>
+                                                    </svg>  
+                                                </a>
+                                            ) }                                  
+                                        </div>
+                                    ) }
+                                </div>
                             </div>
+                            <div className="post__body">
+                                <p>{ description } <br /> { description }</p>
+                                <p>{ description } <br /> { description }</p>
+                            </div>
+                            <CommentSubmit postId={_id} comments={ comments } />
                         </div>
-                        <div className="post__body">
-                            <p>{ description } <br /> { description }</p>
-                            <p>{ description } <br /> { description }</p>
-                        </div>
-                        <CommentSubmit postId={_id} comments={ comments } />
                     </div>
                 </div> 
             )}

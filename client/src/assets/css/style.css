@@ -594,6 +594,10 @@ strong {
   .form--createPost {
     padding: 3rem;
     margin-bottom: 0; }
+  .form--changePassword {
+    padding: 3rem; }
+  .form--account {
+    padding: 3rem; }
   .form__group {
     margin-bottom: 2rem; }
   .form__label {
@@ -739,7 +743,8 @@ strong {
   margin-right: 2.5rem; }
   .post__image-block img {
     width: 100%;
-    height: 100%; }
+    height: 20rem;
+    object-fit: cover; }
 
 .post__title {
   flex: 1;
@@ -833,7 +838,9 @@ strong {
   .post__image-block {
     display: block;
     margin: 0 auto;
-    width: 20rem; }
+    width: 20rem;
+    height: 20rem;
+    object-fit: cover; }
   .post__title {
     margin-top: 2.5rem;
     text-align: center;
@@ -950,7 +957,7 @@ strong {
         width: 6rem;
         height: 6rem; }
     .comment-post__information {
-      margin: 0 1.5rem; }
+      margin: 0 1.5rem 0 0.5rem; }
     .comment-post__user-name {
       font-size: 1.6rem; }
       .comment-post__user-name span {
