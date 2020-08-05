@@ -4,7 +4,7 @@ import PostReducer from './PostReducer';
 import { toast } from 'react-toastify';
 import { withRouter } from 'react-router-dom';
 import axios from 'axios';
-import { GET_ALL_POSTS, CREATE_COMMENT, GET_POST, POST_ERROR } from "../types";
+import { GET_ALL_POSTS, CREATE_COMMENT, GET_POST, DELETE_COMMENT, POST_ERROR } from "../types";
 
 const PostState = props => {
 
@@ -81,6 +81,7 @@ const PostState = props => {
     try {
         await axios.delete(`/api/post/${id}`); 
         toast.success('Post has been deleted.');
+        props.history.push('/');
     } catch (err) {
         dispatch({ type: POST_ERROR });
         toast.error(err.response.data.message);
@@ -106,6 +107,10 @@ const PostState = props => {
     try {
         const res = await axios.delete(`/api/post/comment/${postId}/${commentId}`);
         toast.success(res.data.message);
+        dispatch({
+          type: DELETE_COMMENT,
+          payload: commentId
+        });
     } catch (err) {
         dispatch({ type: POST_ERROR });
         toast.error(err.response.data.message);

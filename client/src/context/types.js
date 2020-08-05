@@ -9,6 +9,7 @@ export const LOGOUT = 'LOGOUT';
 export const GET_POST = 'GET_POST';
 export const GET_ALL_POSTS = 'GET_ALLPOSTS';
 export const CREATE_COMMENT = 'CREATE_COMMENT';
+export const DELETE_COMMENT = 'DELETE_COMMENT';
 export const POST_ERROR = 'POST_ERROR';
 
 // USERS
