@@ -14,7 +14,7 @@ const PostForm = () => {
 
     const handleSubmit = e => {
         e.preventDefault();
-        createPost(e, title, tag, description, image);
+        createPost(title, tag, description, image);
     }
 
     return (

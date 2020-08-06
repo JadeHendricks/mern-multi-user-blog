@@ -80,8 +80,7 @@ const FullPost = ({ match, history }) => {
                                 </div>
                             </div>
                             <div className="post__body">
-                                <p>{ description } <br /> { description }</p>
-                                <p>{ description } <br /> { description }</p>
+                                <p>{ description }</p>
                             </div>
                             <CommentSubmit postId={_id} comments={ comments } />
                         </div>

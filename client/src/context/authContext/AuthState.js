@@ -81,10 +81,8 @@ const AuthState = props => {
       toast.success('Logging out');
       dispatch({ type: LOGOUT });
       if (res.data.message === 'success') {
-        setTimeout(() => {
-          props.history.push('/')
           window.location.reload(true);
-        }, 4000);
+          props.history.push('/')
       }
     } catch (err) {
       dispatch({ type: AUTH_ERROR });
@@ -105,6 +103,8 @@ const AuthState = props => {
   }
 
   const resetPassword = async (newPassword, token) => {
+    console.log('newPassword from state', newPassword);
+    console.log('token from state', token);
     const config = { headers: {'Content-Type': 'application/json'} };
     const body = JSON.stringify({ newPassword, resetPasswordLink: token });
 
@@ -117,6 +117,7 @@ const AuthState = props => {
           }, 4000);
         }
     } catch (err) {
+      console.log(err);
       dispatch({ type: AUTH_ERROR });
       toast.error(err.response.data.message);
     }

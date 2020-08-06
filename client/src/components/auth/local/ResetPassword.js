@@ -20,6 +20,7 @@ const ResetPassword = ({ match }) => {
     const handleOnChange = e => setValues({ ...values, [e.target.name]: e.target.value });
 
     const handleOnSubmit = async (e) => {
+        console.log('values', values);
         e.preventDefault();
         resetPassword(newPassword, token);
         setValues({ ...values, newPassword: '' });
@@ -34,8 +35,8 @@ const ResetPassword = ({ match }) => {
                 </p>
                 <form class="form form--resetPassword" onSubmit={ handleOnSubmit }>
                     <div class="form__group">
-                        <label class="form__label" htmlFor="newpassword">New Password</label>
-                        <input class="form__input" id="newpassword" onChange={ handleOnChange } name="newpassword" type="password" placeholder="••••••••" />
+                        <label class="form__label" htmlFor="newPassword">New Password</label>
+                        <input class="form__input" id="newPassword" onChange={ handleOnChange } name="newPassword" type="password" placeholder="••••••••" />
                     </div>
                     <div class="form__group">
                         <button class="button button--green">Reset Password</button>
