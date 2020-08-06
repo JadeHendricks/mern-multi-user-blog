@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import AuthContext from '../../context/authContext/AuthContext';
 import PostContext from '../../context/postContext/PostContext';
 import CommentSubmit from '../comment/CommentSubmit';
+import ContentLoader from '../layouts/ContentLoader';
 
 const FullPost = ({ match, history }) => {
     const { loggedInUser, isUsersData, authLoading } = useContext(AuthContext);
@@ -16,7 +17,7 @@ const FullPost = ({ match, history }) => {
 
     return (
         <Fragment>
-            { authLoading && postLoading ? (<h1>Loading</h1>) : (
+            { authLoading && postLoading ? (<ContentLoader />) : (
                 <div className="post">
                     <div className="post__banner">
                         <div className="author-options">

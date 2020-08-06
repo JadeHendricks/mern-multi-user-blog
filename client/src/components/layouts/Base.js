@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, Fragment } from 'react';
 import PostCard from '../cards/PostCard'
 import PostContext from '../../context/postContext/PostContext';
+import ContentLoader from '../layouts/ContentLoader';
 
 const Base = () => {
     const { getAllPosts, posts, postLoading } = useContext(PostContext);
@@ -11,7 +12,7 @@ const Base = () => {
 
     return (
         <Fragment>
-            { postLoading ? (<h1>LOADING</h1>): (
+            { postLoading ? (<ContentLoader />): (
                 <section className="all-posts">
                     <div className="container">
                         <div className="cards">

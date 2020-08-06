@@ -1,6 +1,7 @@
 import React, { Fragment, useContext, useEffect } from 'react';
 import PostCard from '../cards/PostCard';
 import PostContext from '../../context/postContext/PostContext';
+import ContentLoader from '../layouts/ContentLoader';
 
 const MostPopularPosts = () => {
     const { getAllPosts, posts, postLoading } = useContext(PostContext);
@@ -13,7 +14,7 @@ const MostPopularPosts = () => {
 
     return (
         <Fragment>
-            { postLoading ? (<h1>LOADING</h1>) : (
+            { postLoading ? (<ContentLoader />) : (
                 <section className="all-posts">
                     <div className="container">
                         <div className="cards">

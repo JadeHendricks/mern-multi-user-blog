@@ -2,6 +2,7 @@ import React, { useContext, Fragment } from 'react';
 import Moment from 'react-moment';
 import AuthContext from '../../context/authContext/AuthContext';
 import PostContext from '../../context/postContext/PostContext';
+import ContentLoader from '../layouts/ContentLoader';
 
 const CommentPost = ({ comment: { userId, avatar, comment, name, date, _id }, postId }) => {
     const { loggedInUser, isUsersData, authLoader } = useContext(AuthContext);
@@ -9,7 +10,7 @@ const CommentPost = ({ comment: { userId, avatar, comment, name, date, _id }, po
 
     return (
         <Fragment>
-            { authLoader && postLoader ? (<h1>LOADING</h1>) : (
+            { authLoader && postLoader ? (<ContentLoader />) : (
                 <div className="comment-post">
                     <div className="comment-post__icon">
                         <img src={require(`../../assets/images/users/${avatar}`)} alt={ name } title={ name } />

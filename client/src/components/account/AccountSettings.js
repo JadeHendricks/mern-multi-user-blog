@@ -1,5 +1,6 @@
 import React, { Fragment, useEffect, useContext, useState } from 'react';
 import UserContext from '../../context/userContext/UserContext';
+import ContentLoader from '../layouts/ContentLoader';
 
 const AccountSettings = ({ user }) => {
     const { updateUserSocials, updateUser, userLoading } = useContext(UserContext);
@@ -24,7 +25,7 @@ const AccountSettings = ({ user }) => {
     
     return (
         <Fragment>
-            { userLoading ? (<h1>Loading</h1>) : (
+            { userLoading ? (<ContentLoader />) : (
                 <Fragment>
                     <section className="account-settings">
                         <form className="form form--account" onSubmit={ (e) => {

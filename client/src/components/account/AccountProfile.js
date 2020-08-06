@@ -5,6 +5,7 @@ import PostCard from '../cards/PostCard';
 import AccountSettings from './AccountSettings';
 import AuthContext from '../../context/authContext/AuthContext';
 import UserContext from '../../context/userContext/UserContext';
+import ContentLoader from '../layouts/ContentLoader';
 
 const Profile = ({ match }) => {
     const { loggedInUser, isUsersData, authLoading } = useContext(AuthContext);
@@ -20,7 +21,7 @@ const Profile = ({ match }) => {
 
     return (
         <Fragment>
-            { authLoading && userLoading ?  (<h1>LOADING</h1>) : (
+            { authLoading && userLoading ?  (<ContentLoader />) : (
                 <Fragment>
                     <div className="post">
                         <div className="post__banner post__banner--account">

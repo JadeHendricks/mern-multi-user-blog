@@ -1,6 +1,7 @@
 import React, { useEffect, useContext, Fragment } from 'react';
 import UserCard from '../cards/UserCard';
 import UserContext from '../../context/userContext/UserContext';
+import ContentLoader from '../layouts/ContentLoader';
 
 const AllUsers = () => {
     const { getAllUsers, users, userLoading} = useContext(UserContext);
@@ -11,7 +12,7 @@ const AllUsers = () => {
     
     return (
         <Fragment>
-            { userLoading ? (<h1>LOADING</h1>) : (
+            { userLoading ? (<ContentLoader />) : (
                 <section className="all-user">
                     <div className="container">
                         <div className="all-userCards">
