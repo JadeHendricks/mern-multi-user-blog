@@ -31,15 +31,14 @@ const ProfileCard = ({ post: { _id, title, image, tag, description, comments, li
                         <span>{ comments.length } { comments.length === 1 ? 'Comment' : 'Comments' }</span>
                     </div>
                     <div className="card__interaction-block">	
-                        { !postIsLiked(likes, loggedInUser) ? (	
+                        { postIsLiked(likes, loggedInUser) ? 	
+                            <svg className="card__interaction-icon" onClick={ () => unLikePost(_id) }>	
+                                <use xlinkHref={`${svg}#icon-heart`}></use>	
+                            </svg> :
                             <svg className="card__interaction-icon" onClick={ () => likePost(_id) }>	
                                 <use xlinkHref={`${svg}#icon-heart-o`}></use>	
                             </svg>	
-                        ) : (	
-                            <svg className="card__interaction-icon" onClick={ () => unLikePost(_id) }>	
-                                <use xlinkHref={`${svg}#icon-heart`}></use>	
-                            </svg>	
-                        ) }  	
+                        } 	
                         <span>{ likes.length } { likes.length === 1 ? 'Like' : 'Likes' }</span>	
                     </div>
                 </div>

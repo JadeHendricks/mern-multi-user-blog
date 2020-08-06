@@ -10,6 +10,7 @@ export const GET_POST = 'GET_POST';
 export const GET_ALL_POSTS = 'GET_ALLPOSTS';
 export const CREATE_COMMENT = 'CREATE_COMMENT';
 export const DELETE_COMMENT = 'DELETE_COMMENT';
+export const UPDATE_LIKES = 'UPDATE_LIKES';
 export const POST_ERROR = 'POST_ERROR';
 
 // USERS

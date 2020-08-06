@@ -4,7 +4,7 @@ import PostReducer from './PostReducer';
 import { toast } from 'react-toastify';
 import { withRouter } from 'react-router-dom';
 import axios from 'axios';
-import { GET_ALL_POSTS, CREATE_COMMENT, GET_POST, DELETE_COMMENT, POST_ERROR } from "../types";
+import { GET_ALL_POSTS, CREATE_COMMENT, GET_POST, DELETE_COMMENT, UPDATE_LIKES, POST_ERROR } from "../types";
 
 const PostState = props => {
 
@@ -119,8 +119,9 @@ const PostState = props => {
 
   const postIsLiked = (likes, loggedInUser) => {	
     if (likes && loggedInUser) {	
+      // console.log('likes', likes);
         const isLiked = likes.filter(like => like.user === loggedInUser._id);	
-        if (isLiked.length > 0) {	
+        if (isLiked.length) {	
             return true;	
         }	
         return false;	
@@ -129,7 +130,12 @@ const PostState = props => {
 
   const likePost = async (id) => {	
       try {	
-          const res = await axios.put(`/api/post/like/${id}`);  	
+          const res = await axios.put(`/api/post/like/${id}`);  
+          console.log('like', res.data.likes);	
+          dispatch({ 
+            type: UPDATE_LIKES, 
+            payload: res.data.likes 
+          });
           toast.success(res.data.message);	
       } catch (err) {	
           console.error(err);   	
@@ -140,6 +146,11 @@ const PostState = props => {
   const unLikePost = async (id) => {	
       try {	
           const res = await axios.put(`/api/post/unlike/${id}`);  	
+          console.log('dislike', res.data.likes);	
+          dispatch({ 
+            type: UPDATE_LIKES, 
+            payload: res.data.likes 
+          });
           toast.success(res.data.message);	
       } catch (err) {	
           console.error(err);   	
