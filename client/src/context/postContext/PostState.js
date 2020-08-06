@@ -128,13 +128,12 @@ const PostState = props => {
     }	
 }	
 
-  const likePost = async (id) => {	
+  const likePost = async (postId) => {	
       try {	
-          const res = await axios.put(`/api/post/like/${id}`);  
-          console.log('like', res.data.likes);	
+          const res = await axios.put(`/api/post/like/${postId}`);  
           dispatch({ 
             type: UPDATE_LIKES, 
-            payload: res.data.likes 
+            payload: { postId, likes: res.data.likes }
           });
           toast.success(res.data.message);	
       } catch (err) {	
@@ -143,13 +142,13 @@ const PostState = props => {
       }	
   }	
 
-  const unLikePost = async (id) => {	
+  const unLikePost = async (postId) => {	
       try {	
-          const res = await axios.put(`/api/post/unlike/${id}`);  	
+          const res = await axios.put(`/api/post/unlike/${postId}`);  	
           console.log('dislike', res.data.likes);	
           dispatch({ 
             type: UPDATE_LIKES, 
-            payload: res.data.likes 
+            payload: { postId, likes: res.data.likes }
           });
           toast.success(res.data.message);	
       } catch (err) {	

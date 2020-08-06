@@ -29,7 +29,8 @@ export default ( state, action ) => {
         case UPDATE_LIKES: 
             return {
                 ...state,
-                post: { ...state.post, likes: action.payload },
+                post: state.post._id === action.payload.postId ? { ...state.post, likes: action.payload.likes } : state.post,
+                posts: state.posts.map(post => post._id === action.payload.postId ? { ...post, likes: action.payload.likes } : post ),
                 loading: false
             }
         case POST_ERROR: 

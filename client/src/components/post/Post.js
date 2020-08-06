@@ -24,7 +24,7 @@ const FullPost = ({ match, history }) => {
                                 <Fragment>
                                     <button className="button button--white" onClick={ () => history.goBack() }>Go back</button>
                                     { postIsLiked(likes, loggedInUser) ? 	
-                                        <button className="button" onClick={ () => unLikePost(_id) }>Unlike Post</button> :	
+                                        <button className="button button--red" onClick={ () => unLikePost(_id) }>Unlike Post</button> :	
                                         <button className="button" onClick={ () => likePost(_id) }>Like Post</button>	
                                     }
                                     { loggedInUser && isUsersData(loggedInUser._id, user._id) && (
