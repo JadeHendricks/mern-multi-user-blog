@@ -33,17 +33,18 @@
         list-style-type: none;
     }
     &__el {
-        font-size: 1.8rem;
-        text-transform: uppercase;
         border-bottom: 0.1rem solid $white;
         padding: 2rem 0;
         &:last-child {
             border: 0;
         }
-    }
-    & a {
-        text-decoration: none;
-        color: $white;
+        & button {
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            border: 0;
+            background: transparent;
+            color: $white;
+        }
     }
 }
 
@@ -69,8 +70,17 @@
             list-style-type: none;
         }
         &__el {
-            font-size: 1.6rem;
             padding: 1.5rem 0;
+            &:last-child {
+                border: 0;
+            }
+            & button {
+                font-size: 1.6rem;
+                text-transform: uppercase;
+                border: 0;
+                background: transparent;
+                color: $white;
+            }
         }
     }
 }
@@ -85,10 +95,6 @@
     .account-nav {
         &__ul {
             list-style-type: none;
-        }
-        &__el {
-            font-size: 1.6rem;
-            padding: 1.5rem 0;
         }
     }
 }

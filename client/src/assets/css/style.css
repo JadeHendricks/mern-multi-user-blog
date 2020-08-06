@@ -1086,16 +1086,16 @@ strong {
   list-style-type: none; }
 
 .account-nav__el {
-  font-size: 1.8rem;
-  text-transform: uppercase;
   border-bottom: 0.1rem solid #ffffff;
   padding: 2rem 0; }
   .account-nav__el:last-child {
     border: 0; }
-
-.account-nav a {
-  text-decoration: none;
-  color: #ffffff; }
+  .account-nav__el button {
+    font-size: 1.8rem;
+    text-transform: uppercase;
+    border: 0;
+    background: transparent;
+    color: #ffffff; }
 
 @media screen and (max-width: 1200px) {
   .account {
@@ -1113,8 +1113,15 @@ strong {
   .account-nav__ul {
     list-style-type: none; }
   .account-nav__el {
-    font-size: 1.6rem;
-    padding: 1.5rem 0; } }
+    padding: 1.5rem 0; }
+    .account-nav__el:last-child {
+      border: 0; }
+    .account-nav__el button {
+      font-size: 1.6rem;
+      text-transform: uppercase;
+      border: 0;
+      background: transparent;
+      color: #ffffff; } }
 
 @media screen and (max-width: 991px) {
   .account {
@@ -1122,10 +1129,7 @@ strong {
     .account__options {
       padding: 1rem; }
   .account-nav__ul {
-    list-style-type: none; }
-  .account-nav__el {
-    font-size: 1.6rem;
-    padding: 1.5rem 0; } }
+    list-style-type: none; } }
 
 .user-header {
   display: flex;
