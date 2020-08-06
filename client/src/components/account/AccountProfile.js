@@ -28,7 +28,7 @@ const Profile = ({ match }) => {
                             <div className="container">
                                 <div className="user-header">
                                     <div className="user-header__image">
-                                        { user.avatar && ( <img src={require(`../../assets/images/users/${user.avatar}`)} alt={ user.name } title={ user.name } /> )}
+                                        { user && user.avatar && ( <img src={require(`../../assets/images/users/${user?.avatar}`)} alt={ user?.name } title={ user?.name } /> )}
                                     </div>
                                     <div className="user-header__info">
                                         <h3 className="user-header__info-name">{ user?.name }</h3>
@@ -37,23 +37,23 @@ const Profile = ({ match }) => {
                                             Corporis iusto quasi, quidem molestias aperiam in earum deleniti amet incidunt possimus.
                                         </p>
                                         <div className="user-header__socials">    
-                                            { user.social && (
+                                            { user?.social && (
                                                 <div className="user-header__socials">    
-                                                    { user.socials.facebook && (
+                                                    { user?.socials.facebook && (
                                                         <a href={user.socials.facebook} target='_blank' rel='noopener noreferrer'>
                                                             <svg className="user-header__socials-icon">
                                                                 <use xlinkHref={`${svg}#icon-facebook-square`}></use>
                                                             </svg>  
                                                         </a>
                                                     )}
-                                                    { user.socials.linkedin && (
+                                                    { user?.socials.linkedin && (
                                                         <a href={user.socials.linkedin} target='_blank' rel='noopener noreferrer'>
                                                             <svg className="user-header__socials-icon">
                                                                 <use xlinkHref={`${svg}#icon-linkedin-square`}></use>
                                                             </svg>
                                                         </a>
                                                     )}
-                                                    { user.socials.twitter && (
+                                                    { user?.socials.twitter && (
                                                         <a href={user.socials.twitter} target='_blank' rel='noopener noreferrer'>
                                                             <svg className="user-header__socials-icon">
                                                                 <use xlinkHref={`${svg}#icon-twitter-square`}></use>
@@ -73,8 +73,8 @@ const Profile = ({ match }) => {
                             <aside className="account__options">
                                 <nav className="account-nav">
                                     <ul className="account-nav__ul">
-                                        <li className="account-nav__el"><a onClick={ handleNavigationState } name='all-posts' href="#">All posts ({ userPosts?.length })</a></li>
-                                        { isUsersData(loggedInUser?._id, user._id) && <li className="account-nav__el"><a onClick={ handleNavigationState } name='account-settings' href="#!">Account settings</a></li> }
+                                        <li className="account-nav__el"><button onClick={ handleNavigationState } name='all-posts' href="#">All posts ({ userPosts?.length })</button></li>
+                                        { isUsersData(loggedInUser?._id, user._id) && <li className="account-nav__el"><button onClick={ handleNavigationState } name='account-settings'>Account settings</button></li> }
                                     </ul>
                                 </nav>
                             </aside>

@@ -23,7 +23,6 @@ const ResetPassword = ({ match }) => {
         console.log('values', values);
         e.preventDefault();
         resetPassword(newPassword, token);
-        setValues({ ...values, newPassword: '' });
     }
 
     return (

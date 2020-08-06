@@ -53,7 +53,7 @@ const AuthState = props => {
     try {
         await axios.post('/api/auth/login', body, config);
         dispatch({ type: LOGIN_SUCCESS });
-        toast.success('Login successful, welcome to the Mern Authentication Boilerplate.');
+        toast.success('Login successful, welcome to the Multi User Blog.');
         loadUser();
         props.history.push('/');
     } catch (err) {
@@ -71,7 +71,7 @@ const AuthState = props => {
         toast.success(res.data.message);
     } catch (err) {
       dispatch({ type: AUTH_ERROR });
-      toast.success(err.response.data.message);
+      toast.error(err.response.data.message);
     }
   }
 
@@ -82,7 +82,7 @@ const AuthState = props => {
       dispatch({ type: LOGOUT });
       if (res.data.message === 'success') {
           window.location.reload(true);
-          props.history.push('/')
+          props.history.push('/login')
       }
     } catch (err) {
       dispatch({ type: AUTH_ERROR });

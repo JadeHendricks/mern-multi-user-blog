@@ -9,6 +9,7 @@ const PostForm = ({ match }) => {
     const { image, title, tag, description } = values;
 
     const [ blogimage, setBlogImage] = useState();
+    const [ uploadName, setUploadName] = useState();
 
     const getPost = async (id) => {
         try {
@@ -83,8 +84,9 @@ const PostForm = ({ match }) => {
                             <input className="form__upload" type="file" accept="image/*" id="blogimage" name="blogimage" onChange={ e => {
                                 const file = e.target.files[0];
                                 setBlogImage(file);
+                                setUploadName(e.target.value.slice(12));
                             } } />
-                            <label htmlFor="blogimage">Choose a blog post image</label>
+                            <label htmlFor="blogimage">{ uploadName ? uploadName : 'Choose a blog post image' }</label>
                         </div>
                         <div className="form__group">
                             <button className="button button--green">Update Post</button>

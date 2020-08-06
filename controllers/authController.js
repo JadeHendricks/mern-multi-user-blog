@@ -63,7 +63,7 @@ exports.accountActivation = async (req, res) => {
         await User.create({ name, email, password });
 
         res.status(201).json({
-            message: 'Activation successful. Please signin'
+            message: 'Activation successful. Please login.'
         });
         
     } catch (err) {

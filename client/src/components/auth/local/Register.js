@@ -15,7 +15,6 @@ const Register = () => {
     const handleOnSubmit = async (e) => {
         e.preventDefault();
         register(name, email, password);
-        setValues({ ...values, name: '', email: '', password: '' });
     }
 
     if (isAuthenticated && user) {

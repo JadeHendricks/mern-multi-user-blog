@@ -11,6 +11,7 @@ const AccountSettings = ({ user }) => {
 
     const [ name, setName] = useState();
     const [ avatar, setAvatar] = useState();
+    const [ uploadName, setUploadName] = useState();
 
     useEffect(() => {
         if (user.socials) {
@@ -48,8 +49,9 @@ const AccountSettings = ({ user }) => {
                                 <input className="form__upload" type="file" accept="image/*" id="avatar" name="avatar" onChange={ e => {
                                     const file = e.target.files[0];
                                     setAvatar(file);
+                                    setUploadName(e.target.value.slice(12));
                                 } } />
-                                <label htmlFor="avatar">Choose a new profile picture</label>
+                                <label htmlFor="avatar">{ uploadName ? uploadName : 'Choose a new profile picture'}</label>
                             </div>
                             <div className="form__group">
                                 <button type="submit" className="button button--green">Update Account</button>

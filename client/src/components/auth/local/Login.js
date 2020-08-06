@@ -14,7 +14,6 @@ const Login = () => {
     const handleOnSubmit = async (e) => {
         e.preventDefault();
         login(email, password);
-        setValues({ ...values, email: '', password: '' });
     }
 
     if (isAuthenticated && user) {

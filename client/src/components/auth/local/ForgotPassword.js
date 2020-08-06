@@ -11,7 +11,6 @@ const ForgotPassword = () => {
     const handleOnSubmit = async (e) => {
         e.preventDefault();
         forgotPassword(email);
-        setValues({ ...values, email: '',});
     }
     
     return (
