@@ -16,7 +16,7 @@ const AllUsers = () => {
                 <section className="all-user">
                     <div className="container">
                         <div className="all-userCards">
-                            { users?.map(user => <UserCard key={ user._id } user={ user }/>) }
+                            { users.length === 0 ? <h3>No Content Found...</h3> : users.map(user => <UserCard key={ user._id } user={ user }/>) }
                         </div>
                     </div>
                 </section>

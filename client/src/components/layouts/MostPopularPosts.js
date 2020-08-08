@@ -18,9 +18,12 @@ const MostPopularPosts = () => {
                 <section className="all-posts">
                     <div className="container">
                         <div className="cards">
-                            { posts?.sort((a, b) => b.likes.length - a.likes.length).slice(0, 6).map(post => <PostCard key={ post._id } post={ post } /> ) }
+                            { posts.length === 0 ? <h3>No Content Found...</h3> : posts
+                                .sort((a, b) => b.likes.length - a.likes.length)
+                                .slice(0, 6)
+                                .map(post => <PostCard key={ post._id } post={ post } /> ) }
                         </div>
-                    </div>
+                        </div>
                 </section>
             ) }
         </Fragment>
