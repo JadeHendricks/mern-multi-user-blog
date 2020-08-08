@@ -8,6 +8,7 @@ const AllUsers = () => {
 
     useEffect(() => {
         getAllUsers();
+        // eslint-disable-next-line
     }, []);
     
     return (

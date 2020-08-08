@@ -10,6 +10,7 @@ const MostPopularPosts = () => {
         if (posts.length === 0) {
             getAllPosts();
         }
+        // eslint-disable-next-line
     }, [])
 
     return (

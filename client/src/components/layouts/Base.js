@@ -8,6 +8,7 @@ const Base = () => {
 
     useEffect(() => {
         getAllPosts();
+        // eslint-disable-next-line
     }, [])
 
     return (

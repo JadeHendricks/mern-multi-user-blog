@@ -81,7 +81,6 @@ const AuthState = props => {
       toast.success('Logging out');
       dispatch({ type: LOGOUT });
       if (res.data.message === 'success') {
-          window.location.reload(true);
           props.history.push('/login')
       }
     } catch (err) {

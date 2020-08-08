@@ -35,7 +35,7 @@ const Navigation = () => {
                         <span>{ loggedInUser.name.split(' ')[0] }</span>
                     </Link>
                     <Link to='/create-post' className="nav__el button button--green">Create Post</Link>
-                    <a className="nav__el nav__el--logout" onClick={ onLogout }>Log out</a>
+                    <a className="nav__el nav__el--logout" href="#!" onClick={ onLogout }>Log out</a>
                 </nav> 
             )}
         </header>

@@ -22,6 +22,7 @@ const AccountSettings = ({ user }) => {
             });
         }
         setName(user.name);
+        // eslint-disable-next-line
     }, []);
     
     return (
@@ -34,11 +35,11 @@ const AccountSettings = ({ user }) => {
                             updateUser(name, avatar);
                         } }>
                             <div className="form__group">
-                                <label className="form__label" htmlFor="name">Name</label>
-                                <input className="form__input" id="name" value={ name } onChange={ e => {
+                                <label className="form__label" htmlFor="name" name="name" type="text" placeholder="Name">Name</label>
+                                <input className="form__input" id="name" value={ name || '' } onChange={ e => {
                                     const value = e.target.value;
                                     setName(value);
-                                } } name="name" type="text" placeholder="Name" />
+                                } } />
                             </div>
                             <div className="form__group">
                                 <label className="form__label" htmlFor="email">Email</label>

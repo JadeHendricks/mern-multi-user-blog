@@ -17,6 +17,7 @@ const Profile = ({ match }) => {
     useEffect(() => {
         getUser(match.params.id);
         getAllUsersPosts(match.params.id);
+        // eslint-disable-next-line
     }, [match.params.id, loggedInUser]);
 
     return (

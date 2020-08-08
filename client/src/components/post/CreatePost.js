@@ -40,17 +40,19 @@ const PostForm = () => {
                         </div>
                         <div className="form__group">
                             <label className="form__label" htmlFor="tag">Post Tag</label>
-                            <div class="form__radio">
-                                <input type="radio" id="general" value="general" name="tag" onChange={ handleOnChange } checked={tag && tag === 'general'} checked />
-                                <label for="general" className="form__radio-label">general</label>
+                            <div className="form__radio">
+                                { tag && tag === 'general' ? <input type="radio" id="general" value="general" name="tag" onChange={ handleOnChange } checked={tag && tag === 'general'} /> :
+                                <input type="radio" id="general" value="general" name="tag" onChange={ handleOnChange } checked />}
+                                
+                                <label htmlFor="general" className="form__radio-label">general</label>
                             </div>
-                            <div class="form__radio">
+                            <div className="form__radio">
                                 <input type="radio" id="travel" value="travel" name="tag" onChange={ handleOnChange } checked={tag && tag === 'travel'} />
-                                <label for="travel" className="form__radio-label">travel</label>
+                                <label htmlFor="travel" className="form__radio-label">travel</label>
                             </div>
-                            <div class="form__radio">
+                            <div className="form__radio">
                                 <input type="radio" id="funny" value="funny" name="tag" onChange={ handleOnChange } checked={tag && tag === 'funny'} />
-                                <label for="funny" className="form__radio-label">funny</label>
+                                <label htmlFor="funny" className="form__radio-label">funny</label>
                             </div>
                         </div>
                         <div className="form__group">

@@ -13,6 +13,7 @@ const FullPost = ({ match, history }) => {
 
     useEffect(() => {
         getPost(match.params.id);
+        // eslint-disable-next-line
     }, [match.params.id]);
 
     return (
