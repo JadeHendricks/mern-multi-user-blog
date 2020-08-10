@@ -2,7 +2,7 @@
 {
     "MONGO_URI": "mongodb+srv://jade:<PASSWORD>@cluster0-l7qvw.mongodb.net/<dbname>?retryWrites=true&w=majority",
     "MONGO_PASSWORD": "jade123",
-    "CLIENT_URL": "http://localhost:3000",
+    "CLIENT_URL": "https://still-hollows-11115.herokuapp.com",
     "SG_API_KEY": "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",
     "JWT_SECRET": "TwUB0rcGO0e9uu64MRvImQ2wWCKxYhWI",
     "JWT_ACCOUNT_ACTIVATION": "VETPWTpqwXZ0sJuNWpDX3w2Beg8m0XPJ",
