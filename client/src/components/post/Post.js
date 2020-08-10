@@ -44,13 +44,13 @@ const FullPost = ({ match, history }) => {
                             <div className="post__header">
                                 <div className="post__top">
                                     <div className="post__image-block">
-                                        { image && ( <img src={require(`../../assets/images/posts/${image}`)} alt={ title } title={ title } /> )}
+                                        <img src={require(`../../assets/images/posts/default.jpg`)} alt={ title } title={ title } />
                                     </div>
                                     <h1 className="post__title">{ title }</h1>
                                 </div>
                                 <div className="post__user">
                                     <div className="post__user-block">
-                                        { user && ( <img className="form__user-photo" src={require(`../../assets/images/users/${user?.avatar}`)} alt={ user?.name } title={ user?.name } /> )}
+                                        <img className="form__user-photo" src={require(`../../assets/images/users/default.jpg`)} alt={ user?.name } title={ user?.name } />
                                         <span className="post__user-name">{ user?.name }</span>
                                     </div>
                                     { user?.socials && (

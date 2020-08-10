@@ -46,7 +46,7 @@ const AccountSettings = ({ user }) => {
                                 <input className="form__input" id="email" name="email" value={ user.email } placeholder="yourname@example.com" disabled></input>
                             </div>
                             <div className="form__group form__photo-upload">
-                                { user.avatar && ( <img className="form__user-photo" src={require(`../../assets/images/users/${user.avatar}`)} alt={ user.name } title={ user.name } />) }
+                                <img className="form__user-photo" src={require(`../../assets/images/users/default.jpg`)} alt={ user?.name } title={ user?.name } />
                                 <input className="form__upload" type="file" accept="image/*" id="avatar" name="avatar" onChange={ e => {
                                     const file = e.target.files[0];
                                     setAvatar(file);

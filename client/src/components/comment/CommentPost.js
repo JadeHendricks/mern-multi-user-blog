@@ -13,7 +13,7 @@ const CommentPost = ({ comment: { userId, avatar, comment, name, date, _id }, po
             { authLoader && postLoader ? (<ContentLoader />) : (
                 <div className="comment-post">
                     <div className="comment-post__icon">
-                        <img src={require(`../../assets/images/users/${avatar}`)} alt={ name } title={ name } />
+                        <img src={require(`../../assets/images/users/default.jpg`)} alt={ name } title={ name } />
                     </div>
                     <div className="comment-post__information">
                         <h5 className="comment-post__user-name">{ name } <span><Moment format="DD/MM/YYYY">{ date }</Moment></span></h5>

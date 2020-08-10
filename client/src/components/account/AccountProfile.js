@@ -29,7 +29,7 @@ const Profile = ({ match }) => {
                             <div className="container">
                                 <div className="user-header">
                                     <div className="user-header__image">
-                                        { user && user.avatar && ( <img src={require(`../../assets/images/users/${user?.avatar}`)} alt={ user?.name } title={ user?.name } /> )}
+                                        <img src={require(`../../assets/images/users/default.jpg`)} alt={ user?.name } title={ user?.name } />
                                     </div>
                                     <div className="user-header__info">
                                         <h3 className="user-header__info-name">{ user?.name }</h3>

@@ -78,9 +78,7 @@ const PostForm = ({ match }) => {
                             <textarea className="form__input form__textarea" onChange={ handleOnChange } value={ description } id="description" name="description" placeholder="Post goes here"></textarea>
                         </div>
                         <div className="form__group form__photo-upload">
-                            { image && title && (
-                                <img className="form__user-photo" src={require(`../../assets/images/posts/${image}`)} alt={ title } title={ title } />
-                            )}
+                            <img className="form__user-photo" src={require(`../../assets/images/posts/default.jpg`)} alt={ title } title={ title } />
                             <input className="form__upload" type="file" accept="image/*" id="blogimage" name="blogimage" onChange={ e => {
                                 const file = e.target.files[0];
                                 setBlogImage(file);
