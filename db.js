@@ -1,10 +1,9 @@
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-dotenv.config();
+const config = require('config');
 
 const connectDB = async () => {
 
-	const DB = process.env.MONGO_URI.replace('<PASSWORD>', process.env.MONGO_PASSWORD);
+	const DB = config.get('MONGO_URI').replace('<PASSWORD>', config.get('MONGO_PASSWORD'));
 
 	try {
 		await mongoose.connect(DB, {

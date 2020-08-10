@@ -1,11 +1,10 @@
 const User = require('../models/UserModel');
 const jwt = require('jsonwebtoken');
 const sendGridMail = require('@sendgrid/mail');
-const dotenv = require('dotenv');
+const config = require('config');
 const _ = require('lodash');
 
-dotenv.config();
-sendGridMail.setApiKey(process.env.SG_API_KEY);
+sendGridMail.setApiKey(config.get('SG_API_KEY'));
 
 //Signup - email work flow
 exports.register = async (req, res) => {
@@ -18,20 +17,20 @@ exports.register = async (req, res) => {
             });
         }
 
-        const token = jwt.sign({ name, email, password }, process.env.JWT_ACCOUNT_ACTIVATION, {
+        const token = jwt.sign({ name, email, password }, config.get('JWT_ACCOUNT_ACTIVATION'), {
            expiresIn: 3600000
         });
 
         const emailData = {
-            from: process.env.EMAIL_FROM,
+            from: config.get('EMAIL_FROM'),
             to: email,
             subject: `Account activation link`,
             html: `
             <h1>Please user the following link to activate your account</h1>
-            <p>${process.env.CLIENT_URL}/auth/activate/${token}</p>
+            <p>${config.get('CLIENT_URL')}/auth/activate/${token}</p>
             <hr/>
             <p>This email may contain sensitive information</p>
-            <p>${process.env.CLIENT_URL}</p>
+            <p>${config.get('CLIENT_URL')}</p>
             `
         }
 
@@ -57,7 +56,7 @@ exports.accountActivation = async (req, res) => {
     }
 
     try {
-        const decoded = await jwt.verify(token, process.env.JWT_ACCOUNT_ACTIVATION);
+        const decoded = await jwt.verify(token, config.get('JWT_ACCOUNT_ACTIVATION'));
 
         const { name, email, password } = decoded;
         await User.create({ name, email, password });
@@ -85,10 +84,10 @@ exports.login = async (req, res) => {
             });
         }
 
-        const token = jwt.sign({ _id: user._id}, process.env.JWT_SECRET, { expiresIn: 3600000 });
+        const token = jwt.sign({ _id: user._id}, config.get('JWT_SECRET'), { expiresIn: 3600000 });
 
         const cookieOptions = {
-            expires: new Date(Date.now() + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
+            expires: new Date(Date.now() + config.get('COOKIE_EXPIRES_IN') * 24 * 60 * 60 * 1000),
             httpOnly: true
         }
         if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
@@ -113,7 +112,7 @@ exports.isLoggedIn = async (req, res) => {
     if (req.cookies.authtoken) {
       try {
         // 1) verify token
-        const decoded = await jwt.verify(req.cookies.authtoken, process.env.JWT_SECRET);
+        const decoded = await jwt.verify(req.cookies.authtoken, config.get('JWT_SECRET'));
         // 2) Check if user still exists
         const currentUser = await User.findById(decoded._id);
         if (!currentUser) {
@@ -163,7 +162,7 @@ exports.protect = async (req, res, next) => {
     }
 
     //verify the token
-    const decoded = await jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = await jwt.verify(token, config.get('JWT_SECRET'));
     // check if the user still exists
     const currentUser = await User.findById(decoded._id);
     if (!currentUser) {
@@ -198,20 +197,20 @@ exports.forgotPassword = async (req, res) => {
             });
         }
     
-        const token = jwt.sign({ _id: user._id, name: user.name }, process.env.JWT_RESET_PASSWORD, {
+        const token = jwt.sign({ _id: user._id, name: user.name }, config.get('JWT_RESET_PASSWORD'), {
             expiresIn: 3600000
          });
     
          const emailData = {
-             from: process.env.EMAIL_FROM,
+             from: config.get('EMAIL_FROM'),
              to: email,
              subject: `Password Reset link`,
              html: `
              <h1>Please user the following link to reset your password</h1>
-             <p>${process.env.CLIENT_URL}/auth/password/reset/${token}</p>
+             <p>${config.get('CLIENT_URL')}/auth/password/reset/${token}</p>
              <hr/>
              <p>This email may contain sensitive information</p>
-             <p>${process.env.CLIENT_URL}</p>
+             <p>${config.get('CLIENT_URL')}</p>
              `
          }
     
@@ -233,7 +232,7 @@ exports.resetPassword = async (req, res) => {
     const { resetPasswordLink, newPassword } = req.body;
 
     try {
-        if (resetPasswordLink && await jwt.verify(resetPasswordLink, process.env.JWT_RESET_PASSWORD)) {
+        if (resetPasswordLink && await jwt.verify(resetPasswordLink, config.get('JWT_RESET_PASSWORD'))) {
             let user = await User.findOne({ resetPasswordLink });
             if (!user) {
                 return res.status(400).json({
