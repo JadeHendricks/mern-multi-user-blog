@@ -5,9 +5,8 @@ node_modules/
 /client/src/assets/node_modules/
 /client/node_modules/
 /client/.env/
-/config/default.json
+config/
 # production
-/client/build
 
 # misc
 .DS_Store
