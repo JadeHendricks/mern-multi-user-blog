@@ -7,45 +7,45 @@ const _ = require('lodash');
 sendGridMail.setApiKey(config.get('SG_API_KEY'));
 
 //Signup - email work flow
-// exports.register = async (req, res) => {
-//     const { name, email, password } = req.body;
-//     try {
-//         const user = await User.findOne({ email });
-//         if (user) {
-//             return res.status(400).json({
-//                 message: 'Email Address already exists'
-//             });
-//         }
+exports.register = async (req, res) => {
+    const { name, email, password } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if (user) {
+            return res.status(400).json({
+                message: 'Email Address already exists'
+            });
+        }
 
-//         const token = jwt.sign({ name, email, password }, config.get('JWT_ACCOUNT_ACTIVATION'), {
-//            expiresIn: 3600000
-//         });
+        const token = jwt.sign({ name, email, password }, config.get('JWT_ACCOUNT_ACTIVATION'), {
+           expiresIn: 3600000
+        });
 
-//         const emailData = {
-//             from: config.get('EMAIL_FROM'),
-//             to: email,
-//             subject: `Account activation link`,
-//             html: `
-//             <h1>Please user the following link to activate your account</h1>
-//             <p>${config.get('CLIENT_URL')}/auth/activate/${token}</p>
-//             <hr/>
-//             <p>This email may contain sensitive information</p>
-//             <p>${config.get('CLIENT_URL')}</p>
-//             `
-//         }
+        const emailData = {
+            from: config.get('EMAIL_FROM'),
+            to: email,
+            subject: `Account activation link`,
+            html: `
+            <h1>Please user the following link to activate your account</h1>
+            <p>${config.get('CLIENT_URL')}/auth/activate/${token}</p>
+            <hr/>
+            <p>This email may contain sensitive information</p>
+            <p>${config.get('CLIENT_URL')}</p>
+            `
+        }
 
-//         await sendGridMail.send(emailData);
-//         res.status(200).json({
-//             message: `Email has been sent to ${email}. Follow the instructions to activate your account`
-//         });
+        await sendGridMail.send(emailData);
+        res.status(200).json({
+            message: `Email has been sent to ${email}. Follow the instructions to activate your account`
+        });
 
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({
-//             message: err.message
-//         });
-//     }
-// }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            message: err.message
+        });
+    }
+}
 
 exports.accountActivation = async (req, res) => {
     const { token } = req.body;

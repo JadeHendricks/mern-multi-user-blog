@@ -4,7 +4,7 @@ const authController = require('../controllers/authController');
 const { runValidation } = require('../validators/index');
 const { userRegisterValidator, userloginValidator, forgotPasswordValidator, resetPasswordValidator } = require('../validators/auth');
 
-// router.post('/register', userRegisterValidator, runValidation, authController.register);
+router.post('/register', userRegisterValidator, runValidation, authController.register);
 router.post('/account-activation', authController.accountActivation);
 router.post('/login', userloginValidator, runValidation, authController.login);
 
