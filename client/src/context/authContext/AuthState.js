@@ -27,7 +27,7 @@ const AuthState = props => {
       }
     } catch (err) { 
       //could be made better //TODO
-      if (window.location.href === 'https://still-hollows-11115.herokuapp.com/' || window.location.href === 'https://still-hollows-11115.herokuapp.com/users'|| window.location.href === 'https://still-hollows-11115.herokuapp.com/most-popular-posts'  || window.location.href === 'https://still-hollows-11115.herokuapp.com/register' || window.location.href.startsWith('https://still-hollows-11115.herokuapp.com/auth/')) {
+      if (window.location.href.startsWith('https://still-hollows-11115.herokuapp.com/profile') || window.location.href.startsWith('https://still-hollows-11115.herokuapp.com/post') || window.location.href === 'https://still-hollows-11115.herokuapp.com/' || window.location.href === 'https://still-hollows-11115.herokuapp.com/users'|| window.location.href === 'https://still-hollows-11115.herokuapp.com/most-popular-posts'  || window.location.href === 'https://still-hollows-11115.herokuapp.com/register' || window.location.href.startsWith('https://still-hollows-11115.herokuapp.com/auth/')) {
         dispatch({ type: AUTH_ERROR });
         return;
       } else {
