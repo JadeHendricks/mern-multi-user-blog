@@ -5,7 +5,7 @@ node_modules/
 /client/src/assets/node_modules/
 /client/node_modules/
 /client/.env/
-config/
+# config/
 # production
 
 # misc
