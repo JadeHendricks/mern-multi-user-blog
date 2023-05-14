@@ -17,7 +17,10 @@ const postRouter = require('./routes/postRoute');
 const connectDB = require('./db');
 
 connectDB();
-app.listen(port, () => console.log(`Server running on port:${port}`))
+
+if (process.env.PORT) {
+   app.listen(port, () => console.log(`Server running on port:${process.env.PORT}`))
+}
 
 //Middleware
 app.use(morgan('dev'));
@@ -49,3 +52,5 @@ if (process.env.NODE_ENV === 'production') {
       res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
    });
 }
+
+module.exports = app;
