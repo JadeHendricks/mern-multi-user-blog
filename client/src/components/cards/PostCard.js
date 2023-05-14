@@ -43,11 +43,11 @@ const PostCard = ({ post: { _id, title, image, date, tag, description, user, lik
                     </div>
                 </div>
             </div>
-            <Link to={`/profile/${user._id}`} className="card__user-link">
+            <Link to={`/profile/${user?._id}`} className="card__user-link">
                 <div className="card__user">
                     <img className="card__user-image" src={require(`../../assets/images/users/default.jpg`)} alt={ user?.name } title={ user?.name } />
                     <div className="card__user-info">
-                        <div>{ user.name }</div>
+                        <div>{ user?.name }</div>
                         <div>Posted on: <Moment format="DD/MM/YYYY">{ date }</Moment></div>
                     </div>
                 </div>

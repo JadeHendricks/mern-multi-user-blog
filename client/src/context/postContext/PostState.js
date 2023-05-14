@@ -119,7 +119,6 @@ const PostState = props => {
 
   const postIsLiked = (likes, loggedInUser) => {	
     if (likes && loggedInUser) {	
-      // console.log('likes', likes);
         const isLiked = likes.filter(like => like.user === loggedInUser._id);	
         if (isLiked.length) {	
             return true;	
@@ -145,7 +144,6 @@ const PostState = props => {
   const unLikePost = async (postId) => {	
       try {	
           const res = await axios.put(`/api/post/unlike/${postId}`);  	
-          console.log('dislike', res.data.likes);	
           dispatch({ 
             type: UPDATE_LIKES, 
             payload: { postId, likes: res.data.likes }

@@ -26,7 +26,7 @@ exports.register = async (req, res) => {
             to: email,
             subject: `Account activation link`,
             html: `
-            <h1>Please user the following link to activate your account</h1>
+            <h1>Please use the following link to activate your account</h1>
             <p>${config.get('CLIENT_URL')}/auth/activate/${token}</p>
             <hr/>
             <p>This email may contain sensitive information</p>

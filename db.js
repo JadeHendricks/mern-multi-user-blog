@@ -2,8 +2,7 @@ const mongoose = require('mongoose');
 const config = require('config');
 
 const connectDB = async () => {
-
-	const DB = config.get('MONGO_URI').replace('<PASSWORD>', config.get('MONGO_PASSWORD'));
+	const DB = config.get('MONGO_URI2').replace('<PASSWORD>', config.get('MONGO_PASSWORD'));
 
 	try {
 		await mongoose.connect(DB, {
