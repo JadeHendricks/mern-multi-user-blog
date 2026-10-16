@@ -43,5 +43,10 @@ export default [
     ignores: ['test/api/support/crash-server.js'],
     languageOptions: { sourceType: 'module', globals: { ...globals.node } },
   },
+  {
+    // Playwright specs pass functions to page.evaluate(), which run in the browser.
+    files: ['e2e/**/*.js'],
+    languageOptions: { globals: { ...globals.node, ...globals.browser } },
+  },
   prettier,
 ];

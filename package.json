@@ -13,6 +13,8 @@
     "clientinstall": "npm install --prefix client",
     "start:dev": "concurrently \"npm run server\" \" npm run start:client\"",
     "test:api": "vitest run --config vitest.config.mjs",
+    "e2e:install": "playwright install chromium",
+    "serve:memory": "node e2e/support/start-api.js",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
@@ -47,7 +49,9 @@
     "xss-clean": "0.1.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
     "@eslint/js": "10.0.1",
+    "@playwright/test": "1.64.1",
     "concurrently": "5.2.0",
     "eslint": "10.13.0",
     "eslint-config-prettier": "10.1.8",
