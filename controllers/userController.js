@@ -104,8 +104,11 @@ exports.updateMe = async (req, res) => {
         let user = await User.findOneAndUpdate(
             { _id: req.user.id },
             { $set: userFields },
-            { new: true, upsert: true }
-        );;
+            { new: true }
+        );
+        if (!user) {
+            return res.status(404).json({ message: 'User not found!' });
+        }
 
         res.status(200).json({
             message: 'User details has been updated',
@@ -125,19 +128,19 @@ exports.updateUserSocials = async (req, res) => {
     try {
         const { facebook, linkedin, twitter } = req.body;
 
+        // Dotted $set keys touch only the networks that were sent; an empty string clears that one field.
         const userFields = {};
-        userFields.socials = {};
-
-        if (facebook) userFields.socials.facebook = facebook;
-        if (linkedin) userFields.socials.linkedin = linkedin;
-        if (twitter) userFields.socials.twitter = twitter;
-
+        if (facebook !== undefined) userFields['socials.facebook'] = facebook;
+        if (linkedin !== undefined) userFields['socials.linkedin'] = linkedin;
+        if (twitter !== undefined) userFields['socials.twitter'] = twitter;
         let user = await User.findOneAndUpdate(
             { _id: req.user.id },
             { $set: userFields },
-            { new: true, upsert: true }
+            { new: true }
         );
-
+        if (!user) {
+            return res.status(404).json({ message: 'User not found!' });
+        }
         res.status(200).json({
             message: 'Your socials have been updated',
             user

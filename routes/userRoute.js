@@ -4,7 +4,7 @@ const asyncHandler = require('../lib/asyncHandler');
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
 const { runValidation } = require('../validators/index');
-const { updateMeValidator } = require('../validators/user');
+const { updateMeValidator, updateSocialsValidator } = require('../validators/user');
 
 router
     .route('/me')
@@ -21,7 +21,7 @@ router
 
 router
     .route('/:id/socials')
-    .put(authController.protect, asyncHandler(userController.updateUserSocials));
+    .put(authController.protect, updateSocialsValidator, runValidation, asyncHandler(userController.updateUserSocials));
 
 //admin only example
 //router.put('/admin', requireSignin, adminOnlyRoutes, updateUser);
