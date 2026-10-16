@@ -72,6 +72,8 @@ const userSchema = new mongoose.Schema({
 userSchema.pre('save', async function(next) {
     if (!this.isModified('password')) return next();
     this.password = await bcrypt.hash(this.password, 12);
+    // Sessions issued before this moment are rejected by verifySession
+    if (!this.isNew) this.passwordChangedAt = new Date();
     next();
 });
 

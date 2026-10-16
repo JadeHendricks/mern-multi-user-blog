@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { createRequire } from 'node:module';
 import supertest from 'supertest';
 import { clearDb, connectDb, disconnectDb, mongoose } from './support/db.js';
 import {
@@ -10,6 +11,9 @@ import {
   registerAndActivate,
 } from './support/helpers.js';
 import { extractLink, readLatestMail, readMails, tokenFromLink } from './support/outbox.js';
+
+const require = createRequire(import.meta.url);
+const jwt = require('jsonwebtoken');
 
 describe('auth', () => {
   let app;
@@ -202,7 +206,7 @@ describe('auth', () => {
         .send({ email: user.email, password: user.password });
 
       expect(res.status).toBe(200);
-      expect(typeof res.body.token).toBe('string');
+      expect('token' in res.body).toBe(false);
       expect(res.body.user.email).toBe(user.email);
       expect(res.body.user.name).toBe(user.name);
       expect('password' in res.body.user).toBe(false);
@@ -210,8 +214,24 @@ describe('auth', () => {
       const cookie = res.headers['set-cookie'].find((c) => c.startsWith('authtoken='));
       expect(cookie).toBeDefined();
       expect(cookie).toMatch(/HttpOnly/i);
+      expect(cookie).toMatch(/SameSite=Lax/i);
       // NODE_ENV is not production in tests, so the Secure flag is absent.
       expect(cookie).not.toMatch(/Secure/i);
+    });
+
+    it('the session JWT and cookie both last COOKIE_EXPIRES_IN days', async () => {
+      const user = fakeUser();
+      await registerAndActivate(app, user);
+      const res = await supertest(app)
+        .post('/api/auth/login')
+        .send({ email: user.email, password: user.password });
+
+      const cookie = res.headers['set-cookie'].find((c) => c.startsWith('authtoken='));
+      const token = cookie.split(';')[0].slice('authtoken='.length);
+      const { exp, iat } = jwt.decode(token);
+      expect(exp - iat).toBe(Number(fakeConfig().COOKIE_EXPIRES_IN) * 86400);
+      const expires = new Date(/Expires=([^;]+)/i.exec(cookie)[1]).getTime();
+      expect(Math.abs(expires - (exp * 1000))).toBeLessThan(5000);
     });
 
     it('walks register -> activate -> login -> isloggedin -> /api/user/me', async () => {
@@ -227,16 +247,20 @@ describe('auth', () => {
       expect(me.body.user.email).toBe(credentials.email);
     });
 
-    it('accepts the login token as a Bearer header too', async () => {
+    it('accepts the session cookie value as a Bearer header too', async () => {
       const user = fakeUser();
       await registerAndActivate(app, user);
-      const { body } = await supertest(app)
+      const login = await supertest(app)
         .post('/api/auth/login')
         .send({ email: user.email, password: user.password });
+      const token = login.headers['set-cookie']
+        .find((c) => c.startsWith('authtoken='))
+        .split(';')[0]
+        .slice('authtoken='.length);
 
       const me = await supertest(app)
         .get('/api/user/me')
-        .set('Authorization', `Bearer ${body.token}`);
+        .set('Authorization', `Bearer ${token}`);
 
       expect(me.status).toBe(200);
       expect(me.body.user.email).toBe(user.email);
@@ -278,21 +302,34 @@ describe('auth', () => {
       expect(me.body.message).toBe('You are not logged in! Please log in to get access.');
     });
 
-    it('logout overwrites the cookie with "loggedout"', async () => {
+    it('POST logout clears the cookie and ends the session', async () => {
       const { agent } = await createUserAndLogin(app);
 
-      const res = await agent.get('/api/auth/logout');
+      const res = await agent.post('/api/auth/logout');
 
       expect(res.status).toBe(200);
       expect(res.body.message).toBe('success');
+      expect(res.headers.deprecation).toBeUndefined();
       const cookie = res.headers['set-cookie'].find((c) => c.startsWith('authtoken='));
-      expect(cookie.startsWith('authtoken=loggedout')).toBe(true);
+      expect(cookie.startsWith('authtoken=;')).toBe(true);
       expect(cookie).toMatch(/HttpOnly/i);
+      expect(cookie).toMatch(/SameSite=Lax/i);
 
       const after = await agent.get('/api/auth/isloggedin');
       expect(after.status).toBe(401);
     });
 
+    it('GET logout still works as a deprecated alias', async () => {
+      const { agent } = await createUserAndLogin(app);
+
+      const res = await agent.get('/api/auth/logout');
+
+      expect(res.status).toBe(200);
+      expect(res.headers.deprecation).toBe('true');
+      const cookie = res.headers['set-cookie'].find((c) => c.startsWith('authtoken='));
+      expect(cookie.startsWith('authtoken=;')).toBe(true);
+      expect((await agent.get('/api/auth/isloggedin')).status).toBe(401);
+    });
     it('a second login gives a fresh working session', async () => {
       const { credentials } = await createUserAndLogin(app);
 

@@ -2,7 +2,6 @@ const User = require('../models/UserModel');
 const jwt = require('jsonwebtoken');
 const sendGridMail = require('@sendgrid/mail');
 const config = require('config');
-const _ = require('lodash');
 const { newToken, hashToken } = require('../lib/tokens');
 const fs = require('fs');
 const path = require('path');
@@ -136,6 +135,16 @@ exports.activationPreview = async (req, res) => {
     }
     res.status(200).json({ name: user.name });
 }
+// Session length comes from one setting so the JWT and the cookie always expire together.
+const sessionDays = () => Number(config.get('COOKIE_EXPIRES_IN'));
+
+// Same flags for setting and clearing: browsers only clear a cookie when the attributes match.
+const baseCookieOptions = () => {
+    const options = { httpOnly: true, sameSite: 'lax', path: '/' };
+    if (process.env.NODE_ENV === 'production') options.secure = true;
+    return options;
+}
+
 exports.login = async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -147,19 +156,19 @@ exports.login = async (req, res) => {
             });
         }
 
-        const token = jwt.sign({ _id: user._id}, config.get('JWT_SECRET'), { expiresIn: 3600000 });
+        const token = jwt.sign({ _id: user._id }, config.get('JWT_SECRET'), {
+            expiresIn: sessionDays() * 24 * 60 * 60
+        });
 
-        const cookieOptions = {
-            expires: new Date(Date.now() + config.get('COOKIE_EXPIRES_IN') * 24 * 60 * 60 * 1000),
-            httpOnly: true
-        }
-        if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
-        res.cookie('authtoken', token, cookieOptions);
+        res.cookie('authtoken', token, {
+            ...baseCookieOptions(),
+            expires: new Date(Date.now() + sessionDays() * 24 * 60 * 60 * 1000)
+        });
 
         user.password = undefined;
 
+        // The token only travels in the httpOnly cookie, never in the body.
         res.status(200).json({
-            token,
             user
         });
 
@@ -172,11 +181,18 @@ exports.login = async (req, res) => {
 }
 
 // Shared by protect and isLoggedIn: returns the user for a valid token, or null for a bad/expired
-// token or a user that no longer exists. Never throws on a bad token.
+// token, a user that no longer exists, an inactive user, or a token issued before the last
+// password change. Never throws on a bad token.
 const verifySession = async (token) => {
     try {
         const decoded = jwt.verify(token, config.get('JWT_SECRET'));
-        return await User.findById(decoded._id);
+        const user = await User.findById(decoded._id).select('+passwordChangedAt');
+        if (!user || user.status !== 'active') return null;
+        // iat is in whole seconds, so compare against the change time truncated to seconds
+        if (user.passwordChangedAt && Math.floor(user.passwordChangedAt.getTime() / 1000) > decoded.iat) {
+            return null;
+        }
+        return user;
     } catch {
         return null;
     }
@@ -201,16 +217,18 @@ exports.isLoggedIn = async (req, res) => {
 }
 
 exports.logout = (req, res) => {
-    res.cookie('authtoken', 'loggedout', {
-        expires: new Date(Date.now() + 5 * 1000),
-        httpOnly: true
-    });
+    res.clearCookie('authtoken', baseCookieOptions());
 
     res.status(200).json({
         message: 'success'
     });
 }
 
+// GET logout is kept for old clients only; a GET that changes state can be triggered cross-site.
+exports.logoutDeprecated = (req, res) => {
+    res.set('Deprecation', 'true');
+    return exports.logout(req, res);
+}
 exports.protect = async (req, res, next) => {
     let token;
     //first part is for the API
@@ -250,39 +268,43 @@ exports.restrictTo = (...roles) => {
     };
 };
 
+const forgotMessage = (email) =>
+    `Email has been sent to ${email}. Follow the instructions to reset your password`;
+const RESET_TTL_MS = 30 * 60 * 1000;
+
 exports.forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
         const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(400).json({
-                message: 'User does not exist'
+
+        // Unknown and pending emails get the same 200 so the endpoint cannot be used to find accounts.
+        if (user && user.status === 'active') {
+            const { raw, hash } = newToken();
+
+            const emailData = {
+                from: config.get('EMAIL_FROM'),
+                to: email,
+                subject: `Password Reset link`,
+                html: `
+                <h1>Please user the following link to reset your password</h1>
+                <p>${config.get('CLIENT_URL')}/auth/password/reset/${raw}</p>
+                <hr/>
+                <p>This email may contain sensitive information</p>
+                <p>${config.get('CLIENT_URL')}</p>
+                `
+            }
+
+            await user.updateOne({
+                resetPasswordLink: hash,
+                resetPasswordExpires: new Date(Date.now() + RESET_TTL_MS)
             });
+
+            await sendMail(emailData);
         }
-    
-        const token = jwt.sign({ _id: user._id, name: user.name }, config.get('JWT_RESET_PASSWORD'), {
-            expiresIn: 3600000
-         });
-    
-         const emailData = {
-             from: config.get('EMAIL_FROM'),
-             to: email,
-             subject: `Password Reset link`,
-             html: `
-             <h1>Please user the following link to reset your password</h1>
-             <p>${config.get('CLIENT_URL')}/auth/password/reset/${token}</p>
-             <hr/>
-             <p>This email may contain sensitive information</p>
-             <p>${config.get('CLIENT_URL')}</p>
-             `
-         }
-    
-         await user.updateOne({ resetPasswordLink: token });
-    
-         await sendMail(emailData);
-         res.status(200).json({
-             message: `Email has been sent to ${email}. Follow the instructions to reset your password`
-         });
+
+        res.status(200).json({
+            message: forgotMessage(email)
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({
@@ -295,26 +317,26 @@ exports.resetPassword = async (req, res) => {
     const { resetPasswordLink, newPassword } = req.body;
 
     try {
-        if (resetPasswordLink && await jwt.verify(resetPasswordLink, config.get('JWT_RESET_PASSWORD'))) {
-            let user = await User.findOne({ resetPasswordLink });
-            if (!user) {
-                return res.status(400).json({
-                    message: 'User not found'
-                });
-            }
-    
-            const updatedFields = {
-                password: newPassword,
-                resetPasswordLink: ''
-            }
-    
-            user = _.extend(user, updatedFields);
-            await user.save();
-    
-            res.status(200).json({
-                message: 'Password has been updated, Login!'
-            })
-        }   
+        const user = await User.findOne({
+            resetPasswordLink: hashToken(resetPasswordLink),
+            resetPasswordExpires: { $gt: new Date() }
+        });
+        if (!user) {
+            return res.status(400).json({
+                message: 'Invalid or expired reset link'
+            });
+        }
+
+        // Clearing the hash makes the link single-use; the pre-save hook sets passwordChangedAt,
+        // which invalidates sessions issued before the reset.
+        user.password = newPassword;
+        user.resetPasswordLink = undefined;
+        user.resetPasswordExpires = undefined;
+        await user.save();
+
+        res.status(200).json({
+            message: 'Password has been updated, Login!'
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({

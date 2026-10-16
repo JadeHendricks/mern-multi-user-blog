@@ -14,6 +14,7 @@ router.put('/forgot-password', forgotPasswordValidator, runValidation, asyncHand
 router.put('/reset-password', resetPasswordValidator, runValidation, asyncHandler(authController.resetPassword));
 
 router.get('/isloggedin', asyncHandler(authController.isLoggedIn));
-router.get('/logout', asyncHandler(authController.logout));
+router.post('/logout', asyncHandler(authController.logout));
+router.get('/logout', asyncHandler(authController.logoutDeprecated));
 
 module.exports = router;
