@@ -1,0 +1,16 @@
+# Legacy code is reformatted in later phases, not now.
+controllers/
+models/
+routes/
+validators/
+server.js
+db.js
+client/
+node_modules/
+package-lock.json
+.agents/
+e2e/__screenshots__/
+playwright-report/
+tmp/
+coverage/
+README.md
