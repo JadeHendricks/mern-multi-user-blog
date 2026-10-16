@@ -1,4 +1,5 @@
 import { existsSync, readdirSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import supertest from 'supertest';
@@ -11,6 +12,7 @@ import {
   TINY_PNG,
 } from './support/helpers.js';
 
+const require = createRequire(import.meta.url);
 const clientPostImages = path.resolve('client/src/assets/images/posts');
 const list = (dir) => (existsSync(dir) ? readdirSync(dir).sort() : []);
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -224,5 +226,40 @@ describe('posts', () => {
 
     expect(res.status).toBe(404);
     expect(res.body.message).toBe('Post not found.');
+  });
+});
+
+describe('length limits', () => {
+  let app;
+
+  beforeAll(async () => {
+    await connectDb();
+    app = loadApp();
+  });
+  beforeEach(clearDb);
+  afterAll(disconnectDb);
+
+  it('rejects a 101-character title and accepts a 100-character one', async () => {
+    const { agent } = await createUserAndLogin(app);
+
+    const tooLong = await agent
+      .post('/api/post')
+      .send({ title: 'a'.repeat(101), description: LONG_DESCRIPTION });
+    const ok = await agent
+      .post('/api/post')
+      .send({ title: 'a'.repeat(100), description: LONG_DESCRIPTION });
+
+    expect(tooLong.status).toBeGreaterThanOrEqual(400);
+    expect(ok.status).toBe(201);
+  });
+
+  it('rejects a 33-character user name at the schema level', async () => {
+    const User = require('../../models/UserModel');
+
+    const tooLong = new User({ name: 'n'.repeat(33), email: 'long@example.test', password: 'x' });
+    const ok = new User({ name: 'n'.repeat(32), email: 'ok@example.test', password: 'x' });
+
+    await expect(tooLong.validate()).rejects.toThrow(/maximum allowed length/);
+    await expect(ok.validate()).resolves.toBeUndefined();
   });
 });

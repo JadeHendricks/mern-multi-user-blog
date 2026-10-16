@@ -13,7 +13,7 @@ const postSchema = new mongoose.Schema({
         type: String,
         trim: true,
         required: true,
-        max: 32
+        maxlength: 100
     },
     tag: {
         type: String,
@@ -44,7 +44,7 @@ const postSchema = new mongoose.Schema({
           },
           comment: {
               type: String,
-              require: true
+              required: true
           },
           date: {
               type: Date,
