@@ -7,6 +7,7 @@ const { userRegisterValidator, userloginValidator, forgotPasswordValidator, rese
 
 router.post('/register', userRegisterValidator, runValidation, asyncHandler(authController.register));
 router.post('/account-activation', asyncHandler(authController.accountActivation));
+router.get('/account-activation/:token', asyncHandler(authController.activationPreview));
 router.post('/login', userloginValidator, runValidation, asyncHandler(authController.login));
 
 router.put('/forgot-password', forgotPasswordValidator, runValidation, asyncHandler(authController.forgotPassword));
