@@ -37,5 +37,11 @@ export default [
     files: ['**/*.mjs', 'eslint.config.js'],
     languageOptions: { sourceType: 'module', globals: { ...globals.node } },
   },
+  {
+    // Vitest files are ES modules; crash-server.js is a plain CommonJS child script.
+    files: ['test/**/*.js'],
+    ignores: ['test/api/support/crash-server.js'],
+    languageOptions: { sourceType: 'module', globals: { ...globals.node } },
+  },
   prettier,
 ];
