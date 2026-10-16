@@ -58,7 +58,7 @@ async function main() {
   const app = require('../../app');
   const server = app.listen(PORT, () => {
     console.log(
-      `E2E API on http://localhost:${PORT} (seeded ${counts.users} users, ${counts.posts} posts)`,
+      `E2E API on http://localhost:${PORT} (seeded ${counts.users} users, ${counts.pending} pending, ${counts.posts} posts)`,
     );
   });
 
