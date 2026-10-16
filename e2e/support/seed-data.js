@@ -23,6 +23,7 @@ const routes = {
   post: `/post/${ids.posts[0]}`,
   profileOwner: `/profile/${ids.alice}`,
   profileVisitor: `/profile/${ids.bob}`,
+  profileDan: `/profile/${ids.dan}`,
   users: '/users',
   popular: '/most-popular-posts',
   login: '/login',

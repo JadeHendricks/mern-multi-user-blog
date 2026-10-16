@@ -19,6 +19,8 @@ test.describe('anonymous visitor', () => {
     ['post', routes.post],
     ['profile', routes.profileOwner],
     ['users', routes.users],
+    // Dan has three https social links, so this pins the B19 fix.
+    ['profile-with-socials', routes.profileDan],
     ['most-popular-posts', routes.popular],
     ['login', routes.login],
     ['register', routes.register],
