@@ -4,6 +4,7 @@ models/
 routes/
 validators/
 server.js
+app.js
 db.js
 client/
 node_modules/
