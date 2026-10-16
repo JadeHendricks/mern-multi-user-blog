@@ -65,21 +65,19 @@ describe('forgot and reset password', () => {
     expect(second.body.message).toBe('User not found');
   });
 
-  it('KNOWN BUG B4: the schema declares resetPasswordLink as a nested object, yet the flow works', async () => {
+  it('the schema declares resetPasswordLink as a hidden String', async () => {
     const User = mongoose.model('user');
-    // `{ data: String, default: '' }` is a nested path, not a String with a default.
-    expect(User.schema.pathType('resetPasswordLink')).toBe('nested');
-    expect(User.schema.pathType('resetPasswordLink.data')).toBe('real');
+    expect(User.schema.path('resetPasswordLink').instance).toBe('String');
+    expect(User.schema.path('resetPasswordLink').options.select).toBe(false);
 
     const user = fakeUser();
     await registerAndActivate(app, user);
     const { token } = await requestReset(user);
 
-    // Mongoose still writes the raw string at that path, which is why reset works at all.
     const raw = await mongoose.connection.db.collection('users').findOne({ email: user.email });
     expect(raw.resetPasswordLink).toBe(token);
 
-    // ...and it is cleared to '' after a successful reset.
+    // Cleared to '' after a successful reset (C8 replaces this with unset + hashing).
     await supertest(app)
       .put('/api/auth/reset-password')
       .send({ resetPasswordLink: token, newPassword: 'another-secret-1' });

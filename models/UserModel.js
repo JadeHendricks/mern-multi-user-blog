@@ -40,9 +40,32 @@ const userSchema = new mongoose.Schema({
         enum: ['user', 'admin'],
         default: 'user'
     },
+    // Defaults to active so documents created before this field existed keep working
+    status: {
+        type: String,
+        enum: ['pending', 'active'],
+        default: 'active'
+    },
+    // Secrets and bookkeeping are select:false so no query can leak them by accident.
     resetPasswordLink: {
-        data: String,
-        default: ''
+        type: String,
+        select: false
+    },
+    resetPasswordExpires: {
+        type: Date,
+        select: false
+    },
+    activationToken: {
+        type: String,
+        select: false
+    },
+    activationExpires: {
+        type: Date,
+        select: false
+    },
+    passwordChangedAt: {
+        type: Date,
+        select: false
     },
 }, { timestamps: true });
 

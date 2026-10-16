@@ -1,6 +1,8 @@
 const User = require('../models/UserModel');
 const { makeUpload, removeStoredFile } = require('../lib/upload');
 
+const PUBLIC_FIELDS = '_id name avatar socials createdAt';
+
 exports.uploadUserAvatar = makeUpload({ subdir: 'users', prefix: 'user', field: 'avatar' });
 
 exports.getMe = async (req, res) => {
@@ -27,7 +29,8 @@ exports.getMe = async (req, res) => {
 
 exports.getUser = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id);
+        // Public view: no email, role or timestamps beyond createdAt
+        const user = await User.findById(req.params.id).select(PUBLIC_FIELDS);
         if (!user) {
             return res.status(400).json({
                 message: 'User not found!'
@@ -49,7 +52,8 @@ exports.getUser = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
     try {
-        const users = await User.find();
+        // Pending (not yet activated) accounts must never be listed
+        const users = await User.find({ status: { $ne: 'pending' } }).select(PUBLIC_FIELDS);
         if (!users) {
             return res.status(404).json({
                 message: 'No user have been found!'

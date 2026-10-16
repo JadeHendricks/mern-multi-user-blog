@@ -8,7 +8,7 @@ exports.uploadPostPhoto = makeUpload({ subdir: 'posts', prefix: 'post', field: '
 
 exports.getAllPosts = async (req, res) => { 
     try {
-        const posts = await Post.find().populate('user', ['name', 'email', 'avatar', '_id']).sort({ 'date': '-1' });
+        const posts = await Post.find().populate('user', ['name', 'avatar', '_id']).sort({ 'date': '-1' });
         
         if (!posts) {
             return res.status(404).json({
@@ -31,7 +31,7 @@ exports.getAllPosts = async (req, res) => {
 
 exports.getPost = async (req, res) => { 
     try {
-        const post = await Post.findById(req.params.id).populate('user', ['name', 'email', 'avatar', '_id', 'socials']);
+        const post = await Post.findById(req.params.id).populate('user', ['name', 'avatar', '_id', 'socials']);
         if (!post) {
           return res.status(404).json({ 
             message: 'Post not found' 
@@ -106,7 +106,7 @@ exports.deletePost = async (req, res) => {
 
 exports.getAllUsersPosts = async (req, res) => { 
     try {
-        const usersPosts = await Post.find({'user': req.params.id}).populate('user', ['name', 'email', 'avatar','_id']);
+        const usersPosts = await Post.find({'user': req.params.id}).populate('user', ['name', 'avatar', '_id']);
         res.status(200).json({
             message: 'success',
             results: usersPosts.length,
