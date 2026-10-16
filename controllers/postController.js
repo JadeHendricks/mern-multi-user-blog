@@ -1,34 +1,10 @@
 const Post = require('../models/PostModel');
 const User = require('../models/UserModel');
 
-const multer = require('multer');
-const path = require('path');
 const mongoose = require('mongoose');
+const { makeUpload, removeStoredFile } = require('../lib/upload');
 
-const multerStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, process.env.UPLOAD_DIR ? path.join(process.env.UPLOAD_DIR, 'posts') : 'client/src/assets/images/posts')
-    },
-    filename: (req, file, cb) => {
-        const ext = file.mimetype.split('/')[1];
-        cb(null, `post-${req.user.id}-${Date.now()}.${ext}`)
-    }
-});
-
-const multerFilter = (req, file, cb) => {
-    if (file.mimetype.startsWith('image')) {
-        cb(null, true);
-    } else {
-        cb('Not an Image! Please upload only images.', false);
-    }
-}
-
-const upload = multer({ 
-    storage: multerStorage,
-    fileFilter: multerFilter
-});
-
-exports.uploadPostPhoto = upload.single('image');
+exports.uploadPostPhoto = makeUpload({ subdir: 'posts', prefix: 'post', field: 'image' });
 
 exports.getAllPosts = async (req, res) => { 
     try {
@@ -112,7 +88,8 @@ exports.deletePost = async (req, res) => {
         if (post.user.toString() !== req.user.id) {
             return res.status(401).json({ message: 'This post does not belong to you.' });
         }
-        await post.remove();
+        await post.deleteOne();
+        await removeStoredFile('posts', post.image);
         res.status(200).json({ message: 'Post has been deleted.' });
 
     } catch (err) {
@@ -169,6 +146,8 @@ exports.editPost = async (req, res) => {
             { $set: postFields },
             { new: true, runValidators: true }
           );
+        // The replaced image is no longer referenced, so drop it from disk
+        if (req.file) await removeStoredFile('posts', existing.image);
         res.status(200).json({
             message: 'Post has been updated',
             post

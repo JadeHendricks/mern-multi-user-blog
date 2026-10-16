@@ -1,31 +1,7 @@
 const User = require('../models/UserModel');
-const multer = require('multer');
-const path = require('path');
+const { makeUpload, removeStoredFile } = require('../lib/upload');
 
-const multerStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, process.env.UPLOAD_DIR ? path.join(process.env.UPLOAD_DIR, 'users') : 'client/src/assets/images/users')
-    },
-    filename: (req, file, cb) => {
-        const ext = file.mimetype.split('/')[1];
-        cb(null, `user-${req.user.id}-${Date.now()}.${ext}`)
-    }
-});
-
-const multerFilter = (req, file, cb) => {
-    if (file.mimetype.startsWith('image')) {
-        cb(null, true);
-    } else {
-        cb('Not an Image! Please upload only images.', false);
-    }
-}
-
-const upload = multer({ 
-    storage: multerStorage,
-    fileFilter: multerFilter
-});
-
-exports.uploadUserAvatar = upload.single('avatar');
+exports.uploadUserAvatar = makeUpload({ subdir: 'users', prefix: 'user', field: 'avatar' });
 
 exports.getMe = async (req, res) => {
     try {
@@ -109,6 +85,8 @@ exports.updateMe = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found!' });
         }
+        // req.user still holds the pre-update avatar; the replaced file is no longer referenced
+        if (req.file) await removeStoredFile('users', req.user.avatar);
 
         res.status(200).json({
             message: 'User details has been updated',

@@ -75,7 +75,7 @@ describe('posts', () => {
 
   it('stores an uploaded image under UPLOAD_DIR and not in the client source tree', async () => {
     const beforeClient = list(clientPostImages);
-    const { agent, user } = await createUserAndLogin(app);
+    const { agent } = await createUserAndLogin(app);
 
     const res = await agent
       .post('/api/post')
@@ -85,14 +85,14 @@ describe('posts', () => {
       .attach('image', TINY_PNG, { filename: 'tiny.png', contentType: 'image/png' });
 
     expect(res.status).toBe(201);
-    expect(res.body.post.image).toMatch(new RegExp(`^post-${user._id}-\\d+\\.png$`));
+    expect(res.body.post.image).toMatch(/^post-[0-9a-f]{32}\.png$/);
 
     const uploaded = path.join(process.env.UPLOAD_DIR, 'posts', res.body.post.image);
     expect(existsSync(uploaded)).toBe(true);
     expect(list(clientPostImages)).toEqual(beforeClient);
   });
 
-  it('rejects a non-image upload with a bare 500 (multer error reaches Express as a string)', async () => {
+  it('rejects a non-image upload with a JSON 400', async () => {
     const { agent } = await createUserAndLogin(app);
 
     const res = await agent
@@ -101,7 +101,8 @@ describe('posts', () => {
       .field('description', LONG_DESCRIPTION)
       .attach('image', Buffer.from('plain text'), { filename: 'a.txt', contentType: 'text/plain' });
 
-    expect(res.status).toBe(500);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBeDefined();
     expect(await mongoose.model('Post').countDocuments()).toBe(0);
   });
 
@@ -190,7 +191,7 @@ describe('posts', () => {
       .attach('image', TINY_PNG, { filename: 'tiny.png', contentType: 'image/png' });
 
     expect(res.status).toBe(200);
-    expect(res.body.post.image).toMatch(/^post-.+-\d+\.png$/);
+    expect(res.body.post.image).toMatch(/^post-[0-9a-f]{32}\.png$/);
     expect(existsSync(path.join(process.env.UPLOAD_DIR, 'posts', res.body.post.image))).toBe(true);
     expect(list(clientPostImages)).toEqual(beforeClient);
   });
