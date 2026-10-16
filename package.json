@@ -2,7 +2,10 @@
   "name": "mern-starterkit",
   "version": "1.0.0",
   "description": "",
-  "main": "sever.js",
+  "main": "server.js",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "start": "node server",
     "server": "nodemon server",

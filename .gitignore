@@ -4,8 +4,10 @@
 node_modules/
 /client/src/assets/node_modules/
 /client/node_modules/
-/client/.env/
-config/
+/client/.env
+/config/*
+!/config/default.json.example
+!/config/custom-environment-variables.json
 # production
 
 # misc
@@ -18,3 +20,12 @@ config/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# build, test and local output
+/client/build
+tmp/
+e2e/test-results
+e2e/.auth
+playwright-report
+.env
+coverage
