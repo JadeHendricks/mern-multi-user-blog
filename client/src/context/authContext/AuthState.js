@@ -26,14 +26,8 @@ const AuthState = props => {
         loadUser();
       }
     } catch (err) { 
-      //could be made better //TODO
-      if (window.location.href.startsWith('http://localhost:3000/profile') || window.location.href.startsWith('http://localhost:3000/post') || window.location.href === 'http://localhost:3000/' || window.location.href === 'http://localhost:3000/users'|| window.location.href === 'http://localhost:3000/most-popular-posts'  || window.location.href === 'http://localhost:3000/register' || window.location.href.startsWith('http://localhost:3000/auth/')) {
-        dispatch({ type: AUTH_ERROR });
-        return;
-      } else {
-        props.history.push('/login');
-        dispatch({ type: AUTH_ERROR });
-      }
+      // Public pages stay put; PrivateRoute redirects guarded ones.
+      dispatch({ type: AUTH_ERROR });
     }
   }
 
@@ -77,7 +71,7 @@ const AuthState = props => {
 
   const logout = async () => {
     try {
-      const res = await axios.get('/api/auth/logout');
+      const res = await axios.post('/api/auth/logout');
       toast.success('Logging out');
       dispatch({ type: LOGOUT });
       if (res.data.message === 'success') {
@@ -109,9 +103,8 @@ const AuthState = props => {
         const res = await axios.put('/api/auth/reset-password', body, config);
         toast.success(res.data.message);
         if (res.status === 200) {
-          setTimeout(() => {
-            props.history.push('/login');
-          }, 4000);
+          // The toast lives in App.js, so it survives the navigation.
+          props.history.push('/login');
         }
     } catch (err) {
       console.log(err);
@@ -127,11 +120,9 @@ const AuthState = props => {
     try {
         const res = await axios.post('/api/auth/account-activation', body, config);
         toast.success(res.data.message);
-        setTimeout(() => {
-          if (res.status === 201) {
-            props.history.push('/login');
+        if (res.status === 201) {
+          props.history.push('/login');
         }
-        }, 4000);
     } catch (err) {
         console.error(err.message);
         toast.error(err.response.data.message);

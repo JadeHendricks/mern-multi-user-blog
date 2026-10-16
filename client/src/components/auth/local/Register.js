@@ -5,7 +5,7 @@ import AuthContext from '../../../context/authContext/AuthContext';
 
 const Register = () => {
 
-    const { register, isAuthenticated, user } = useContext(AuthContext);
+    const { register, isAuthenticated, loggedInUser } = useContext(AuthContext);
 
     const [values, setValues] = useState({ name: '', email: '', password: ''});
     const { name, email, password } = values;
@@ -18,7 +18,7 @@ const Register = () => {
         register(name, email, password);
     }
 
-    if (isAuthenticated && user) {
+    if (isAuthenticated && loggedInUser) {
         return <Redirect to='/' />;
     }
     

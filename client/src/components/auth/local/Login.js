@@ -4,7 +4,7 @@ import { Link, Redirect } from 'react-router-dom';
 
 const Login = () => {
 
-    const { login, isAuthenticated, user }  = useContext(AuthContext);
+    const { login, isAuthenticated, loggedInUser }  = useContext(AuthContext);
 
     const [values, setValues] = useState({ email: '', password: ''});
     const { email, password } = values;
@@ -16,7 +16,7 @@ const Login = () => {
         login(email, password);
     }
 
-    if (isAuthenticated && user) {
+    if (isAuthenticated && loggedInUser) {
         return <Redirect to='/' />;
     }
     

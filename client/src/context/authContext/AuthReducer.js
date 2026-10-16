@@ -20,7 +20,8 @@ export default ( state, action ) => {
             return {
                 ...state,
                 isAuthenticated: false,
-                authLoading: true,
+                // Bootstrap is finished once auth fails, so guards can redirect instead of spinning forever.
+                authLoading: false,
                 loggedInUser: null
             };
         default: 
