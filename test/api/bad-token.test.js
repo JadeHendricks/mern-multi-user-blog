@@ -58,14 +58,6 @@ function request(port, method, urlPath, headers = {}, body) {
   });
 }
 
-async function expectCrash() {
-  const timeout = new Promise((resolve) => setTimeout(() => resolve('still running'), 10000));
-  const outcome = await Promise.race([child.exited, timeout]);
-  expect(outcome).not.toBe('still running');
-  expect(outcome.code).not.toBe(0);
-  expect(outcome.code).not.toBeNull();
-}
-
 afterEach(async () => {
   if (child && child.exitCode === null && child.signalCode === null) child.kill('SIGKILL');
   if (child) await child.exited;
@@ -73,19 +65,19 @@ afterEach(async () => {
 });
 
 describe('protect with an invalid token', () => {
-  it('KNOWN BUG B1: a garbage Bearer token gets no response and kills the server', async () => {
+  it('answers 401 for a garbage Bearer token and the server stays alive', async () => {
     const port = await startServer();
 
     const result = await request(port, 'GET', '/api/user/me', {
       Authorization: 'Bearer not-a-jwt',
     });
 
-    expect(result.status).toBeUndefined();
-    expect(result.error).toBeDefined();
-    await expectCrash();
+    expect(result.status).toBe(401);
+    expect(child.exitCode).toBeNull();
+    expect((await request(port, 'GET', '/api/nope')).status).toBe(404);
   });
 
-  it('KNOWN BUG B1: an expired token gets no response and kills the server', async () => {
+  it('answers 401 for an expired Bearer token and the server stays alive', async () => {
     const port = await startServer();
     const expired = jwt.sign(
       { _id: new mongoose.Types.ObjectId().toString() },
@@ -99,19 +91,19 @@ describe('protect with an invalid token', () => {
       Authorization: `Bearer ${expired}`,
     });
 
-    expect(result.status).toBeUndefined();
-    expect(result.error).toBeDefined();
-    await expectCrash();
+    expect(result.status).toBe(401);
+    expect(child.exitCode).toBeNull();
+    expect((await request(port, 'GET', '/api/nope')).status).toBe(404);
   });
 
-  it('KNOWN BUG B1: a garbage authtoken cookie kills the server on a protected route', async () => {
+  it('answers 401 for a garbage authtoken cookie and the server stays alive', async () => {
     const port = await startServer();
 
     const result = await request(port, 'GET', '/api/user/me', { Cookie: 'authtoken=garbage' });
 
-    expect(result.status).toBeUndefined();
-    expect(result.error).toBeDefined();
-    await expectCrash();
+    expect(result.status).toBe(401);
+    expect(child.exitCode).toBeNull();
+    expect((await request(port, 'GET', '/api/nope')).status).toBe(404);
   });
 });
 
@@ -143,11 +135,34 @@ describe('isloggedin with a bad cookie (try/catch path)', () => {
   });
 });
 
-describe('KNOWN BUG B2: editPost has no return after its 404', () => {
+describe('API fallbacks', () => {
+  const app = loadApp();
+
+  it('answers an unknown /api route with a JSON 404', async () => {
+    const res = await supertest(app).get('/api/nope');
+
+    expect(res.status).toBe(404);
+    expect(res.headers['content-type']).toMatch(/json/);
+    expect(res.body).toEqual({ message: 'Not found' });
+  });
+
+  it('answers a malformed JSON body with a JSON 400', async () => {
+    const res = await supertest(app)
+      .post('/api/auth/login')
+      .set('Content-Type', 'application/json')
+      .send('{"email": ');
+
+    expect(res.status).toBe(400);
+    expect(res.headers['content-type']).toMatch(/json/);
+    expect(res.body.message).toBeDefined();
+  });
+});
+
+describe('editPost with an unknown post id', () => {
   beforeAll(connectDb);
   afterAll(disconnectDb);
 
-  it('KNOWN BUG B2: editing an unknown post id answers 404, then the server crashes', async () => {
+  it('editing an unknown post id answers 404 and the server stays alive', async () => {
     const app = loadApp();
     const { user } = await createUserAndLogin(app);
     const token = jwt.sign({ _id: user._id }, fakeConfig().JWT_SECRET, { expiresIn: 600 });
@@ -173,9 +188,8 @@ describe('KNOWN BUG B2: editPost has no return after its 404', () => {
       body,
     );
 
-    // The client sees the 404 that was sent first...
     expect(result.status).toBe(404);
-    // ...then `res.status(200).json()` throws ERR_HTTP_HEADERS_SENT inside an async handler.
-    await expectCrash();
+    // The handler used to send 200 after the 404 and kill the process; asyncHandler now contains it.
+    expect(child.exitCode).toBeNull();
   });
 });

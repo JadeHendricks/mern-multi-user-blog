@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const asyncHandler = require('../lib/asyncHandler');
 const postController = require('../controllers/postController')
 const authController = require('../controllers/authController');
 const { runValidation } = require('../validators/index');
@@ -7,33 +8,33 @@ const { addCommentValidator, updatePostValidator, createPostValidator } = requir
 
 router
     .route('/')
-    .get(postController.getAllPosts)
-    .post(authController.protect, postController.uploadPostPhoto, createPostValidator, runValidation, postController.createPost);
+    .get(asyncHandler(postController.getAllPosts))
+    .post(authController.protect, postController.uploadPostPhoto, createPostValidator, runValidation, asyncHandler(postController.createPost));
 
 router
     .route('/user/:id')
-    .get(postController.getAllUsersPosts);
+    .get(asyncHandler(postController.getAllUsersPosts));
 
 router
     .route('/comment/:id')
-    .post(authController.protect, addCommentValidator, runValidation, postController.addComment);
+    .post(authController.protect, addCommentValidator, runValidation, asyncHandler(postController.addComment));
 
 router
     .route('/comment/:id/:comment_id')
-    .delete(authController.protect, postController.deleteComment);
+    .delete(authController.protect, asyncHandler(postController.deleteComment));
 
 router	
     .route('/like/:id')	
-    .put(authController.protect, postController.likePost)	
+    .put(authController.protect, asyncHandler(postController.likePost))	
 
 router	
     .route('/unlike/:id')	
-    .put(authController.protect, postController.unlikePost)
+    .put(authController.protect, asyncHandler(postController.unlikePost))
 
 router
     .route('/:id')
-    .get(postController.getPost)
-    .put(authController.protect, postController.uploadPostPhoto, updatePostValidator, runValidation, postController.editPost)
-    .delete(authController.protect, postController.deletePost);
+    .get(asyncHandler(postController.getPost))
+    .put(authController.protect, postController.uploadPostPhoto, updatePostValidator, runValidation, asyncHandler(postController.editPost))
+    .delete(authController.protect, asyncHandler(postController.deletePost));
 
 module.exports = router;

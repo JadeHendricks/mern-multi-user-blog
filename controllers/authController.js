@@ -126,13 +126,20 @@ exports.login = async (req, res) => {
     }
 }
 
+// Shared by protect and isLoggedIn: returns the user for a valid token, or null for a bad/expired
+// token or a user that no longer exists. Never throws on a bad token.
+const verifySession = async (token) => {
+    try {
+        const decoded = jwt.verify(token, config.get('JWT_SECRET'));
+        return await User.findById(decoded._id);
+    } catch {
+        return null;
+    }
+}
+
 exports.isLoggedIn = async (req, res) => {
     if (req.cookies.authtoken) {
-      try {
-        // 1) verify token
-        const decoded = await jwt.verify(req.cookies.authtoken, config.get('JWT_SECRET'));
-        // 2) Check if user still exists
-        const currentUser = await User.findById(decoded._id);
+        const currentUser = await verifySession(req.cookies.authtoken);
         if (!currentUser) {
             return res.status(401).json({
                 message: 'Token is no longer valid, please log in again.'
@@ -141,11 +148,6 @@ exports.isLoggedIn = async (req, res) => {
         return res.status(200).json({
             message: 'success'
         });
-      } catch (err) {
-        return res.status(401).json({
-            message: 'Token is no longer valid, please log in again.'
-        });
-      }
     }
 
     return res.status(401).json({
@@ -179,10 +181,8 @@ exports.protect = async (req, res, next) => {
         });
     }
 
-    //verify the token
-    const decoded = await jwt.verify(token, config.get('JWT_SECRET'));
-    // check if the user still exists
-    const currentUser = await User.findById(decoded._id);
+    // verify the token and check the user still exists
+    const currentUser = await verifySession(token);
     if (!currentUser) {
         return res.status(401).json({
             message: 'The user belonging to this token no longer exists'
