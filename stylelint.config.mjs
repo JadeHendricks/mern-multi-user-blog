@@ -3,9 +3,6 @@
 // are switched off for that path only (an allowlist by path, no disable comments in the source).
 // A partial leaves the list when it is rebuilt; the list must be empty when Phase 7 ends.
 const legacy = {
-  'client/src/styles/vendor/_toastify.scss': [
-    'comment-whitespace-inside',
-  ],
 };
 
 export default {
