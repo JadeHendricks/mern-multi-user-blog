@@ -2,12 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 import supertest from 'supertest';
 import { createApp } from '../../src/app.js';
 import { clearDb, connectDb, disconnectDb } from './support/db.js';
-import {
-  createPost,
-  createUserAndLogin,
-  LONG_DESCRIPTION,
-  loadApp,
-} from './support/helpers.js';
+import { createPost, createUserAndLogin, LONG_DESCRIPTION, loadApp } from './support/helpers.js';
 
 // These replace the removed sanitizer middleware (xss-clean, express-mongo-sanitize, hpp) and cover
 // the Express 5 behaviour changes. They run on both drivers like the rest of test/api.

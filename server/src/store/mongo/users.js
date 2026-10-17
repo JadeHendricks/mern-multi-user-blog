@@ -12,9 +12,11 @@ const STATUSES = new Set(['pending', 'active']);
 function buildDoc(data, defaultStatus) {
   const status = data.status ?? defaultStatus;
   const role = data.role ?? 'user';
-  if (!STATUSES.has(status)) throw new StoreValidationError('Path `status` is not a valid enum value.');
+  if (!STATUSES.has(status))
+    throw new StoreValidationError('Path `status` is not a valid enum value.');
   if (!ROLES.has(role)) throw new StoreValidationError('Path `role` is not a valid enum value.');
-  if (data._id !== undefined && !isValidId(data._id)) throw new StoreValidationError('Path `_id` is not a valid id.');
+  if (data._id !== undefined && !isValidId(data._id))
+    throw new StoreValidationError('Path `_id` is not a valid id.');
   const now = new Date();
   const createdAt = data.createdAt ? new Date(data.createdAt) : now;
   const doc = {
@@ -78,7 +80,9 @@ export function createUserRepo({ User }) {
 
     async findByActivationHash(hash) {
       if (typeof hash !== 'string' || !hash) return null;
-      const doc = await User.findOne({ activationToken: hash }).select('+activationToken +activationExpires').lean();
+      const doc = await User.findOne({ activationToken: hash })
+        .select('+activationToken +activationExpires')
+        .lean();
       if (!doc) return null;
       const user = view(doc);
       if (doc.activationExpires) user.activationExpires = new Date(doc.activationExpires);
@@ -87,22 +91,32 @@ export function createUserRepo({ User }) {
 
     async findByResetHash(hash) {
       if (typeof hash !== 'string' || !hash) return null;
-      const doc = await User.findOne({ resetPasswordLink: hash, resetPasswordExpires: trust({ $gt: new Date() }) }).lean();
+      const doc = await User.findOne({
+        resetPasswordLink: hash,
+        resetPasswordExpires: trust({ $gt: new Date() }),
+      }).lean();
       return view(doc);
     },
 
     async listPublic({ cursor, limit } = {}) {
-      const { rows, nextCursor } = await findPage(User, { status: trust({ $ne: 'pending' }) }, {
-        cursor,
-        limit,
-        field: 'createdAt',
-        direction: 'asc',
-      });
+      const { rows, nextCursor } = await findPage(
+        User,
+        { status: trust({ $ne: 'pending' }) },
+        {
+          cursor,
+          limit,
+          field: 'createdAt',
+          direction: 'asc',
+        },
+      );
       return { items: rows.map((doc) => toPublicUser(toUserRecord(doc))), nextCursor };
     },
 
     async createPending({ name, email, passwordHash, activationHash, activationExpires }) {
-      const doc = buildDoc({ name, email, passwordHash, activationHash, activationExpires, status: 'pending' }, 'pending');
+      const doc = buildDoc(
+        { name, email, passwordHash, activationHash, activationExpires, status: 'pending' },
+        'pending',
+      );
       const created = await guard(User.create(doc));
       return view(created.toObject());
     },
@@ -125,7 +139,8 @@ export function createUserRepo({ User }) {
     },
 
     // The hash stays on purpose: using the link a second time answers 409, not "expired".
-    activate: (id) => updateOne(id, { $set: { status: 'active' }, $unset: { activationExpires: 1 } }),
+    activate: (id) =>
+      updateOne(id, { $set: { status: 'active' }, $unset: { activationExpires: 1 } }),
 
     async updateProfile(id, { name, avatar } = {}) {
       const set = {};
@@ -144,7 +159,9 @@ export function createUserRepo({ User }) {
     },
 
     async setResetToken(id, hash, expires) {
-      await updateOne(id, { $set: { resetPasswordLink: hash, resetPasswordExpires: new Date(expires) } });
+      await updateOne(id, {
+        $set: { resetPasswordLink: hash, resetPasswordExpires: new Date(expires) },
+      });
     },
 
     // Clearing the hash makes the link single-use; passwordChangedAt ends older sessions.

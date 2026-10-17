@@ -26,7 +26,16 @@ export function paginate(items, { cursor, limit, key, direction = 'asc' }) {
     const after = decodeCursor(cursor);
     rows = rows.filter((item) => {
       const itemKey = key(item);
-      const order = itemKey < after.key ? -1 : itemKey > after.key ? 1 : item._id < after.id ? -1 : item._id > after.id ? 1 : 0;
+      const order =
+        itemKey < after.key
+          ? -1
+          : itemKey > after.key
+            ? 1
+            : item._id < after.id
+              ? -1
+              : item._id > after.id
+                ? 1
+                : 0;
       return order * sign > 0;
     });
   }
@@ -50,7 +59,8 @@ const pageQuery = z.object({
 
 export function parsePageQuery(query) {
   const result = pageQuery.safeParse({ cursor: query.cursor, limit: query.limit });
-  if (!result.success) throw new InvalidCursorError('cursor must be a string and limit a whole number from 1 to 100');
+  if (!result.success)
+    throw new InvalidCursorError('cursor must be a string and limit a whole number from 1 to 100');
   // A malformed cursor is caught here too, so the answer does not depend on the driver.
   if (result.data.cursor !== undefined) decodeCursor(result.data.cursor);
   return result.data;

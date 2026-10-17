@@ -9,13 +9,26 @@ import { FORMAT, FORMAT_VERSION } from './lib/export-file.js';
 // allowed (that is how you move data off a hosted cluster); db:import is the guarded direction.
 // The file holds password hashes, so it is written under DATA_DIR (gitignored) by default.
 
-const stamp = (date) => date.toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z');
+const stamp = (date) =>
+  date
+    .toISOString()
+    .replace(/[-:]/g, '')
+    .replace(/\.\d+Z$/, 'Z');
 
 /**
  * @param {string[]} argv
  * @param {{env?: object, out?: Function, err?: Function, open?: Function, now?: () => Date}} [io]
  */
-export async function run(argv, { env = process.env, out = console.log, err = console.error, open = openStore, now = () => new Date() } = {}) {
+export async function run(
+  argv,
+  {
+    env = process.env,
+    out = console.log,
+    err = console.error,
+    open = openStore,
+    now = () => new Date(),
+  } = {},
+) {
   let store;
   try {
     const { values, positionals } = readArgs(argv);
@@ -23,7 +36,9 @@ export async function run(argv, { env = process.env, out = console.log, err = co
     store = await open(config);
     const exportedAt = now();
     const data = await store.admin.exportAll();
-    const file = path.resolve(positionals[0] ?? path.join(config.DATA_DIR, 'exports', `export-${stamp(exportedAt)}.json`));
+    const file = path.resolve(
+      positionals[0] ?? path.join(config.DATA_DIR, 'exports', `export-${stamp(exportedAt)}.json`),
+    );
     await mkdir(path.dirname(file), { recursive: true });
     const body = {
       format: FORMAT,

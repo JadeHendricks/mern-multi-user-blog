@@ -77,13 +77,9 @@ describe('protect with an invalid token', () => {
 
   it('answers 401 for an expired Bearer token and the server stays alive', async () => {
     const port = await startServer();
-    const expired = jwt.sign(
-      { _id: newId() },
-      fakeConfig().JWT_SECRET,
-      {
-        expiresIn: -60,
-      },
-    );
+    const expired = jwt.sign({ _id: newId() }, fakeConfig().JWT_SECRET, {
+      expiresIn: -60,
+    });
 
     const result = await request(port, 'GET', '/api/user/me', {
       Authorization: `Bearer ${expired}`,
@@ -116,13 +112,9 @@ describe('isloggedin with a bad cookie (try/catch path)', () => {
   });
 
   it('answers 401 for an expired cookie', async () => {
-    const expired = jwt.sign(
-      { _id: newId() },
-      fakeConfig().JWT_SECRET,
-      {
-        expiresIn: -60,
-      },
-    );
+    const expired = jwt.sign({ _id: newId() }, fakeConfig().JWT_SECRET, {
+      expiresIn: -60,
+    });
 
     const res = await supertest(app)
       .get('/api/auth/isloggedin')

@@ -5,8 +5,8 @@ import crypto from 'crypto';
 const hashToken = (raw) => crypto.createHash('sha256').update(String(raw)).digest('hex');
 
 const newToken = () => {
-    const raw = crypto.randomBytes(32).toString('hex');
-    return { raw, hash: hashToken(raw) };
+  const raw = crypto.randomBytes(32).toString('hex');
+  return { raw, hash: hashToken(raw) };
 };
 
 export { newToken, hashToken };

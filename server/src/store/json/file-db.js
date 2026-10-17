@@ -2,7 +2,13 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { StoreError } from '../errors.js';
 import { createBackups } from './backup.js';
-import { latestVersion, migrate, migrations as defaultMigrations, needsMigration, versionOf } from './migrations.js';
+import {
+  latestVersion,
+  migrate,
+  migrations as defaultMigrations,
+  needsMigration,
+  versionOf,
+} from './migrations.js';
 import { createQueue } from './queue.js';
 
 // A whole-file JSON database: the committed state lives in memory and every change rewrites db.json.
@@ -140,8 +146,15 @@ export function createFileDb({
           (newest ? `Restore the newest backup: ${newest}` : 'There is no backup to restore from.'),
       );
     }
-    if (!data || typeof data !== 'object' || Array.isArray(data) || ![data.users, data.posts].every(Array.isArray)) {
-      throw new StoreError(`${file} does not look like a blog database (expected "users" and "posts" lists).`);
+    if (
+      !data ||
+      typeof data !== 'object' ||
+      Array.isArray(data) ||
+      ![data.users, data.posts].every(Array.isArray)
+    ) {
+      throw new StoreError(
+        `${file} does not look like a blog database (expected "users" and "posts" lists).`,
+      );
     }
 
     const willMigrate = needsMigration(data, migrationSteps);

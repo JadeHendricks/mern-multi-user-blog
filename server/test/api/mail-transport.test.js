@@ -75,7 +75,9 @@ describe('mail transport', () => {
     const token = tokenFromLink(extractLink(readLatestMail(user.email)));
     await supertest(fileApp).post('/api/auth/account-activation').send({ token });
     send.mockClear();
-    const res = await supertest(sendgridApp).put('/api/auth/forgot-password').send({ email: user.email });
+    const res = await supertest(sendgridApp)
+      .put('/api/auth/forgot-password')
+      .send({ email: user.email });
     expect(res.status).toBe(200);
     expect(send).toHaveBeenCalledTimes(1);
     expect(send.mock.calls[0][0].subject).toBe('Password Reset link');

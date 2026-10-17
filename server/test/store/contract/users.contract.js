@@ -1,6 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { newId } from '../../../src/lib/ids.js';
-import { DuplicateEmailError, InvalidCursorError, StoreValidationError } from '../../../src/store/errors.js';
+import {
+  DuplicateEmailError,
+  InvalidCursorError,
+  StoreValidationError,
+} from '../../../src/store/errors.js';
 import { activeUser, hex, pendingInput, rejection } from './support.js';
 
 // Runs against any adapter. `makeStore()` resolves to { store, cleanup }.
@@ -17,7 +21,9 @@ export function runUserContract(label, makeStore) {
     });
 
     it('creates a pending user and finds it by id and by email (trimmed, any case)', async () => {
-      const created = await store.users.createPending(pendingInput(1, { email: '  Mixed.Case@Example.Test ' }));
+      const created = await store.users.createPending(
+        pendingInput(1, { email: '  Mixed.Case@Example.Test ' }),
+      );
 
       expect(created.status).toBe('pending');
       expect(created.email).toBe('mixed.case@example.test');
@@ -47,7 +53,14 @@ export function runUserContract(label, makeStore) {
       const secret = await store.users.findById(created._id, { secrets: true });
       const byEmail = await store.users.findByEmail(created.email, { secrets: true });
 
-      for (const key of ['passwordHash', 'activationHash', 'activationExpires', 'resetHash', 'resetExpires', 'passwordChangedAt']) {
+      for (const key of [
+        'passwordHash',
+        'activationHash',
+        'activationExpires',
+        'resetHash',
+        'resetExpires',
+        'passwordChangedAt',
+      ]) {
         expect(key in plain).toBe(false);
       }
       expect(secret.passwordHash).toMatch(/^\$2a\$12\$/);
@@ -58,7 +71,9 @@ export function runUserContract(label, makeStore) {
     it('rejects a duplicate email in any case, and only one of two concurrent creates wins', async () => {
       await store.users.createPending(pendingInput(1, { email: 'a@x.test' }));
 
-      const clash = await rejection(store.users.createPending(pendingInput(2, { email: 'A@X.test' })));
+      const clash = await rejection(
+        store.users.createPending(pendingInput(2, { email: 'A@X.test' })),
+      );
       expect(clash).toBeInstanceOf(DuplicateEmailError);
 
       const results = await Promise.allSettled([
@@ -66,16 +81,26 @@ export function runUserContract(label, makeStore) {
         store.users.createPending(pendingInput(4, { email: 'RACE@x.test' })),
       ]);
       expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
-      expect(results.find((r) => r.status === 'rejected').reason).toBeInstanceOf(DuplicateEmailError);
-      expect(await store.users.create({ name: 'Other', email: 'a@x.test', passwordHash: hex() }).catch((e) => e)).toBeInstanceOf(
+      expect(results.find((r) => r.status === 'rejected').reason).toBeInstanceOf(
         DuplicateEmailError,
       );
+      expect(
+        await store.users
+          .create({ name: 'Other', email: 'a@x.test', passwordHash: hex() })
+          .catch((e) => e),
+      ).toBeInstanceOf(DuplicateEmailError);
     });
 
     it('enforces the name rules', async () => {
-      expect(await rejection(store.users.createPending(pendingInput(1, { name: '   ' })))).toBeInstanceOf(StoreValidationError);
-      expect(await rejection(store.users.createPending(pendingInput(2, { name: 'x'.repeat(33) })))).toBeInstanceOf(StoreValidationError);
-      expect((await store.users.createPending(pendingInput(3, { name: `  ${'x'.repeat(32)}  ` }))).name).toBe('x'.repeat(32));
+      expect(
+        await rejection(store.users.createPending(pendingInput(1, { name: '   ' }))),
+      ).toBeInstanceOf(StoreValidationError);
+      expect(
+        await rejection(store.users.createPending(pendingInput(2, { name: 'x'.repeat(33) }))),
+      ).toBeInstanceOf(StoreValidationError);
+      expect(
+        (await store.users.createPending(pendingInput(3, { name: `  ${'x'.repeat(32)}  ` }))).name,
+      ).toBe('x'.repeat(32));
     });
 
     it('finds by activation hash with its expiry, and activation keeps the hash', async () => {
@@ -97,7 +122,12 @@ export function runUserContract(label, makeStore) {
     it('refreshes a pending signup with a new name, password and link', async () => {
       const first = pendingInput(1);
       const created = await store.users.createPending(first);
-      const next = { name: 'New Name', passwordHash: `$2a$12$${hex(40)}`, activationHash: hex(), activationExpires: new Date(Date.now() + 5000) };
+      const next = {
+        name: 'New Name',
+        passwordHash: `$2a$12$${hex(40)}`,
+        activationHash: hex(),
+        activationExpires: new Date(Date.now() + 5000),
+      };
 
       const refreshed = await store.users.refreshPending(created._id, next);
 
@@ -105,7 +135,9 @@ export function runUserContract(label, makeStore) {
       expect(refreshed.status).toBe('pending');
       expect(await store.users.findByActivationHash(first.activationHash)).toBeNull();
       expect((await store.users.findByActivationHash(next.activationHash))._id).toBe(created._id);
-      expect((await store.users.findById(created._id, { secrets: true })).passwordHash).toBe(next.passwordHash);
+      expect((await store.users.findById(created._id, { secrets: true })).passwordHash).toBe(
+        next.passwordHash,
+      );
       expect(await store.users.refreshPending(newId(), next)).toBeNull();
     });
 
@@ -129,7 +161,13 @@ export function runUserContract(label, makeStore) {
       const ids = [];
       for (let n = 1; n <= 5; n += 1) {
         // The last two share a timestamp with the first three on purpose.
-        ids.push((await activeUser(store, n, { createdAt: n <= 3 ? createdAt : new Date('2025-11-21T09:00:00.000Z') }))._id);
+        ids.push(
+          (
+            await activeUser(store, n, {
+              createdAt: n <= 3 ? createdAt : new Date('2025-11-21T09:00:00.000Z'),
+            })
+          )._id,
+        );
       }
       const expected = [...ids.slice(0, 3).sort(), ...ids.slice(3).sort()];
 
@@ -145,14 +183,21 @@ export function runUserContract(label, makeStore) {
 
       expect(seen).toEqual(expected);
       expect(pages).toBe(3);
-      expect(await rejection(store.users.listPublic({ cursor: 'not a cursor' }))).toBeInstanceOf(InvalidCursorError);
-      expect(await rejection(store.users.listPublic({ limit: 0 }))).toBeInstanceOf(InvalidCursorError);
+      expect(await rejection(store.users.listPublic({ cursor: 'not a cursor' }))).toBeInstanceOf(
+        InvalidCursorError,
+      );
+      expect(await rejection(store.users.listPublic({ limit: 0 }))).toBeInstanceOf(
+        InvalidCursorError,
+      );
     });
 
     it('updates the profile without creating anything', async () => {
       const user = await activeUser(store, 1);
 
-      const updated = await store.users.updateProfile(user._id, { name: '  Renamed ', avatar: 'user-1.png' });
+      const updated = await store.users.updateProfile(user._id, {
+        name: '  Renamed ',
+        avatar: 'user-1.png',
+      });
 
       expect(updated.name).toBe('Renamed');
       expect(updated.avatar).toBe('user-1.png');
@@ -166,7 +211,10 @@ export function runUserContract(label, makeStore) {
       const user = await activeUser(store, 1);
       expect('socials' in (await store.users.findById(user._id))).toBe(false);
 
-      await store.users.updateSocials(user._id, { facebook: 'https://facebook.com/me', twitter: 'https://twitter.com/me' });
+      await store.users.updateSocials(user._id, {
+        facebook: 'https://facebook.com/me',
+        twitter: 'https://twitter.com/me',
+      });
       const second = await store.users.updateSocials(user._id, { twitter: '' });
 
       expect(second.socials).toEqual({ facebook: 'https://facebook.com/me', twitter: '' });
@@ -205,13 +253,19 @@ export function runUserContract(label, makeStore) {
 
     it('creates users with fixed ids and dates for seed and import', async () => {
       const id = newId();
-      const created = await activeUser(store, 1, { _id: id, createdAt: new Date('2025-11-20T09:00:00.000Z'), socials: { twitter: 'https://twitter.com/me' } });
+      const created = await activeUser(store, 1, {
+        _id: id,
+        createdAt: new Date('2025-11-20T09:00:00.000Z'),
+        socials: { twitter: 'https://twitter.com/me' },
+      });
 
       expect(created._id).toBe(id);
       expect(created.status).toBe('active');
       expect(created.createdAt.toISOString()).toBe('2025-11-20T09:00:00.000Z');
       expect(created.socials).toEqual({ twitter: 'https://twitter.com/me' });
-      expect(await rejection(activeUser(store, 2, { _id: 'nope' }))).toBeInstanceOf(StoreValidationError);
+      expect(await rejection(activeUser(store, 2, { _id: 'nope' }))).toBeInstanceOf(
+        StoreValidationError,
+      );
     });
   });
 }

@@ -5,7 +5,13 @@ import path from 'node:path';
 // from the mailer, so controllers never deal with transports or credentials.
 //   file (default): writes the message as JSON into <DATA_DIR>/outbox, nothing leaves the machine.
 //   sendgrid: loads @sendgrid/mail only when it is first used and sets the API key at send time.
-export function createMailer({ MAIL_TRANSPORT = 'file', DATA_DIR, EMAIL_FROM, EMAIL_REPLY, SG_API_KEY }) {
+export function createMailer({
+  MAIL_TRANSPORT = 'file',
+  DATA_DIR,
+  EMAIL_FROM,
+  EMAIL_REPLY,
+  SG_API_KEY,
+}) {
   if (MAIL_TRANSPORT === 'sendgrid') {
     let client;
     return {

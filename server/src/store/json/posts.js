@@ -13,7 +13,8 @@ const iso = (value) => new Date(value).toISOString();
 const byDateDesc = (a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : a._id < b._id ? 1 : -1);
 
 function buildPost(data) {
-  if (data._id !== undefined && !isValidId(data._id)) throw new StoreValidationError('Path `_id` is not a valid id.');
+  if (data._id !== undefined && !isValidId(data._id))
+    throw new StoreValidationError('Path `_id` is not a valid id.');
   return {
     _id: data._id ?? newId(),
     user: data.user,
@@ -34,7 +35,8 @@ function buildPost(data) {
 
 /** @returns {import('../types.js').PostRepo} */
 export function createPostRepo(db) {
-  const find = (state, id) => (isValidId(id) ? state.posts.find((post) => post._id === id) : undefined);
+  const find = (state, id) =>
+    isValidId(id) ? state.posts.find((post) => post._id === id) : undefined;
   const authors = () => userIndex(db.read()).byId;
 
   return {
@@ -47,7 +49,10 @@ export function createPostRepo(db) {
       const rows = [...db.read().posts].sort(byDateDesc);
       const page = paginate(rows, { cursor, limit, key: (post) => post.date, direction: 'desc' });
       const byId = authors();
-      return { items: page.items.map((post) => toPostView(post, byId, 'list')), nextCursor: page.nextCursor };
+      return {
+        items: page.items.map((post) => toPostView(post, byId, 'list')),
+        nextCursor: page.nextCursor,
+      };
     },
 
     async listByUser(userId, { cursor, limit } = {}) {
@@ -58,7 +63,10 @@ export function createPostRepo(db) {
         .sort(byDateDesc);
       const page = paginate(rows, { cursor, limit, key: (post) => post.date, direction: 'desc' });
       const byId = authors();
-      return { items: page.items.map((post) => toPostView(post, byId, 'list')), nextCursor: page.nextCursor };
+      return {
+        items: page.items.map((post) => toPostView(post, byId, 'list')),
+        nextCursor: page.nextCursor,
+      };
     },
 
     create: ({ user, title, tag, description, image }) =>
@@ -76,7 +84,8 @@ export function createPostRepo(db) {
           return null;
         }
         if (fields.title !== undefined) record.title = cleanTitle(fields.title);
-        if (fields.description !== undefined) record.description = cleanDescription(fields.description);
+        if (fields.description !== undefined)
+          record.description = cleanDescription(fields.description);
         if (fields.tag !== undefined) record.tag = fields.tag || DEFAULT_TAG;
         if (fields.image !== undefined) record.image = fields.image || DEFAULT_IMAGE;
         return toPostView(record, new Map(draft.users.map((user) => [user._id, user])), 'id');
@@ -136,7 +145,9 @@ export function createPostRepo(db) {
     addComment: (id, userId, text) =>
       db.write((draft, tx) => {
         const record = find(draft, id);
-        const author = isValidId(userId) ? draft.users.find((user) => user._id === userId) : undefined;
+        const author = isValidId(userId)
+          ? draft.users.find((user) => user._id === userId)
+          : undefined;
         if (!record || !author) {
           tx.unchanged();
           return null;

@@ -15,7 +15,9 @@ export const trust = (value) => mongoose.trusted(value);
 export function translateError(err) {
   if (err && err.code === 11000) {
     // The unique index on email is the only one besides _id.
-    return /email/.test(String(err.message)) ? new DuplicateEmailError() : new StoreValidationError('Path `_id` is already used.');
+    return /email/.test(String(err.message))
+      ? new DuplicateEmailError()
+      : new StoreValidationError('Path `_id` is already used.');
   }
   if (err && err.name === 'ValidationError') {
     const first = Object.values(err.errors ?? {})[0];
@@ -46,17 +48,30 @@ export async function findPage(Model, base, { cursor, limit, field, direction, p
     if (Number.isNaN(key.getTime())) throw new InvalidCursorError();
     const op = sign === 1 ? '$gt' : '$lt';
     filter = {
-      $and: [base, { $or: [{ [field]: trust({ [op]: key }) }, { [field]: key, _id: trust({ [op]: oid(after.id) }) }] }],
+      $and: [
+        base,
+        {
+          $or: [
+            { [field]: trust({ [op]: key }) },
+            { [field]: key, _id: trust({ [op]: oid(after.id) }) },
+          ],
+        },
+      ],
     };
   }
-  let query = Model.find(filter).sort({ [field]: sign, _id: sign }).lean();
+  let query = Model.find(filter)
+    .sort({ [field]: sign, _id: sign })
+    .lean();
   if (populate) query = query.populate(populate);
   if (limit !== undefined) query = query.limit(limit + 1);
   const rows = await query;
   if (limit === undefined || rows.length <= limit) return { rows, nextCursor: null };
   const page = rows.slice(0, limit);
   const last = page[page.length - 1];
-  return { rows: page, nextCursor: encodeCursor(new Date(last[field]).toISOString(), String(last._id)) };
+  return {
+    rows: page,
+    nextCursor: encodeCursor(new Date(last[field]).toISOString(), String(last._id)),
+  };
 }
 
 // Mongo's update result: `n` before mongoose 6, `matchedCount` after.

@@ -46,7 +46,10 @@ function toPostDoc(post) {
  * @returns {import('../types.js').StoreAdmin}
  */
 export function createAdmin({ User, Post }) {
-  const counts = async () => ({ users: await User.countDocuments({}), posts: await Post.countDocuments({}) });
+  const counts = async () => ({
+    users: await User.countDocuments({}),
+    posts: await Post.countDocuments({}),
+  });
 
   return {
     async exportAll() {
@@ -69,7 +72,9 @@ export function createAdmin({ User, Post }) {
       }
       const next = migrate(structuredClone(data));
       assertImportable(next);
-      const userDocs = next.users.map((user) => toUserDoc({ ...user, email: cleanEmail(user.email) }, oid));
+      const userDocs = next.users.map((user) =>
+        toUserDoc({ ...user, email: cleanEmail(user.email) }, oid),
+      );
       const postDocs = next.posts.map(toPostDoc);
       const current = await counts();
       if (!replace && (current.users > 0 || current.posts > 0)) {
@@ -90,7 +95,10 @@ export function createAdmin({ User, Post }) {
 
     // The indexes beyond _id, for the tests: { users: [{ key, unique }], posts: [...] }.
     async indexes() {
-      const pick = (list) => list.filter((index) => index.name !== '_id_').map((index) => ({ key: index.key, unique: index.unique === true }));
+      const pick = (list) =>
+        list
+          .filter((index) => index.name !== '_id_')
+          .map((index) => ({ key: index.key, unique: index.unique === true }));
       const [users, posts] = await Promise.all([User.listIndexes(), Post.listIndexes()]);
       return { users: pick(users), posts: pick(posts) };
     },
@@ -119,7 +127,10 @@ export function createAdmin({ User, Post }) {
       if (Object.keys($set).length > 0) update.$set = $set;
       if (Object.keys($unset).length > 0) update.$unset = $unset;
       // timestamps off: patching must not move updatedAt on its own.
-      const result = await User.updateOne({ _id: oid(id) }, update, { timestamps: false, strict: false });
+      const result = await User.updateOne({ _id: oid(id) }, update, {
+        timestamps: false,
+        strict: false,
+      });
       return matched(result) > 0;
     },
   };

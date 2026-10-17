@@ -10,7 +10,9 @@ export const cleanName = (value) => {
   const name = typeof value === 'string' ? value.trim() : '';
   if (!name) throw new StoreValidationError('Path `name` is required.');
   if (name.length > NAME_MAX) {
-    throw new StoreValidationError(`Path \`name\` is longer than the maximum allowed length (${NAME_MAX}).`);
+    throw new StoreValidationError(
+      `Path \`name\` is longer than the maximum allowed length (${NAME_MAX}).`,
+    );
   }
   return name;
 };
@@ -22,7 +24,8 @@ export const cleanEmail = (value) => {
 };
 
 export const requireHash = (value) => {
-  if (typeof value !== 'string' || !value) throw new StoreValidationError('Path `passwordHash` is required.');
+  if (typeof value !== 'string' || !value)
+    throw new StoreValidationError('Path `passwordHash` is required.');
   return value;
 };
 
@@ -30,18 +33,22 @@ export const cleanTitle = (value) => {
   const title = typeof value === 'string' ? value.trim() : '';
   if (!title) throw new StoreValidationError('Path `title` is required.');
   if (title.length > TITLE_MAX) {
-    throw new StoreValidationError(`Path \`title\` is longer than the maximum allowed length (${TITLE_MAX}).`);
+    throw new StoreValidationError(
+      `Path \`title\` is longer than the maximum allowed length (${TITLE_MAX}).`,
+    );
   }
   return title;
 };
 
 export const cleanDescription = (value) => {
-  if (typeof value !== 'string' || value === '') throw new StoreValidationError('Path `description` is required.');
+  if (typeof value !== 'string' || value === '')
+    throw new StoreValidationError('Path `description` is required.');
   return value;
 };
 
 export const cleanComment = (value) => {
-  if (typeof value !== 'string' || value === '') throw new StoreValidationError('Path `comment` is required.');
+  if (typeof value !== 'string' || value === '')
+    throw new StoreValidationError('Path `comment` is required.');
   return value;
 };
 
@@ -50,7 +57,8 @@ export function assertImportable(data) {
   const emails = new Set();
   const ids = new Set();
   for (const user of data.users) {
-    if (!isValidId(user._id) || ids.has(user._id)) throw new StoreError('Import has a missing or duplicate user id.');
+    if (!isValidId(user._id) || ids.has(user._id))
+      throw new StoreError('Import has a missing or duplicate user id.');
     ids.add(user._id);
     const email = cleanEmail(user.email);
     if (emails.has(email)) throw new StoreError('Import has two users with the same email.');
@@ -58,7 +66,8 @@ export function assertImportable(data) {
   }
   const postIds = new Set();
   for (const post of data.posts) {
-    if (!isValidId(post._id) || postIds.has(post._id)) throw new StoreError('Import has a missing or duplicate post id.');
+    if (!isValidId(post._id) || postIds.has(post._id))
+      throw new StoreError('Import has a missing or duplicate post id.');
     postIds.add(post._id);
   }
 }

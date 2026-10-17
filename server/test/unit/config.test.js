@@ -37,7 +37,12 @@ describe('loadConfig', () => {
   });
 
   it('coerces numeric strings and returns a frozen object', () => {
-    const config = loadConfig({ ...valid, PORT: '8080', COOKIE_EXPIRES_IN: '1', AUTH_RATE_LIMIT_MAX: '3' });
+    const config = loadConfig({
+      ...valid,
+      PORT: '8080',
+      COOKIE_EXPIRES_IN: '1',
+      AUTH_RATE_LIMIT_MAX: '3',
+    });
 
     expect(config.PORT).toBe(8080);
     expect(config.COOKIE_EXPIRES_IN).toBe(1);
@@ -58,7 +63,8 @@ describe('loadConfig', () => {
       expect.stringContaining('MONGO_URI'),
     ]);
     expect(
-      loadConfig({ ...valid, DB_DRIVER: 'mongo', MONGO_URI: 'mongodb://127.0.0.1:27017/blog' }).MONGO_URI,
+      loadConfig({ ...valid, DB_DRIVER: 'mongo', MONGO_URI: 'mongodb://127.0.0.1:27017/blog' })
+        .MONGO_URI,
     ).toBe('mongodb://127.0.0.1:27017/blog');
   });
 
@@ -93,7 +99,12 @@ describe('loadConfig', () => {
   it('never puts a secret value in the error text', () => {
     let message = '';
     try {
-      loadConfig({ JWT_SECRET: SECRET, PORT: 'not-a-number', DB_DRIVER: 'sqlite', SG_API_KEY: 'fake-key' });
+      loadConfig({
+        JWT_SECRET: SECRET,
+        PORT: 'not-a-number',
+        DB_DRIVER: 'sqlite',
+        SG_API_KEY: 'fake-key',
+      });
     } catch (err) {
       message = err.message;
     }

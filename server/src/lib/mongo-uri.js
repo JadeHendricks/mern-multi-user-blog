@@ -10,7 +10,9 @@ export function isLocalMongoUri(uri) {
   const authority = match[1];
   const hostList = authority.slice(authority.lastIndexOf('@') + 1);
   return hostList.split(',').every((hostPort) => {
-    const host = hostPort.startsWith('[') ? hostPort.slice(1, hostPort.indexOf(']')) : hostPort.replace(/:\d*$/, '');
+    const host = hostPort.startsWith('[')
+      ? hostPort.slice(1, hostPort.indexOf(']'))
+      : hostPort.replace(/:\d*$/, '');
     return LOCAL_HOSTS.has(host.toLowerCase());
   });
 }

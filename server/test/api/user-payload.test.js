@@ -82,7 +82,8 @@ describe('public user payloads expose only the public fields', () => {
     expect(res.status).toBe(200);
     const keys = keysOf(res.body.post.user);
     for (const key of ['_id', 'avatar', 'name']) expect(keys).toContain(key);
-    for (const key of ['email', 'password', 'resetPasswordLink', 'role']) expect(keys).not.toContain(key);
+    for (const key of ['email', 'password', 'resetPasswordLink', 'role'])
+      expect(keys).not.toContain(key);
   });
 
   it('GET /api/post/user/:id shows the author without email', async () => {

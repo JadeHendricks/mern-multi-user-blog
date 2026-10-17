@@ -27,12 +27,20 @@ const schema = z
   })
   .superRefine((value, ctx) => {
     if (value.DB_DRIVER === 'mongo' && !value.MONGO_URI) {
-      ctx.addIssue({ code: 'custom', path: ['MONGO_URI'], message: 'is required when DB_DRIVER=mongo' });
+      ctx.addIssue({
+        code: 'custom',
+        path: ['MONGO_URI'],
+        message: 'is required when DB_DRIVER=mongo',
+      });
     }
     if (value.MAIL_TRANSPORT === 'sendgrid') {
       for (const key of ['SG_API_KEY', 'EMAIL_FROM', 'EMAIL_REPLY']) {
         if (!value[key]) {
-          ctx.addIssue({ code: 'custom', path: [key], message: 'is required when MAIL_TRANSPORT=sendgrid' });
+          ctx.addIssue({
+            code: 'custom',
+            path: [key],
+            message: 'is required when MAIL_TRANSPORT=sendgrid',
+          });
         }
       }
     }

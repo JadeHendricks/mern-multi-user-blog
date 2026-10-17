@@ -3,7 +3,8 @@ import { randomBytes } from 'node:crypto';
 // Fake data for the contract suites. Hashes here are random hex, not real credentials.
 export const hex = (length = 64) => randomBytes(length / 2).toString('hex');
 
-export const LONG_TEXT = 'This description is long enough to satisfy the fifty character minimum of the validator.';
+export const LONG_TEXT =
+  'This description is long enough to satisfy the fifty character minimum of the validator.';
 
 export const pendingInput = (n, overrides = {}) => ({
   name: `User ${n}`,

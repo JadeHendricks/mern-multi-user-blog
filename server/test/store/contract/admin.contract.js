@@ -59,7 +59,10 @@ export function runAdminContract(label, makeStore) {
       const exported = await store.admin.exportAll();
 
       expect(await rejection(store.admin.importAll(exported))).toBeInstanceOf(Error);
-      expect(await store.admin.importAll(exported, { replace: true })).toEqual({ users: 3, posts: 1 });
+      expect(await store.admin.importAll(exported, { replace: true })).toEqual({
+        users: 3,
+        posts: 1,
+      });
       expect(await rejection(store.admin.importAll({ users: [] }))).toBeInstanceOf(Error);
     });
 
@@ -95,7 +98,12 @@ export function runAdminContract(label, makeStore) {
       const hash = hex();
       await store.users.setResetToken(user._id, hash, new Date(Date.now() + 60000));
 
-      expect(await store.admin.patchUser(user._id, { resetExpires: new Date(Date.now() - 1000), activationExpires: null })).toBe(true);
+      expect(
+        await store.admin.patchUser(user._id, {
+          resetExpires: new Date(Date.now() - 1000),
+          activationExpires: null,
+        }),
+      ).toBe(true);
 
       expect(await store.users.findByResetHash(hash)).toBeNull();
       const raw = await store.admin.rawUserByEmail(user.email);

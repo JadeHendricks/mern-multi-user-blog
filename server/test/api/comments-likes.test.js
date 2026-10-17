@@ -51,9 +51,7 @@ describe('comments', () => {
   it('answers 404 when commenting on an unknown post', async () => {
     const { agent } = await createUserAndLogin(app);
 
-    const res = await agent
-      .post(`/api/post/comment/${newId()}`)
-      .send({ comment: 'Hello?' });
+    const res = await agent.post(`/api/post/comment/${newId()}`).send({ comment: 'Hello?' });
 
     expect(res.status).toBe(404);
     expect(res.body.message).toBe('User or Post data not found.');
@@ -77,9 +75,7 @@ describe('comments', () => {
     const { agent } = await createUserAndLogin(app);
     const post = await createPost(agent);
 
-    const res = await agent.delete(
-      `/api/post/comment/${post._id}/${newId()}`,
-    );
+    const res = await agent.delete(`/api/post/comment/${post._id}/${newId()}`);
 
     expect(res.status).toBe(404);
     expect(res.body).toEqual({ msg: 'Comment does not exist' });
@@ -88,13 +84,12 @@ describe('comments', () => {
   it('answers 404 when deleting a comment on an unknown post', async () => {
     const { agent } = await createUserAndLogin(app);
 
-    const res = await agent.delete(
-      `/api/post/comment/${newId()}/${newId()}`,
-    );
+    const res = await agent.delete(`/api/post/comment/${newId()}/${newId()}`);
 
     expect(res.status).toBe(404);
     expect(res.body.message).toBe('Post not found');
-  });});
+  });
+});
 
 describe('likes', () => {
   let app;

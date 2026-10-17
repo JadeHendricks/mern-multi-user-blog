@@ -26,7 +26,9 @@ describe('json store: concurrency', () => {
     const { store, dir } = await open();
     const author = await activeUser(store, 0);
     const post = await store.posts.create(postInput(author._id));
-    const users = await Promise.all(Array.from({ length: 200 }, (_, n) => activeUser(store, n + 1)));
+    const users = await Promise.all(
+      Array.from({ length: 200 }, (_, n) => activeUser(store, n + 1)),
+    );
 
     const results = await Promise.all(users.map((user) => store.posts.like(post._id, user._id)));
 
@@ -40,7 +42,10 @@ describe('json store: concurrency', () => {
     const user = await activeUser(store, 1);
     const post = await store.posts.create(postInput(user._id));
 
-    const results = await Promise.all([store.posts.like(post._id, user._id), store.posts.like(post._id, user._id)]);
+    const results = await Promise.all([
+      store.posts.like(post._id, user._id),
+      store.posts.like(post._id, user._id),
+    ]);
 
     expect(results.map((result) => result.status).sort()).toEqual(['already', 'liked']);
   });
@@ -66,7 +71,9 @@ describe('json store: concurrency', () => {
     })();
 
     const writes = Array.from({ length: 60 }, (_, n) =>
-      n % 2 === 0 ? store.posts.create(postInput(user._id, { title: `Post ${n}` })) : store.users.updateProfile(user._id, { name: `Name ${n}` }),
+      n % 2 === 0
+        ? store.posts.create(postInput(user._id, { title: `Post ${n}` }))
+        : store.users.updateProfile(user._id, { name: `Name ${n}` }),
     );
     await Promise.all(writes);
     reading = false;
@@ -272,7 +279,8 @@ describe('json store: backups', () => {
   it('backs up at most once per interval on the write path', async () => {
     let clock = 1_000_000;
     const { store, dir } = await open({ deps: { now: () => clock } });
-    const count = () => (existsSync(path.join(dir, 'backups')) ? readdirSync(path.join(dir, 'backups')).length : 0);
+    const count = () =>
+      existsSync(path.join(dir, 'backups')) ? readdirSync(path.join(dir, 'backups')).length : 0;
     const user = await activeUser(store, 1);
     expect(count()).toBe(0);
 
@@ -296,7 +304,9 @@ describe('json store: schema migrations', () => {
     const { store } = await open({ dir });
 
     expect(readDb(dir)).toEqual({ schemaVersion: 1, users: [], posts: [] });
-    const backups = readdirSync(path.join(dir, 'backups')).filter((name) => name.endsWith('-v0.json'));
+    const backups = readdirSync(path.join(dir, 'backups')).filter((name) =>
+      name.endsWith('-v0.json'),
+    );
     expect(backups).toHaveLength(1);
     expect(JSON.parse(readFileSync(path.join(dir, 'backups', backups[0]), 'utf8'))).toEqual(v0);
     expect(await store.admin.counts()).toEqual({ users: 0, posts: 0 });
@@ -322,8 +332,14 @@ describe('json store: schema migrations', () => {
       { to: 3, up: (data) => ({ ...data, trail: [...data.trail, 'three'] }) },
     ];
 
-    expect(migrate({ users: [], posts: [] }, steps)).toMatchObject({ schemaVersion: 3, trail: ['one', 'two', 'three'] });
-    expect(migrate({ schemaVersion: 2, trail: ['x'] }, steps)).toMatchObject({ schemaVersion: 3, trail: ['x', 'three'] });
+    expect(migrate({ users: [], posts: [] }, steps)).toMatchObject({
+      schemaVersion: 3,
+      trail: ['one', 'two', 'three'],
+    });
+    expect(migrate({ schemaVersion: 2, trail: ['x'] }, steps)).toMatchObject({
+      schemaVersion: 3,
+      trail: ['x', 'three'],
+    });
     expect(() => migrate({ schemaVersion: 4 }, steps)).toThrow(StoreError);
   });
 });

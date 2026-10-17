@@ -11,7 +11,10 @@ import {
   TINY_PNG,
 } from './support/helpers.js';
 
-const clientPostImages = path.resolve(import.meta.dirname, '../../../client/src/assets/images/posts');
+const clientPostImages = path.resolve(
+  import.meta.dirname,
+  '../../../client/src/assets/images/posts',
+);
 const list = (dir) => (existsSync(dir) ? readdirSync(dir).sort() : []);
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -190,7 +193,9 @@ describe('posts', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.post.image).toMatch(/^post-[0-9a-f]{32}\.png$/);
-    expect(existsSync(path.join(process.env.DATA_DIR, 'uploads', 'posts', res.body.post.image))).toBe(true);
+    expect(
+      existsSync(path.join(process.env.DATA_DIR, 'uploads', 'posts', res.body.post.image)),
+    ).toBe(true);
     expect(list(clientPostImages)).toEqual(beforeClient);
   });
 
@@ -255,7 +260,11 @@ describe('length limits', () => {
   it('rejects a 33-character user name at the storage level', async () => {
     const user = (name, email) => getStore().users.create({ name, email, passwordHash: 'x' });
 
-    await expect(user('n'.repeat(33), 'long@example.test')).rejects.toThrow(/maximum allowed length/);
-    await expect(user('n'.repeat(32), 'ok@example.test')).resolves.toMatchObject({ name: 'n'.repeat(32) });
+    await expect(user('n'.repeat(33), 'long@example.test')).rejects.toThrow(
+      /maximum allowed length/,
+    );
+    await expect(user('n'.repeat(32), 'ok@example.test')).resolves.toMatchObject({
+      name: 'n'.repeat(32),
+    });
   });
 });

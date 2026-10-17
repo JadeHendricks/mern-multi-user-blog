@@ -2,7 +2,14 @@ import { copyFile, mkdir, readdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { hashPassword } from '../src/lib/password.js';
 import { hashToken } from '../src/lib/tokens.js';
-import { describeError, isLocalTarget, openStore, readArgs, REMOTE_HINT, scriptConfig } from './lib/cli.js';
+import {
+  describeError,
+  isLocalTarget,
+  openStore,
+  readArgs,
+  REMOTE_HINT,
+  scriptConfig,
+} from './lib/cli.js';
 import seedData from './seed-data.cjs';
 
 // Deterministic sample data for the E2E run and for a throwaway local store.
@@ -12,7 +19,8 @@ import seedData from './seed-data.cjs';
 //
 // Ids, dates, titles and comments are fixed on purpose: screenshots must look the same on every
 // run. Only the password hashes differ between runs (bcrypt salts them).
-const { E2E_PASSWORD, SEED_ACTIVATION_TOKEN, PENDING_USER, SEED_IDS, SEED_USERS, SEED_POSTS } = seedData;
+const { E2E_PASSWORD, SEED_ACTIVATION_TOKEN, PENDING_USER, SEED_IDS, SEED_USERS, SEED_POSTS } =
+  seedData;
 
 // Sample images (server/seed-assets) are copied into DATA_DIR/uploads and used as avatars and
 // post images, so a seeded store shows real pictures. Pass { images: false } to keep default.jpg.
@@ -40,7 +48,8 @@ async function copyAssets(kind, dataDir) {
  */
 export async function seed(store, { dataDir, images = SEED_IMAGES } = {}) {
   if (images) {
-    if (!dataDir) throw new Error('seed with images needs a dataDir to copy the sample files into.');
+    if (!dataDir)
+      throw new Error('seed with images needs a dataDir to copy the sample files into.');
     await copyAssets('users', dataDir);
     await copyAssets('posts', dataDir);
   }
@@ -80,7 +89,10 @@ export async function seed(store, { dataDir, images = SEED_IMAGES } = {}) {
       date: new Date(spec.date),
       ...(images && { image: postImage(index) }),
       // Fixed like and comment ids too, so every seeded store is identical.
-      likes: spec.likes.map((id, i) => ({ _id: `64e0000000000000000${index}0${i}`.padEnd(24, '0').slice(0, 24), user: id })),
+      likes: spec.likes.map((id, i) => ({
+        _id: `64e0000000000000000${index}0${i}`.padEnd(24, '0').slice(0, 24),
+        user: id,
+      })),
       comments: spec.comments.map((comment, i) => ({
         _id: `64d0000000000000000${index}0${i}`.padEnd(24, '0').slice(0, 24),
         user: comment.by,
@@ -109,10 +121,16 @@ async function emptyUploads(dataDir) {
  * @param {string[]} argv
  * @param {{env?: object, out?: (line: string) => void, err?: (line: string) => void, open?: Function}} [io]
  */
-export async function run(argv, { env = process.env, out = console.log, err = console.error, open = openStore } = {}) {
+export async function run(
+  argv,
+  { env = process.env, out = console.log, err = console.error, open = openStore } = {},
+) {
   let store;
   try {
-    const { values } = readArgs(argv, { reset: { type: 'boolean' }, 'allow-remote': { type: 'boolean' } });
+    const { values } = readArgs(argv, {
+      reset: { type: 'boolean' },
+      'allow-remote': { type: 'boolean' },
+    });
     const config = scriptConfig(env, values.driver);
     // A reset deletes data, so a Mongo server that is not on this machine needs an explicit yes.
     if (!isLocalTarget(config) && !values['allow-remote']) {
@@ -131,7 +149,9 @@ export async function run(argv, { env = process.env, out = console.log, err = co
       await emptyUploads(config.DATA_DIR);
     }
     const result = await seed(store, { dataDir: config.DATA_DIR });
-    out(`Seeded ${result.users} users, ${result.pending} pending user and ${result.posts} posts (${config.DB_DRIVER} store).`);
+    out(
+      `Seeded ${result.users} users, ${result.pending} pending user and ${result.posts} posts (${config.DB_DRIVER} store).`,
+    );
     return 0;
   } catch (error) {
     err(describeError(error));

@@ -19,7 +19,10 @@ const user = z
     status: z.enum(['pending', 'active']),
     createdAt: isoDate,
     updatedAt: isoDate,
-    socials: z.object({ facebook: optionalString, linkedin: optionalString, twitter: optionalString }).strict().optional(),
+    socials: z
+      .object({ facebook: optionalString, linkedin: optionalString, twitter: optionalString })
+      .strict()
+      .optional(),
     // Password hashes and one-time link hashes travel with the account so logins keep working.
     passwordHash: z.string().min(1),
     passwordChangedAt: isoDate.optional(),
@@ -39,7 +42,9 @@ const post = z
     tag: z.string(),
     description: z.string().min(1),
     likes: z.array(z.object({ _id: hexId, user: hexId }).strict()),
-    comments: z.array(z.object({ _id: hexId, user: hexId, comment: z.string().min(1), date: isoDate }).strict()),
+    comments: z.array(
+      z.object({ _id: hexId, user: hexId, comment: z.string().min(1), date: isoDate }).strict(),
+    ),
     date: isoDate,
   })
   .strict();
@@ -57,7 +62,9 @@ export const exportFileSchema = z
 
 // One short line per problem, with the path but never the offending value (it may be a hash).
 export function describeProblems(error, limit = 8) {
-  const lines = error.issues.slice(0, limit).map((issue) => `  - ${issue.path.join('.') || '(file)'}: ${issue.message}`);
+  const lines = error.issues
+    .slice(0, limit)
+    .map((issue) => `  - ${issue.path.join('.') || '(file)'}: ${issue.message}`);
   if (error.issues.length > limit) lines.push(`  - ...and ${error.issues.length - limit} more`);
   return lines.join('\n');
 }

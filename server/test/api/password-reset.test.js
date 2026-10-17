@@ -1,7 +1,13 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import supertest from 'supertest';
 import { clearDb, connectDb, disconnectDb, getStore } from './support/db.js';
-import { createUserAndLogin, fakeConfig, fakeUser, loadApp, registerAndActivate } from './support/helpers.js';
+import {
+  createUserAndLogin,
+  fakeConfig,
+  fakeUser,
+  loadApp,
+  registerAndActivate,
+} from './support/helpers.js';
 import { extractLink, readLatestMail, readMails, tokenFromLink } from './support/outbox.js';
 
 describe('forgot and reset password', () => {
@@ -72,7 +78,8 @@ describe('forgot and reset password', () => {
 
     // Secrets are only returned when asked for, so no ordinary read can leak the hash.
     const plain = await getStore().users.findByEmail(user.email);
-    for (const key of ['resetHash', 'resetExpires', 'passwordHash']) expect(key in plain).toBe(false);
+    for (const key of ['resetHash', 'resetExpires', 'passwordHash'])
+      expect(key in plain).toBe(false);
 
     const raw = await getStore().admin.rawUserByEmail(user.email);
     expect(raw.resetHash === token).toBe(false);

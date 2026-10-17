@@ -1,7 +1,13 @@
 import supertest from 'supertest';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { clearDb, connectDb, disconnectDb, getStore } from './support/db.js';
-import { createUserAndLogin, fakeUser, loadApp, LONG_DESCRIPTION, registerAndActivate } from './support/helpers.js';
+import {
+  createUserAndLogin,
+  fakeUser,
+  loadApp,
+  LONG_DESCRIPTION,
+  registerAndActivate,
+} from './support/helpers.js';
 
 describe('opt-in pagination', () => {
   let app;
@@ -35,7 +41,9 @@ describe('opt-in pagination', () => {
     let cursor;
     let pages = 0;
     do {
-      const res = await supertest(app).get(url).query({ limit: 2, ...(cursor && { cursor }) });
+      const res = await supertest(app)
+        .get(url)
+        .query({ limit: 2, ...(cursor && { cursor }) });
       expect(res.status).toBe(200);
       seen.push(...res.body[listKey].map((item) => item._id));
       cursor = res.body.nextCursor ?? undefined;
@@ -57,14 +65,16 @@ describe('opt-in pagination', () => {
     expect(users.body.users).toHaveLength(3);
   });
 
-  it('lists posts and a user\'s posts newest first, and users oldest first', async () => {
+  it("lists posts and a user's posts newest first, and users oldest first", async () => {
     const posts = await supertest(app).get('/api/post');
     const mine = await supertest(app).get(`/api/post/user/${alice._id}`);
     const users = await supertest(app).get('/api/user');
 
     const dates = posts.body.posts.map((post) => post.date);
     expect(dates).toEqual([...dates].sort().reverse());
-    expect(mine.body.posts.map((post) => post._id)).toEqual(posts.body.posts.map((post) => post._id));
+    expect(mine.body.posts.map((post) => post._id)).toEqual(
+      posts.body.posts.map((post) => post._id),
+    );
     const joined = users.body.users.map((user) => user.createdAt);
     expect(joined).toEqual([...joined].sort());
     expect(users.body.users[0]._id).toBe(alice._id);
@@ -83,8 +93,10 @@ describe('opt-in pagination', () => {
     expect(walked.pages).toBe(pages);
   });
 
-  it('pages one user\'s posts, including the two that share a date', async () => {
-    const all = (await supertest(app).get(`/api/post/user/${alice._id}`)).body.posts.map((post) => post._id);
+  it("pages one user's posts, including the two that share a date", async () => {
+    const all = (await supertest(app).get(`/api/post/user/${alice._id}`)).body.posts.map(
+      (post) => post._id,
+    );
 
     const walked = await walk(`/api/post/user/${alice._id}`, 'posts');
 
@@ -122,6 +134,8 @@ describe('opt-in pagination', () => {
 
   it('accepts the limits 1 and 100', async () => {
     expect((await supertest(app).get('/api/post').query({ limit: 1 })).body.posts).toHaveLength(1);
-    expect((await supertest(app).get('/api/post').query({ limit: 100 })).body.posts).toHaveLength(5);
+    expect((await supertest(app).get('/api/post').query({ limit: 100 })).body.posts).toHaveLength(
+      5,
+    );
   });
 });

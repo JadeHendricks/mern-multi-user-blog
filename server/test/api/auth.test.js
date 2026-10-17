@@ -12,7 +12,6 @@ import {
 } from './support/helpers.js';
 import { extractLink, readLatestMail, readMails, tokenFromLink } from './support/outbox.js';
 
-
 describe('auth', () => {
   let app;
 
@@ -99,7 +98,9 @@ describe('auth', () => {
       expect(second === first).toBe(false);
       const old = await supertest(app).post('/api/auth/account-activation').send({ token: first });
       expect(old.status).toBe(401);
-      const fresh = await supertest(app).post('/api/auth/account-activation').send({ token: second });
+      const fresh = await supertest(app)
+        .post('/api/auth/account-activation')
+        .send({ token: second });
       expect(fresh.status).toBe(201);
     });
     it('validates the register payload', async () => {
@@ -159,7 +160,9 @@ describe('auth', () => {
       await supertest(app).post('/api/auth/register').send(user);
       const token = tokenFromLink(extractLink(readLatestMail(user.email)));
       const stored = await getStore().admin.rawUserByEmail(user.email);
-      await getStore().admin.patchUser(stored._id, { activationExpires: new Date(Date.now() - 1000) });
+      await getStore().admin.patchUser(stored._id, {
+        activationExpires: new Date(Date.now() - 1000),
+      });
 
       const res = await supertest(app).post('/api/auth/account-activation').send({ token });
 
@@ -228,7 +231,7 @@ describe('auth', () => {
       const { exp, iat } = jwt.decode(token);
       expect(exp - iat).toBe(Number(fakeConfig().COOKIE_EXPIRES_IN) * 86400);
       const expires = new Date(/Expires=([^;]+)/i.exec(cookie)[1]).getTime();
-      expect(Math.abs(expires - (exp * 1000))).toBeLessThan(5000);
+      expect(Math.abs(expires - exp * 1000)).toBeLessThan(5000);
     });
 
     it('walks register -> activate -> login -> isloggedin -> /api/user/me', async () => {
@@ -255,9 +258,7 @@ describe('auth', () => {
         .split(';')[0]
         .slice('authtoken='.length);
 
-      const me = await supertest(app)
-        .get('/api/user/me')
-        .set('Authorization', `Bearer ${token}`);
+      const me = await supertest(app).get('/api/user/me').set('Authorization', `Bearer ${token}`);
 
       expect(me.status).toBe(200);
       expect(me.body.user.email).toBe(user.email);

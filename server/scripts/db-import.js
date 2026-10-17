@@ -1,6 +1,13 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { describeError, isLocalTarget, openStore, readArgs, REMOTE_HINT, scriptConfig } from './lib/cli.js';
+import {
+  describeError,
+  isLocalTarget,
+  openStore,
+  readArgs,
+  REMOTE_HINT,
+  scriptConfig,
+} from './lib/cli.js';
 import { describeProblems, exportFileSchema, FORMAT } from './lib/export-file.js';
 
 // npm run db:import -- file.json [--replace] [--allow-remote] [--driver json|mongo]
@@ -14,12 +21,20 @@ import { describeProblems, exportFileSchema, FORMAT } from './lib/export-file.js
  * @param {string[]} argv
  * @param {{env?: object, out?: Function, err?: Function, open?: Function}} [io]
  */
-export async function run(argv, { env = process.env, out = console.log, err = console.error, open = openStore } = {}) {
+export async function run(
+  argv,
+  { env = process.env, out = console.log, err = console.error, open = openStore } = {},
+) {
   let store;
   try {
-    const { values, positionals } = readArgs(argv, { replace: { type: 'boolean' }, 'allow-remote': { type: 'boolean' } });
+    const { values, positionals } = readArgs(argv, {
+      replace: { type: 'boolean' },
+      'allow-remote': { type: 'boolean' },
+    });
     if (positionals.length !== 1) {
-      err('Usage: npm run db:import -- <file.json> [--replace] [--allow-remote] [--driver json|mongo]');
+      err(
+        'Usage: npm run db:import -- <file.json> [--replace] [--allow-remote] [--driver json|mongo]',
+      );
       return 1;
     }
     const config = scriptConfig(env, values.driver);
@@ -48,7 +63,9 @@ export async function run(argv, { env = process.env, out = console.log, err = co
     const { schemaVersion, users, posts } = parsed.data;
     const data = { ...(schemaVersion !== undefined && { schemaVersion }), users, posts };
     const counts = await store.admin.importAll(data, { replace: Boolean(values.replace) });
-    out(`Imported ${counts.users} users and ${counts.posts} posts into the ${config.DB_DRIVER} store.`);
+    out(
+      `Imported ${counts.users} users and ${counts.posts} posts into the ${config.DB_DRIVER} store.`,
+    );
     return 0;
   } catch (error) {
     err(describeError(error));

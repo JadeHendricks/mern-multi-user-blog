@@ -3,7 +3,14 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterAll, describe, expect, it, vi } from 'vitest';
 import { verifyPassword } from '../../src/lib/password.js';
-import { E2E_PASSWORD, run, SEED_ACTIVATION_TOKEN, SEED_IDS, SEED_IMAGES, seed } from '../../scripts/seed.js';
+import {
+  E2E_PASSWORD,
+  run,
+  SEED_ACTIVATION_TOKEN,
+  SEED_IDS,
+  SEED_IMAGES,
+  seed,
+} from '../../scripts/seed.js';
 import { hashToken } from '../../src/lib/tokens.js';
 import { freshMongoUri, stopOwnMongo } from '../support/mongo.js';
 import { makeJsonStore, makeMongoStore } from '../store/support.js';
@@ -22,7 +29,10 @@ afterAll(async () => {
 // Bcrypt salts every hash, so those are the only fields allowed to differ between two seeds.
 const stable = (data) => ({
   ...data,
-  users: data.users.map(({ passwordHash, ...rest }) => ({ ...rest, hasHash: Boolean(passwordHash) })),
+  users: data.users.map(({ passwordHash, ...rest }) => ({
+    ...rest,
+    hasHash: Boolean(passwordHash),
+  })),
 });
 
 const io = () => {
@@ -43,10 +53,16 @@ describe.each([
       expect(await store.admin.counts()).toEqual({ users: 5, posts: 6 });
       const first = await store.posts.findById(SEED_IDS.posts[0]);
       expect(first.user._id).toBe(SEED_IDS.users.alice);
-      expect(first.likes.map((like) => like.user)).toEqual([SEED_IDS.users.bob, SEED_IDS.users.carol, SEED_IDS.users.dan]);
+      expect(first.likes.map((like) => like.user)).toEqual([
+        SEED_IDS.users.bob,
+        SEED_IDS.users.carol,
+        SEED_IDS.users.dan,
+      ]);
       expect(first.comments).toHaveLength(2);
       expect(first.date.toISOString()).toBe('2025-12-01T09:00:00.000Z');
-      expect((await store.users.findPublicById(SEED_IDS.users.alice)).createdAt.toISOString()).toBe('2025-11-20T09:00:00.000Z');
+      expect((await store.users.findPublicById(SEED_IDS.users.alice)).createdAt.toISOString()).toBe(
+        '2025-11-20T09:00:00.000Z',
+      );
       // Images are on by default (the CLI and the E2E run); this test opted out of copying them.
       expect(SEED_IMAGES).toBe(true);
       expect(first.image).toBe('default.jpg');
@@ -79,7 +95,9 @@ describe.each([
       await seed(first.store, { images: false });
       await seed(second.store, { images: false });
 
-      expect(stable(await first.store.admin.exportAll())).toEqual(stable(await second.store.admin.exportAll()));
+      expect(stable(await first.store.admin.exportAll())).toEqual(
+        stable(await second.store.admin.exportAll()),
+      );
     } finally {
       await first.cleanup();
       await second.cleanup();
@@ -99,7 +117,9 @@ describe.each([
         'seed-user-4.svg',
       ]);
       expect(readdirSync(path.join(dataDir, 'uploads', 'posts'))).toHaveLength(3);
-      expect((await store.users.findPublicById(SEED_IDS.users.alice)).avatar).toBe('seed-user-1.svg');
+      expect((await store.users.findPublicById(SEED_IDS.users.alice)).avatar).toBe(
+        'seed-user-1.svg',
+      );
       expect((await store.posts.findById(SEED_IDS.posts[0])).image).toBe('seed-post-1.svg');
       expect((await store.posts.findById(SEED_IDS.posts[3])).image).toBe('seed-post-1.svg');
     } finally {
@@ -145,7 +165,10 @@ describe('npm run seed (CLI)', () => {
     const dir = tmp();
     const result = io();
 
-    const code = await run([], { env: { DB_DRIVER: 'mongo', MONGO_URI: await freshMongoUri(), DATA_DIR: dir }, ...result });
+    const code = await run([], {
+      env: { DB_DRIVER: 'mongo', MONGO_URI: await freshMongoUri(), DATA_DIR: dir },
+      ...result,
+    });
 
     expect(code).toBe(0);
     expect(result.lines.out[0]).toMatch(/\(mongo store\)/);
@@ -156,7 +179,11 @@ describe('npm run seed (CLI)', () => {
     const result = io();
     const uri = 'mongodb+srv://someone:secret-pass@cluster0.example-host.net/blog';
 
-    const code = await run([], { env: { DB_DRIVER: 'mongo', MONGO_URI: uri, DATA_DIR: tmp() }, open, ...result });
+    const code = await run([], {
+      env: { DB_DRIVER: 'mongo', MONGO_URI: uri, DATA_DIR: tmp() },
+      open,
+      ...result,
+    });
 
     expect(code).toBe(1);
     expect(open).not.toHaveBeenCalled();

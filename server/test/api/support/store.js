@@ -15,7 +15,12 @@ export async function createTestStore() {
   const dir = mkdtempSync(path.join(process.env.DATA_DIR, 'store-'));
   const driver = testDriver();
   const mongoUri = driver === 'mongo' ? await freshMongoUri() : undefined;
-  const store = await createStore({ DB_DRIVER: driver, DATA_DIR: dir, BACKUP_KEEP: 10, MONGO_URI: mongoUri });
+  const store = await createStore({
+    DB_DRIVER: driver,
+    DATA_DIR: dir,
+    BACKUP_KEEP: 10,
+    MONGO_URI: mongoUri,
+  });
   await store.init();
   return {
     store,

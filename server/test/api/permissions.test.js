@@ -93,4 +93,5 @@ describe('permissions', () => {
     const bobs = await supertest(app).get(`/api/post/${bobsPost._id}`);
     expect(alices.body.post.title).toBe('Alice original');
     expect(bobs.body.post.title).toBe('Edited through the right URL');
-  });});
+  });
+});

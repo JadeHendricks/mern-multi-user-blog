@@ -9,23 +9,37 @@ const STATUSES = new Set(['pending', 'active']);
 
 const iso = (value) => new Date(value).toISOString();
 
-
 // The unique-email rule, checked on the draft so it also holds for writes queued back to back.
 const assertEmailFree = (draft, email, exceptId) => {
-  if (draft.users.some((user) => user.email === email && user._id !== exceptId)) throw new DuplicateEmailError();
+  if (draft.users.some((user) => user.email === email && user._id !== exceptId))
+    throw new DuplicateEmailError();
 };
 
-const SECRET_FIELDS = ['passwordChangedAt', 'activationHash', 'activationExpires', 'resetHash', 'resetExpires'];
-const DATE_FIELDS = new Set(['passwordChangedAt', 'activationExpires', 'resetExpires', 'createdAt', 'updatedAt']);
+const SECRET_FIELDS = [
+  'passwordChangedAt',
+  'activationHash',
+  'activationExpires',
+  'resetHash',
+  'resetExpires',
+];
+const DATE_FIELDS = new Set([
+  'passwordChangedAt',
+  'activationExpires',
+  'resetExpires',
+  'createdAt',
+  'updatedAt',
+]);
 
 // Builds a stored record from repo input (used by createPending and create).
 function buildRecord(data, defaults) {
   const stamp = new Date().toISOString();
   const status = data.status ?? defaults.status;
   const role = data.role ?? 'user';
-  if (!STATUSES.has(status)) throw new StoreValidationError('Path `status` is not a valid enum value.');
+  if (!STATUSES.has(status))
+    throw new StoreValidationError('Path `status` is not a valid enum value.');
   if (!ROLES.has(role)) throw new StoreValidationError('Path `role` is not a valid enum value.');
-  if (data._id !== undefined && !isValidId(data._id)) throw new StoreValidationError('Path `_id` is not a valid id.');
+  if (data._id !== undefined && !isValidId(data._id))
+    throw new StoreValidationError('Path `_id` is not a valid id.');
   const record = {
     _id: data._id ?? newId(),
     avatar: data.avatar || DEFAULT_AVATAR,
@@ -39,7 +53,8 @@ function buildRecord(data, defaults) {
   };
   if (data.socials && Object.keys(data.socials).length > 0) record.socials = { ...data.socials };
   for (const key of SECRET_FIELDS) {
-    if (data[key] !== undefined && data[key] !== null) record[key] = DATE_FIELDS.has(key) ? iso(data[key]) : data[key];
+    if (data[key] !== undefined && data[key] !== null)
+      record[key] = DATE_FIELDS.has(key) ? iso(data[key]) : data[key];
   }
   return record;
 }
@@ -47,7 +62,8 @@ function buildRecord(data, defaults) {
 /** @returns {import('../types.js').UserRepo} */
 export function createUserRepo(db) {
   const find = (id) => (isValidId(id) ? userIndex(db.read()).byId.get(id) : undefined);
-  const findInDraft = (draft, id) => (isValidId(id) ? draft.users.find((user) => user._id === id) : undefined);
+  const findInDraft = (draft, id) =>
+    isValidId(id) ? draft.users.find((user) => user._id === id) : undefined;
   const touch = (record) => {
     record.updatedAt = new Date().toISOString();
   };
@@ -83,7 +99,12 @@ export function createUserRepo(db) {
       const now = Date.now();
       const record = db
         .read()
-        .users.find((user) => user.resetHash === hash && user.resetExpires && new Date(user.resetExpires).getTime() > now);
+        .users.find(
+          (user) =>
+            user.resetHash === hash &&
+            user.resetExpires &&
+            new Date(user.resetExpires).getTime() > now,
+        );
       return record ? toUser(record) : null;
     },
 
@@ -91,8 +112,15 @@ export function createUserRepo(db) {
       const rows = db
         .read()
         .users.filter((user) => user.status !== 'pending')
-        .sort((a, b) => (a.createdAt < b.createdAt ? -1 : a.createdAt > b.createdAt ? 1 : a._id < b._id ? -1 : 1));
-      const page = paginate(rows, { cursor, limit, key: (user) => user.createdAt, direction: 'asc' });
+        .sort((a, b) =>
+          a.createdAt < b.createdAt ? -1 : a.createdAt > b.createdAt ? 1 : a._id < b._id ? -1 : 1,
+        );
+      const page = paginate(rows, {
+        cursor,
+        limit,
+        key: (user) => user.createdAt,
+        direction: 'asc',
+      });
       return { items: page.items.map(toPublicUser), nextCursor: page.nextCursor };
     },
 
@@ -127,7 +155,8 @@ export function createUserRepo(db) {
       db.write((draft) => {
         const record = buildRecord(data, { status: 'active' });
         assertEmailFree(draft, record.email);
-        if (draft.users.some((user) => user._id === record._id)) throw new StoreValidationError('Path `_id` is already used.');
+        if (draft.users.some((user) => user._id === record._id))
+          throw new StoreValidationError('Path `_id` is already used.');
         draft.users.push(record);
         return toUser(record);
       }),

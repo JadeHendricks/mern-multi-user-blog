@@ -23,7 +23,17 @@ export function runPostContract(label, makeStore) {
     it('creates a post with defaults and keeps the author as an id', async () => {
       const post = await store.posts.create(postInput(alice._id));
 
-      expect(Object.keys(post).sort()).toEqual(['_id', 'comments', 'date', 'description', 'image', 'likes', 'tag', 'title', 'user']);
+      expect(Object.keys(post).sort()).toEqual([
+        '_id',
+        'comments',
+        'date',
+        'description',
+        'image',
+        'likes',
+        'tag',
+        'title',
+        'user',
+      ]);
       expect(post.user).toBe(alice._id);
       expect(post.image).toBe('default.jpg');
       expect(post.tag).toBe('general');
@@ -33,10 +43,18 @@ export function runPostContract(label, makeStore) {
     });
 
     it('enforces the title and description rules', async () => {
-      expect(await rejection(store.posts.create(postInput(alice._id, { title: ' ' })))).toBeInstanceOf(StoreValidationError);
-      expect(await rejection(store.posts.create(postInput(alice._id, { title: 'x'.repeat(101) })))).toBeInstanceOf(StoreValidationError);
-      expect(await rejection(store.posts.create(postInput(alice._id, { description: '' })))).toBeInstanceOf(StoreValidationError);
-      expect((await store.posts.create(postInput(alice._id, { title: `  ${'x'.repeat(100)} ` }))).title).toHaveLength(100);
+      expect(
+        await rejection(store.posts.create(postInput(alice._id, { title: ' ' }))),
+      ).toBeInstanceOf(StoreValidationError);
+      expect(
+        await rejection(store.posts.create(postInput(alice._id, { title: 'x'.repeat(101) }))),
+      ).toBeInstanceOf(StoreValidationError);
+      expect(
+        await rejection(store.posts.create(postInput(alice._id, { description: '' }))),
+      ).toBeInstanceOf(StoreValidationError);
+      expect(
+        (await store.posts.create(postInput(alice._id, { title: `  ${'x'.repeat(100)} ` }))).title,
+      ).toHaveLength(100);
       expect((await store.admin.counts()).posts).toBe(1);
     });
 
@@ -47,7 +65,12 @@ export function runPostContract(label, makeStore) {
       const detail = await store.posts.findById(post._id);
       const list = await store.posts.list();
 
-      expect(detail.user).toEqual({ _id: alice._id, name: 'Alice', avatar: 'default.jpg', socials: { twitter: 'https://twitter.com/me' } });
+      expect(detail.user).toEqual({
+        _id: alice._id,
+        name: 'Alice',
+        avatar: 'default.jpg',
+        socials: { twitter: 'https://twitter.com/me' },
+      });
       expect(list.items[0].user).toEqual({ _id: alice._id, name: 'Alice', avatar: 'default.jpg' });
     });
 
@@ -73,7 +96,9 @@ export function runPostContract(label, makeStore) {
       for (let n = 1; n <= 4; n += 1) {
         await store.posts.insertMany([postInput(alice._id, { title: `Tie ${n}`, date: sameDate })]);
       }
-      const newest = await store.posts.create(postInput(alice._id, { title: 'Newest', date: new Date('2026-01-01T00:00:00.000Z') }));
+      const newest = await store.posts.create(
+        postInput(alice._id, { title: 'Newest', date: new Date('2026-01-01T00:00:00.000Z') }),
+      );
 
       const everything = await store.posts.list();
       expect(everything.nextCursor).toBeNull();
@@ -92,13 +117,19 @@ export function runPostContract(label, makeStore) {
       expect(seen).toEqual(everything.items.map((post) => post._id));
       expect(new Set(seen).size).toBe(5);
       expect(pages).toBe(3);
-      expect(await rejection(store.posts.list({ cursor: '!!!' }))).toBeInstanceOf(InvalidCursorError);
+      expect(await rejection(store.posts.list({ cursor: '!!!' }))).toBeInstanceOf(
+        InvalidCursorError,
+      );
     });
 
-    it('lists one user\'s posts', async () => {
-      await store.posts.create(postInput(alice._id, { title: 'First', date: new Date('2025-12-01T00:00:00.000Z') }));
+    it("lists one user's posts", async () => {
+      await store.posts.create(
+        postInput(alice._id, { title: 'First', date: new Date('2025-12-01T00:00:00.000Z') }),
+      );
       await store.posts.create(postInput(bob._id, { title: 'Bob' }));
-      await store.posts.create(postInput(alice._id, { title: 'Second', date: new Date('2025-12-02T00:00:00.000Z') }));
+      await store.posts.create(
+        postInput(alice._id, { title: 'Second', date: new Date('2025-12-02T00:00:00.000Z') }),
+      );
 
       const page = await store.posts.listByUser(alice._id);
 
@@ -117,14 +148,19 @@ export function runPostContract(label, makeStore) {
       expect(updated.image).toBe('post-1.png');
       expect(updated.tag).toBe('travel');
       expect(updated.user).toBe(alice._id);
-      expect(await rejection(store.posts.update(post._id, { title: '' }))).toBeInstanceOf(StoreValidationError);
+      expect(await rejection(store.posts.update(post._id, { title: '' }))).toBeInstanceOf(
+        StoreValidationError,
+      );
       expect((await store.posts.findById(post._id)).title).toBe('Renamed');
     });
 
     it('gives the owner and image, deletes, and reports existence', async () => {
       const post = await store.posts.create(postInput(alice._id, { image: 'post-1.png' }));
 
-      expect(await store.posts.getOwnerAndImage(post._id)).toEqual({ user: alice._id, image: 'post-1.png' });
+      expect(await store.posts.getOwnerAndImage(post._id)).toEqual({
+        user: alice._id,
+        image: 'post-1.png',
+      });
       expect(await store.posts.exists(post._id)).toBe(true);
       expect(await store.posts.delete(post._id)).toEqual({ image: 'post-1.png' });
       expect(await store.posts.exists(post._id)).toBe(false);
@@ -158,7 +194,9 @@ export function runPostContract(label, makeStore) {
       for (let n = 10; n < 30; n += 1) users.push(await activeUser(store, n));
 
       const results = await Promise.all(users.map((user) => store.posts.like(post._id, user._id)));
-      const sameUser = await Promise.all(Array.from({ length: 5 }, () => store.posts.like(post._id, alice._id)));
+      const sameUser = await Promise.all(
+        Array.from({ length: 5 }, () => store.posts.like(post._id, alice._id)),
+      );
 
       expect(results.every((result) => result.status === 'liked')).toBe(true);
       expect(sameUser.filter((result) => result.status === 'liked')).toHaveLength(1);
@@ -175,7 +213,14 @@ export function runPostContract(label, makeStore) {
       const comments = await store.posts.addComment(post._id, bob._id, 'two');
 
       expect(comments.map((comment) => comment.comment)).toEqual(['two', 'one']);
-      expect(Object.keys(comments[0]).sort()).toEqual(['_id', 'avatar', 'comment', 'date', 'name', 'userId']);
+      expect(Object.keys(comments[0]).sort()).toEqual([
+        '_id',
+        'avatar',
+        'comment',
+        'date',
+        'name',
+        'userId',
+      ]);
       expect(comments[0]).toMatchObject({ userId: bob._id, name: 'Bob', avatar: 'default.jpg' });
 
       await store.users.updateProfile(bob._id, { name: 'Robert', avatar: 'user-2.png' });
@@ -184,7 +229,9 @@ export function runPostContract(label, makeStore) {
 
       expect(await store.posts.addComment(newId(), alice._id, 'x')).toBeNull();
       expect(await store.posts.addComment(post._id, newId(), 'x')).toBeNull();
-      expect(await rejection(store.posts.addComment(post._id, alice._id, ''))).toBeInstanceOf(StoreValidationError);
+      expect(await rejection(store.posts.addComment(post._id, alice._id, ''))).toBeInstanceOf(
+        StoreValidationError,
+      );
     });
 
     it('falls back to "Deleted user" for a comment whose author is gone', async () => {
@@ -194,7 +241,11 @@ export function runPostContract(label, makeStore) {
 
       const [comment] = (await store.posts.findById(post._id)).comments;
 
-      expect(comment).toMatchObject({ userId: bob._id, name: 'Deleted user', avatar: 'default.jpg' });
+      expect(comment).toMatchObject({
+        userId: bob._id,
+        name: 'Deleted user',
+        avatar: 'default.jpg',
+      });
     });
 
     it('finds and removes a comment', async () => {
@@ -217,7 +268,14 @@ export function runPostContract(label, makeStore) {
           _id: id,
           date: new Date('2025-12-01T09:00:00.000Z'),
           likes: [{ user: bob._id }, { user: alice._id }],
-          comments: [{ _id: commentId, user: bob._id, comment: 'imported', date: new Date('2025-12-02T09:00:00.000Z') }],
+          comments: [
+            {
+              _id: commentId,
+              user: bob._id,
+              comment: 'imported',
+              date: new Date('2025-12-02T09:00:00.000Z'),
+            },
+          ],
         }),
       ]);
 

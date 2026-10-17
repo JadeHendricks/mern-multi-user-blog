@@ -1,18 +1,37 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import supertest from 'supertest';
 import { clearDb, connectDb, disconnectDb, newId } from './support/db.js';
-import { createPost, createUserAndLogin, fakeUser, loadApp, registerAndActivate } from './support/helpers.js';
+import {
+  createPost,
+  createUserAndLogin,
+  fakeUser,
+  loadApp,
+  registerAndActivate,
+} from './support/helpers.js';
 import { extractLink, readLatestMail, tokenFromLink } from './support/outbox.js';
 
 // Response-shape contract: status plus the EXACT key set of every body. These tests must pass
 // unchanged on every storage adapter, so a storage swap cannot change what the client receives.
 // Key names only, never values. `__v` (a Mongoose bookkeeping field) is deliberately not part of
 // the contract and is stripped before comparing.
-const keysOf = (object) => Object.keys(object).filter((key) => key !== '__v').sort();
+const keysOf = (object) =>
+  Object.keys(object)
+    .filter((key) => key !== '__v')
+    .sort();
 
 const OWNER_KEYS = ['_id', 'avatar', 'createdAt', 'email', 'name', 'role', 'status', 'updatedAt'];
 const PUBLIC_USER_KEYS = ['_id', 'avatar', 'createdAt', 'name'];
-const POST_KEYS = ['_id', 'comments', 'date', 'description', 'image', 'likes', 'tag', 'title', 'user'];
+const POST_KEYS = [
+  '_id',
+  'comments',
+  'date',
+  'description',
+  'image',
+  'likes',
+  'tag',
+  'title',
+  'user',
+];
 const COMMENT_KEYS = ['_id', 'avatar', 'comment', 'date', 'name', 'userId'];
 
 describe('response shape contract', () => {
@@ -47,7 +66,9 @@ describe('response shape contract', () => {
       expect(keysOf(again.body)).toEqual(['message']);
 
       const agent = supertest.agent(app);
-      const login = await agent.post('/api/auth/login').send({ email: user.email, password: user.password });
+      const login = await agent
+        .post('/api/auth/login')
+        .send({ email: user.email, password: user.password });
       expect(login.status).toBe(200);
       expect(keysOf(login.body)).toEqual(['user']);
       expect(keysOf(login.body.user)).toEqual(OWNER_KEYS);
@@ -62,12 +83,16 @@ describe('response shape contract', () => {
     });
 
     it('error bodies are { message } only', async () => {
-      const invalid = await supertest(app).post('/api/auth/register').send({ name: '', email: 'x', password: '1' });
+      const invalid = await supertest(app)
+        .post('/api/auth/register')
+        .send({ name: '', email: 'x', password: '1' });
       expect(invalid.status).toBe(422);
       expect(keysOf(invalid.body)).toEqual(['message']);
 
       const user = fakeUser();
-      const wrong = await supertest(app).post('/api/auth/login').send({ email: user.email, password: user.password });
+      const wrong = await supertest(app)
+        .post('/api/auth/login')
+        .send({ email: user.email, password: user.password });
       expect(wrong.status).toBe(401);
       expect(keysOf(wrong.body)).toEqual(['message']);
 
@@ -79,7 +104,9 @@ describe('response shape contract', () => {
       expect(noToken.status).toBe(400);
       expect(keysOf(noToken.body)).toEqual(['message']);
 
-      const expired = await supertest(app).post('/api/auth/account-activation').send({ token: 'nope' });
+      const expired = await supertest(app)
+        .post('/api/auth/account-activation')
+        .send({ token: 'nope' });
       expect(expired.status).toBe(401);
       expect(keysOf(expired.body)).toEqual(['message']);
 
@@ -92,7 +119,9 @@ describe('response shape contract', () => {
       const user = fakeUser();
       await registerAndActivate(app, user);
 
-      const forgot = await supertest(app).put('/api/auth/forgot-password').send({ email: user.email });
+      const forgot = await supertest(app)
+        .put('/api/auth/forgot-password')
+        .send({ email: user.email });
       expect(forgot.status).toBe(200);
       expect(keysOf(forgot.body)).toEqual(['message']);
 
@@ -165,7 +194,9 @@ describe('response shape contract', () => {
       expect(keysOf(noLogin.body)).toEqual(['message']);
 
       const { agent, user } = await createUserAndLogin(app);
-      const invalid = await agent.put(`/api/user/${user._id}/socials`).send({ twitter: 'http://x.test' });
+      const invalid = await agent
+        .put(`/api/user/${user._id}/socials`)
+        .send({ twitter: 'http://x.test' });
       expect(invalid.status).toBe(422);
       expect(keysOf(invalid.body)).toEqual(['message']);
     });
@@ -177,7 +208,8 @@ describe('response shape contract', () => {
 
       const created = await agent.post('/api/post').send({
         title: 'Shape',
-        description: 'This description is long enough to satisfy the fifty character minimum of the validator.',
+        description:
+          'This description is long enough to satisfy the fifty character minimum of the validator.',
       });
       expect(created.status).toBe(201);
       expect(keysOf(created.body)).toEqual(['message', 'post']);
@@ -204,7 +236,8 @@ describe('response shape contract', () => {
 
       const edited = await agent.put(`/api/post/${id}`).send({
         title: 'Shape 2',
-        description: 'This description is long enough to satisfy the fifty character minimum of the validator.',
+        description:
+          'This description is long enough to satisfy the fifty character minimum of the validator.',
       });
       expect(edited.status).toBe(200);
       expect(keysOf(edited.body)).toEqual(['message', 'post']);
@@ -255,12 +288,16 @@ describe('response shape contract', () => {
       const alice = await createUserAndLogin(app);
       const post = await createPost(alice.agent);
 
-      const one = await alice.agent.post(`/api/post/comment/${post._id}`).send({ comment: 'first' });
+      const one = await alice.agent
+        .post(`/api/post/comment/${post._id}`)
+        .send({ comment: 'first' });
       expect(one.status).toBe(201);
       expect(keysOf(one.body)).toEqual(['comment', 'message', 'results']);
       expect(keysOf(one.body.comment[0])).toEqual(COMMENT_KEYS);
 
-      const two = await alice.agent.post(`/api/post/comment/${post._id}`).send({ comment: 'second' });
+      const two = await alice.agent
+        .post(`/api/post/comment/${post._id}`)
+        .send({ comment: 'second' });
       expect(two.body.results).toBe(2);
       expect(two.body.comment.map((item) => item.comment)).toEqual(['second', 'first']);
       expect(two.body.comment[0].userId).toBe(alice.user._id);
@@ -270,7 +307,9 @@ describe('response shape contract', () => {
       const detail = await supertest(app).get(`/api/post/${post._id}`);
       expect(keysOf(detail.body.post.comments[0])).toEqual(COMMENT_KEYS);
 
-      const removed = await alice.agent.delete(`/api/post/comment/${post._id}/${two.body.comment[0]._id}`);
+      const removed = await alice.agent.delete(
+        `/api/post/comment/${post._id}/${two.body.comment[0]._id}`,
+      );
       expect(removed.status).toBe(200);
       expect(keysOf(removed.body)).toEqual(['message']);
     });

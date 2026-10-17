@@ -21,10 +21,19 @@ afterAll(async () => {
 
 const io = () => {
   const lines = { out: [], err: [] };
-  return { lines, out: (line) => lines.out.push(line), err: (line) => lines.err.push(line), text: () => [...lines.out, ...lines.err].join('\n') };
+  return {
+    lines,
+    out: (line) => lines.out.push(line),
+    err: (line) => lines.err.push(line),
+    text: () => [...lines.out, ...lines.err].join('\n'),
+  };
 };
 const jsonEnv = (dir) => ({ DB_DRIVER: 'json', DATA_DIR: dir });
-const mongoEnv = async (dir) => ({ DB_DRIVER: 'mongo', MONGO_URI: await freshMongoUri(), DATA_DIR: dir });
+const mongoEnv = async (dir) => ({
+  DB_DRIVER: 'mongo',
+  MONGO_URI: await freshMongoUri(),
+  DATA_DIR: dir,
+});
 const readExport = (file) => JSON.parse(readFileSync(file, 'utf8'));
 const byId = (list) => [...list].sort((a, b) => (a._id < b._id ? -1 : 1));
 // What an export file says about the data (not when it was written).
@@ -219,7 +228,11 @@ describe('npm run db:import', () => {
       const open = vi.fn();
       const result = io();
 
-      const code = await importRun([await file()], { env: { DB_DRIVER: 'mongo', MONGO_URI: uri, DATA_DIR: tmp() }, open, ...result });
+      const code = await importRun([await file()], {
+        env: { DB_DRIVER: 'mongo', MONGO_URI: uri, DATA_DIR: tmp() },
+        open,
+        ...result,
+      });
 
       expect(code).toBe(1);
       expect(open).not.toHaveBeenCalled();
@@ -236,7 +249,11 @@ describe('npm run db:import', () => {
       const result = io();
 
       const code = await importRun([await file(), '--allow-remote'], {
-        env: { DB_DRIVER: 'mongo', MONGO_URI: `mongodb+srv://admin:hunter2@${secretHost}/blog`, DATA_DIR: tmp() },
+        env: {
+          DB_DRIVER: 'mongo',
+          MONGO_URI: `mongodb+srv://admin:hunter2@${secretHost}/blog`,
+          DATA_DIR: tmp(),
+        },
         open,
         ...result,
       });
@@ -250,10 +267,18 @@ describe('npm run db:import', () => {
 
     it('hides a connection string that a driver error quotes', async () => {
       const uri = `mongodb://localhost:27017/blog`;
-      const open = vi.fn().mockRejectedValue(new Error(`getaddrinfo failed for mongodb+srv://admin:hunter2@${secretHost}/blog`));
+      const open = vi
+        .fn()
+        .mockRejectedValue(
+          new Error(`getaddrinfo failed for mongodb+srv://admin:hunter2@${secretHost}/blog`),
+        );
       const result = io();
 
-      const code = await importRun([await file()], { env: { DB_DRIVER: 'mongo', MONGO_URI: uri, DATA_DIR: tmp() }, open, ...result });
+      const code = await importRun([await file()], {
+        env: { DB_DRIVER: 'mongo', MONGO_URI: uri, DATA_DIR: tmp() },
+        open,
+        ...result,
+      });
 
       expect(code).toBe(1);
       expect(result.text()).not.toMatch(/private-example|hunter2/);

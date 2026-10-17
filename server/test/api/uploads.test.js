@@ -97,7 +97,9 @@ describe('uploads', () => {
   it('deletes a post whose file is already gone and one that uses the default image', async () => {
     const { agent } = await createUserAndLogin(app);
     const withFile = await createWithImage(agent);
-    const plain = (await agent.post('/api/post').send({ title: 'plain', description: LONG_DESCRIPTION })).body.post;
+    const plain = (
+      await agent.post('/api/post').send({ title: 'plain', description: LONG_DESCRIPTION })
+    ).body.post;
     // The file disappears before the delete: ENOENT must not turn into an error.
     rmSync(uploadPath('posts', withFile.body.post.image));
 
@@ -110,13 +112,19 @@ describe('uploads', () => {
   it('removes the old avatar when it is replaced and keeps default.jpg out of it', async () => {
     const { agent } = await createUserAndLogin(app);
 
-    const first = await agent.put('/api/user/me').field('name', 'Avatar One').attach('avatar', TINY_PNG, png);
+    const first = await agent
+      .put('/api/user/me')
+      .field('name', 'Avatar One')
+      .attach('avatar', TINY_PNG, png);
     expect(first.status).toBe(200);
     expect(first.body.user.avatar).toMatch(/^user-[0-9a-f]{32}\.png$/);
     const firstFile = uploadPath('users', first.body.user.avatar);
     expect(existsSync(firstFile)).toBe(true);
 
-    const second = await agent.put('/api/user/me').field('name', 'Avatar Two').attach('avatar', TINY_PNG, png);
+    const second = await agent
+      .put('/api/user/me')
+      .field('name', 'Avatar Two')
+      .attach('avatar', TINY_PNG, png);
 
     expect(second.status).toBe(200);
     expect(existsSync(firstFile)).toBe(false);
@@ -127,7 +135,10 @@ describe('uploads', () => {
     it('serves an uploaded post image and avatar with long-lived cache headers', async () => {
       const { agent } = await createUserAndLogin(app);
       const created = await createWithImage(agent);
-      const avatar = await agent.put('/api/user/me').field('name', 'Has Avatar').attach('avatar', TINY_PNG, png);
+      const avatar = await agent
+        .put('/api/user/me')
+        .field('name', 'Has Avatar')
+        .attach('avatar', TINY_PNG, png);
 
       const post = await supertest(app).get(`/uploads/posts/${created.body.post.image}`);
       const user = await supertest(app).get(`/uploads/users/${avatar.body.user.avatar}`);
@@ -172,10 +183,14 @@ describe('uploads', () => {
         .field('description', LONG_DESCRIPTION)
         .attach('image', TINY_PNG, png);
       expect((await supertest(app).get(`/uploads/posts/${oldName}`)).status).toBe(404);
-      expect((await supertest(app).get(`/uploads/posts/${replaced.body.post.image}`)).status).toBe(200);
+      expect((await supertest(app).get(`/uploads/posts/${replaced.body.post.image}`)).status).toBe(
+        200,
+      );
 
       await agent.delete(`/api/post/${created.body.post._id}`);
-      expect((await supertest(app).get(`/uploads/posts/${replaced.body.post.image}`)).status).toBe(404);
+      expect((await supertest(app).get(`/uploads/posts/${replaced.body.post.image}`)).status).toBe(
+        404,
+      );
     });
 
     it('does not serve default.jpg (it is a bundled client asset)', async () => {

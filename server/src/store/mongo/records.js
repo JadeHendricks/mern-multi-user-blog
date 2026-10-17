@@ -27,7 +27,9 @@ export function toUserRecord(doc) {
     createdAt: doc.createdAt,
     updatedAt: doc.updatedAt,
   };
-  const socials = Object.fromEntries(Object.entries(doc.socials ?? {}).filter(([, value]) => value !== undefined));
+  const socials = Object.fromEntries(
+    Object.entries(doc.socials ?? {}).filter(([, value]) => value !== undefined),
+  );
   if (Object.keys(socials).length > 0) record.socials = socials;
   for (const [column, name] of Object.entries(USER_SECRET_COLUMNS)) {
     if (doc[column] !== undefined && doc[column] !== null) record[name] = doc[column];
@@ -58,7 +60,13 @@ export function toPostRecord(doc) {
 export const idOf = (value) => String(value._id ?? value);
 
 const iso = (value) => new Date(value).toISOString();
-const USER_DATES = ['createdAt', 'updatedAt', 'passwordChangedAt', 'activationExpires', 'resetExpires'];
+const USER_DATES = [
+  'createdAt',
+  'updatedAt',
+  'passwordChangedAt',
+  'activationExpires',
+  'resetExpires',
+];
 
 export function toExportUser(record) {
   const out = { ...record };
@@ -75,11 +83,20 @@ export function toExportPost(record) {
 }
 
 // Repo field names back to Mongo columns, for import and patchUser. Dates may be Date or ISO.
-const COLUMN_OF = Object.fromEntries(Object.entries(USER_SECRET_COLUMNS).map(([column, name]) => [name, column]));
-const DATE_COLUMNS = new Set(['createdAt', 'updatedAt', 'passwordChangedAt', 'activationExpires', 'resetPasswordExpires']);
+const COLUMN_OF = Object.fromEntries(
+  Object.entries(USER_SECRET_COLUMNS).map(([column, name]) => [name, column]),
+);
+const DATE_COLUMNS = new Set([
+  'createdAt',
+  'updatedAt',
+  'passwordChangedAt',
+  'activationExpires',
+  'resetPasswordExpires',
+]);
 
 export const columnOf = (name) => COLUMN_OF[name] ?? name;
-export const toColumnValue = (column, value) => (DATE_COLUMNS.has(column) ? new Date(value) : value);
+export const toColumnValue = (column, value) =>
+  DATE_COLUMNS.has(column) ? new Date(value) : value;
 
 export function toUserDoc(record, oid) {
   const doc = {};

@@ -6,7 +6,13 @@ import { assertImportable, cleanEmail } from '../rules.js';
 import { createUserRepo } from './users.js';
 import { toRawUser, userIndex } from '../views.js';
 
-const DATE_FIELDS = new Set(['passwordChangedAt', 'activationExpires', 'resetExpires', 'createdAt', 'updatedAt']);
+const DATE_FIELDS = new Set([
+  'passwordChangedAt',
+  'activationExpires',
+  'resetExpires',
+  'createdAt',
+  'updatedAt',
+]);
 
 /**
  * The JSON-file adapter.

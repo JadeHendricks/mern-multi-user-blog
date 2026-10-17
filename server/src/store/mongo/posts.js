@@ -22,7 +22,8 @@ const POPULATE = [
 
 // The document to insert from repo input (used by create and insertMany).
 function buildDoc(data) {
-  if (data._id !== undefined && !isValidId(data._id)) throw new StoreValidationError('Path `_id` is not a valid id.');
+  if (data._id !== undefined && !isValidId(data._id))
+    throw new StoreValidationError('Path `_id` is not a valid id.');
   return {
     _id: oid(data._id ?? newId()),
     user: data.user ? asUserOid(data.user) : undefined,
@@ -30,7 +31,10 @@ function buildDoc(data) {
     title: cleanTitle(data.title),
     tag: data.tag || DEFAULT_TAG,
     description: cleanDescription(data.description),
-    likes: (data.likes ?? []).map((like) => ({ _id: oid(like._id ?? newId()), user: asUserOid(like.user) })),
+    likes: (data.likes ?? []).map((like) => ({
+      _id: oid(like._id ?? newId()),
+      user: asUserOid(like.user),
+    })),
     comments: (data.comments ?? []).map((comment) => ({
       _id: oid(comment._id ?? newId()),
       user: asUserOid(comment.user),
@@ -51,7 +55,8 @@ export function createPostRepo({ User, Post }) {
   function read(docs) {
     const authors = new Map();
     const note = (value) => {
-      if (value && value.name !== undefined) authors.set(idOf(value), { ...value, _id: idOf(value) });
+      if (value && value.name !== undefined)
+        authors.set(idOf(value), { ...value, _id: idOf(value) });
     };
     for (const doc of docs) {
       note(doc.user);
@@ -79,14 +84,22 @@ export function createPostRepo({ User, Post }) {
     },
 
     async list({ cursor, limit } = {}) {
-      const { rows, nextCursor } = await findPage(Post, {}, { cursor, limit, field: 'date', direction: 'desc', populate: POPULATE });
+      const { rows, nextCursor } = await findPage(
+        Post,
+        {},
+        { cursor, limit, field: 'date', direction: 'desc', populate: POPULATE },
+      );
       return { items: views(rows, 'list'), nextCursor };
     },
 
     // Newest first, like the main list (this endpoint used to return oldest first).
     async listByUser(userId, { cursor, limit } = {}) {
       if (!isValidId(userId)) return { items: [], nextCursor: null };
-      const { rows, nextCursor } = await findPage(Post, { user: oid(userId) }, { cursor, limit, field: 'date', direction: 'desc', populate: POPULATE });
+      const { rows, nextCursor } = await findPage(
+        Post,
+        { user: oid(userId) },
+        { cursor, limit, field: 'date', direction: 'desc', populate: POPULATE },
+      );
       return { items: views(rows, 'list'), nextCursor };
     },
 
@@ -105,7 +118,9 @@ export function createPostRepo({ User, Post }) {
       if (fields.image !== undefined) set.image = fields.image || DEFAULT_AVATAR;
       const doc =
         Object.keys(set).length > 0
-          ? await guard(Post.findOneAndUpdate(filter, { $set: set }, { returnDocument: 'after' }).lean())
+          ? await guard(
+              Post.findOneAndUpdate(filter, { $set: set }, { returnDocument: 'after' }).lean(),
+            )
           : await Post.findOne(filter).lean();
       return doc ? toPostView(toPostRecord(doc), new Map(), 'id') : null;
     },
@@ -159,10 +174,22 @@ export function createPostRepo({ User, Post }) {
       const filter = postFilter(id);
       if (!filter || !isValidId(userId)) return null;
       const comment = cleanComment(text);
-      if (!(await User.findOne({ _id: oid(userId) }).select('_id').lean())) return null;
+      if (
+        !(await User.findOne({ _id: oid(userId) })
+          .select('_id')
+          .lean())
+      )
+        return null;
       const doc = await Post.findOneAndUpdate(
         filter,
-        { $push: { comments: { $each: [{ _id: oid(newId()), user: oid(userId), comment, date: new Date() }], $position: 0 } } },
+        {
+          $push: {
+            comments: {
+              $each: [{ _id: oid(newId()), user: oid(userId), comment, date: new Date() }],
+              $position: 0,
+            },
+          },
+        },
         { returnDocument: 'after' },
       )
         .populate(POPULATE)
