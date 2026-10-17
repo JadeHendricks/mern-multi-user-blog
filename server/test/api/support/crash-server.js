@@ -12,7 +12,14 @@ async function main() {
   // child only reads what was already written and takes no lock itself.
   const dataDir = process.env.CRASH_SERVER_DATA_DIR;
   const store = await createStore(
-    { DB_DRIVER: 'json', DATA_DIR: dataDir ?? mkdtempSync(path.join(process.env.DATA_DIR, 'crash-')), BACKUP_KEEP: 10 },
+    {
+      // Most crash cases need no data, so they run on a throwaway JSON store whatever the driver.
+      DB_DRIVER: process.env.CRASH_SERVER_MONGO_URI ? 'mongo' : 'json',
+      DATA_DIR: dataDir ?? mkdtempSync(path.join(process.env.DATA_DIR, 'crash-')),
+      BACKUP_KEEP: 10,
+      // Mongo: the parent's in-memory database, so the child sees the same user.
+      MONGO_URI: process.env.CRASH_SERVER_MONGO_URI,
+    },
     { lock: !dataDir },
   );
   await store.init();

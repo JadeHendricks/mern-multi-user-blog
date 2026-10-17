@@ -1,30 +1,12 @@
-import { isValidId } from '../../lib/ids.js';
 import { StoreError } from '../errors.js';
 import { createFileDb, emptyState } from './file-db.js';
 import { migrate } from './migrations.js';
 import { createPostRepo } from './posts.js';
-import { cleanEmail, createUserRepo } from './users.js';
-import { toRawUser, userIndex } from './views.js';
+import { assertImportable, cleanEmail } from '../rules.js';
+import { createUserRepo } from './users.js';
+import { toRawUser, userIndex } from '../views.js';
 
 const DATE_FIELDS = new Set(['passwordChangedAt', 'activationExpires', 'resetExpires', 'createdAt', 'updatedAt']);
-
-// Checks an import before anything is replaced, so a bad file cannot half-load.
-function assertImportable(data) {
-  const emails = new Set();
-  const ids = new Set();
-  for (const user of data.users) {
-    if (!isValidId(user._id) || ids.has(user._id)) throw new StoreError(`Import has a missing or duplicate user id.`);
-    ids.add(user._id);
-    const email = cleanEmail(user.email);
-    if (emails.has(email)) throw new StoreError('Import has two users with the same email.');
-    emails.add(email);
-  }
-  const postIds = new Set();
-  for (const post of data.posts) {
-    if (!isValidId(post._id) || postIds.has(post._id)) throw new StoreError(`Import has a missing or duplicate post id.`);
-    postIds.add(post._id);
-  }
-}
 
 /**
  * The JSON-file adapter.

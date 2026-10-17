@@ -1,32 +1,13 @@
 import { isValidId, newId } from '../../lib/ids.js';
 import { paginate } from '../../lib/pagination.js';
 import { StoreValidationError } from '../errors.js';
-import { DEFAULT_AVATAR, toCommentView, toLikeView, toPostView, userIndex } from './views.js';
+import { cleanComment, cleanDescription, cleanTitle } from '../rules.js';
+import { DEFAULT_AVATAR, toCommentView, toLikeView, toPostView, userIndex } from '../views.js';
 
-const TITLE_MAX = 100;
 const DEFAULT_TAG = 'general';
 const DEFAULT_IMAGE = DEFAULT_AVATAR;
 
 const iso = (value) => new Date(value).toISOString();
-
-const cleanTitle = (value) => {
-  const title = typeof value === 'string' ? value.trim() : '';
-  if (!title) throw new StoreValidationError('Path `title` is required.');
-  if (title.length > TITLE_MAX) {
-    throw new StoreValidationError(`Path \`title\` is longer than the maximum allowed length (${TITLE_MAX}).`);
-  }
-  return title;
-};
-
-const cleanDescription = (value) => {
-  if (typeof value !== 'string' || value === '') throw new StoreValidationError('Path `description` is required.');
-  return value;
-};
-
-const cleanComment = (value) => {
-  if (typeof value !== 'string' || value === '') throw new StoreValidationError('Path `comment` is required.');
-  return value;
-};
 
 // Newest first, with the id as a tie-break so the order is stable.
 const byDateDesc = (a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : a._id < b._id ? 1 : -1);

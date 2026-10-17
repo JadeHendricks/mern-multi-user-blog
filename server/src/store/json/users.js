@@ -1,33 +1,14 @@
 import { isValidId, newId } from '../../lib/ids.js';
 import { paginate } from '../../lib/pagination.js';
 import { DuplicateEmailError, StoreValidationError } from '../errors.js';
-import { DEFAULT_AVATAR, toPublicUser, toUser, userIndex } from './views.js';
+import { cleanEmail, cleanName, requireHash } from '../rules.js';
+import { DEFAULT_AVATAR, toPublicUser, toUser, userIndex } from '../views.js';
 
-const NAME_MAX = 32;
 const ROLES = new Set(['user', 'admin']);
 const STATUSES = new Set(['pending', 'active']);
 
 const iso = (value) => new Date(value).toISOString();
 
-export const cleanName = (value) => {
-  const name = typeof value === 'string' ? value.trim() : '';
-  if (!name) throw new StoreValidationError('Path `name` is required.');
-  if (name.length > NAME_MAX) {
-    throw new StoreValidationError(`Path \`name\` is longer than the maximum allowed length (${NAME_MAX}).`);
-  }
-  return name;
-};
-
-export const cleanEmail = (value) => {
-  const email = typeof value === 'string' ? value.trim().toLowerCase() : '';
-  if (!email) throw new StoreValidationError('Path `email` is required.');
-  return email;
-};
-
-const requireHash = (value) => {
-  if (typeof value !== 'string' || !value) throw new StoreValidationError('Path `passwordHash` is required.');
-  return value;
-};
 
 // The unique-email rule, checked on the draft so it also holds for writes queued back to back.
 const assertEmailFree = (draft, email, exceptId) => {

@@ -12,7 +12,7 @@ export async function createStore(config, deps) {
       return createJsonStore(config, deps);
     case 'mongo':
       // Loaded on demand so the JSON-only setup never needs a MongoDB driver.
-      throw new Error('mongo driver is added in the next commit');
+      return (await import('./mongo/index.js')).createMongoStore(config);
     default:
       throw new Error(`Unknown DB_DRIVER: ${config.DB_DRIVER}`);
   }

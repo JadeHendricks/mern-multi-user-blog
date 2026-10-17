@@ -23,5 +23,7 @@ export function getStore() {
 }
 
 export const getStoreDir = () => current.dir;
+// The in-memory Mongo database of the current store (mongo driver only).
+export const getStoreMongoUri = () => current.mongoUri;
 
 export { newId };

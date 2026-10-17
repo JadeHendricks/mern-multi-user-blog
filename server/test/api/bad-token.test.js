@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import jwt from 'jsonwebtoken';
 import supertest from 'supertest';
-import { connectDb, disconnectDb, getStoreDir, newId } from './support/db.js';
+import { connectDb, disconnectDb, getStoreDir, getStoreMongoUri, newId } from './support/db.js';
 import { createUserAndLogin, fakeConfig, LONG_DESCRIPTION, loadApp } from './support/helpers.js';
 
 const crashServer = path.join(
@@ -167,6 +167,7 @@ describe('editPost with an unknown post id', () => {
     // Same data folder as this worker, so the child finds the user that protect looks up.
     const port = await startServer({
       CRASH_SERVER_DATA_DIR: getStoreDir(),
+      CRASH_SERVER_MONGO_URI: getStoreMongoUri(),
     });
     const body = JSON.stringify({
       id: newId(),

@@ -21,6 +21,7 @@
     "start": "npm start -w server",
     "test": "npm run test:api && npm run test:client",
     "test:api": "npm run test:api -w server",
+    "test:api:mongo": "npm run test:api:mongo -w server",
     "test:client": "cross-env SKIP_PREFLIGHT_CHECK=true npm test -w client -- --watchAll=false --passWithNoTests",
     "test:e2e": "playwright test",
     "test:e2e:update": "playwright test --update-snapshots",
@@ -29,7 +30,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "npm run lint && npm run test:api && npm run test:client && npm run test:e2e",
+    "check": "npm run lint && npm run test:api && npm run test:api:mongo && npm run test:client && npm run test:e2e",
     "seed": "npm run seed -w server --"
   },
   "repository": {
