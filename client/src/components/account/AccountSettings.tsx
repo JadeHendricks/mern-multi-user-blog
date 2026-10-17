@@ -1,25 +1,33 @@
-import React, { Fragment, useState } from 'react';
+import { Fragment, useState } from 'react';
+import type { ChangeEvent } from 'react';
+import type { PublicUserDto } from '@mern-blog/shared';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
 import { useUpdateProfile } from '../../hooks/useUpdateProfile';
 import { useUpdateSocials } from '../../hooks/useUpdateSocials';
 
-const AccountSettings = ({ user, email }) => {
+interface AccountSettingsProps {
+    // Partial: AccountProfile passes an empty object until the profile has arrived.
+    user: Partial<PublicUserDto>;
+    email: string | undefined;
+}
+
+const AccountSettings = ({ user, email }: AccountSettingsProps) => {
     const updateUser = useUpdateProfile();
-    const updateUserSocials = useUpdateSocials(user._id);
+    const updateUserSocials = useUpdateSocials(user._id ?? '');
 
     // Initial values come from props via lazy state. AccountProfile keys this component by user id,
     // so a different user remounts it instead of leaving the previous user's values in the form.
     const [ userSocials, setUserSocials] = useState(() => ({
-        facebook: user.socials?.facebook || '',
-        twitter: user.socials?.twitter || '',
-        linkedin: user.socials?.linkedin || ''
+        facebook: user.socials?.facebook ?? '',
+        twitter: user.socials?.twitter ?? '',
+        linkedin: user.socials?.linkedin ?? ''
     }));
-    const handleSocialsOnChange = e => setUserSocials({ ...userSocials, [e.target.name]: e.target.value });
+    const handleSocialsOnChange = (e: ChangeEvent<HTMLInputElement>) => { setUserSocials({ ...userSocials, [e.target.name]: e.target.value }); };
     const {facebook, linkedin, twitter} = userSocials;
 
-    const [ name, setName] = useState(() => user.name);
-    const [ avatar, setAvatar] = useState();
-    const [ uploadName, setUploadName] = useState();
+    const [ name, setName] = useState(() => user.name ?? '');
+    const [ avatar, setAvatar] = useState<File | undefined>();
+    const [ uploadName, setUploadName] = useState('');
 
     
     return (
@@ -30,7 +38,7 @@ const AccountSettings = ({ user, email }) => {
                     updateUser.mutate({ name, avatar });
                 } }>
                     <div className="form__group">
-                        <label className="form__label" htmlFor="name" name="name" type="text" placeholder="Name">Name</label>
+                        <label className="form__label" htmlFor="name">Name</label>
                         <input className="form__input" id="name" value={ name || '' } onChange={ e => {
                             const value = e.target.value;
                             setName(value);
@@ -38,12 +46,12 @@ const AccountSettings = ({ user, email }) => {
                     </div>
                     <div className="form__group">
                         <label className="form__label" htmlFor="email">Email</label>
-                        <input className="form__input" id="email" name="email" value={ email || '' } placeholder="yourname@example.com" disabled></input>
+                        <input className="form__input" id="email" name="email" value={ email ?? '' } placeholder="yourname@example.com" disabled></input>
                     </div>
                     <div className="form__group form__photo-upload">
-                        <img className="form__user-photo" src={ uploadUrl('users', user?.avatar) } onError={ onImageError('users') } alt={ user?.name } title={ user?.name } />
+                        <img className="form__user-photo" src={ uploadUrl('users', user.avatar) } onError={ onImageError('users') } alt={ user.name } title={ user.name } />
                         <input className="form__upload" type="file" accept="image/*" id="avatar" name="avatar" onChange={ e => {
-                            const file = e.target.files[0];
+                            const file = e.target.files?.[0];
                             setAvatar(file);
                             setUploadName(e.target.value.slice(12));
                         } } />
