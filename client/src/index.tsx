@@ -1,9 +1,13 @@
-﻿import React from 'react';
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 
-createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+const root = document.getElementById('root');
+// A missing #root already crashed (createRoot(null)); this only says why.
+if (!root) throw new Error('index.html has no #root element');
+
+createRoot(root).render(
+  <StrictMode>
     <App />
-  </React.StrictMode>
+  </StrictMode>
 );
