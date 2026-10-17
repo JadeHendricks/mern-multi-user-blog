@@ -14,7 +14,7 @@
 
   &__title {
     margin: $space-25 0 $space-10;
-    color: $color-green;
+    color: $color-green-dark;
 
     @include respond-to('md') {
       margin: $space-15 0 $space-10;

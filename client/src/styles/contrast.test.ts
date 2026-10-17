@@ -12,7 +12,7 @@ const stylesDir = fileURLToPath(new URL('.', import.meta.url));
 
 const colorNames = [
   'white', 'text', 'muted', 'grey', 'grey-light', 'border', 'surface', 'background',
-  'yellow', 'yellow-dark', 'green', 'green-light', 'green-teal', 'red', 'blue',
+  'yellow', 'yellow-dark', 'green', 'green-dark', 'green-light', 'green-teal', 'orange', 'red', 'blue',
   'focus', 'focus-inverse',
 ] as const;
 type ColorName = (typeof colorNames)[number];
@@ -69,6 +69,10 @@ const pairs: [ColorName, ColorName, number, string][] = [
   ['focus', 'green-light', 3, 'focus ring on the banner (light end)'],
   ['focus', 'green-teal', 3, 'focus ring on the banner (dark end)'],
   ['focus-inverse', 'text', 3, 'focus ring on the dark header'],
+  ['white', 'green-dark', 4.5, 'green buttons and the default tag'],
+  ['background', 'green-dark', 4.5, 'Create Post link in the header'],
+  ['green-dark', 'white', 4.5, 'green links, upload label, login and recover titles'],
+  ['white', 'orange', 4.5, 'travel tag'],
   ['white', 'red', 4.5, 'delete button'],
   ['blue', 'white', 4.5, 'link colour'],
   ['red', 'white', 3, 'heart icon'],

@@ -19,7 +19,7 @@
 
   &__title {
     margin: $space-25 0 $space-40;
-    color: $color-green;
+    color: $color-green-dark;
 
     @include respond-to('sm') {
       margin: $space-20 0;

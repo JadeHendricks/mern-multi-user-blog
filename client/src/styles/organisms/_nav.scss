@@ -132,7 +132,7 @@
   // Filled Create Post link. Written after nav__el so its own values are the ones that count: the
   // link used to also carry `button button--green` and the cascade picked between the two.
   &__el--create {
-    background-color: $color-green;
+    background-color: $color-green-dark;
     border-radius: $radius-pill;
     position: relative;
     text-align: center;
