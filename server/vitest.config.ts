@@ -1,6 +1,5 @@
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
-
 export default defineConfig({
   resolve: {
     // Tests run against the shared package's source, never against a stale shared/dist build.
@@ -9,13 +8,13 @@ export default defineConfig({
     },
   },
   test: {
-    // .ts is new (FEAT-003); the older tests are still .js until they are converted.
+    // .js is only here until the store and unit tests are converted.
     include: ['test/{api,store,unit}/**/*.test.{js,ts}'],
     // One forked process per test file: each file gets a fresh `config`, mongoose and app instance.
     pool: 'forks',
     fileParallelism: false,
-    globalSetup: ['test/api/support/global-setup.js'],
-    setupFiles: ['test/api/support/env.js'],
+    globalSetup: ['test/api/support/global-setup.ts'],
+    setupFiles: ['test/api/support/env.ts'],
     // The first run downloads a MongoDB binary, so the hooks need a long timeout.
     hookTimeout: 600000,
     testTimeout: 30000,

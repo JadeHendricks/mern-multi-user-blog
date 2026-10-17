@@ -138,7 +138,7 @@ Run from the repo root.
   answer `422`. Posts are newest first, users oldest first.
 - Uploaded images are served at `/uploads/posts/<name>` and `/uploads/users/<name>` with a long cache
   lifetime. `default.jpg` is a bundled client asset and is not served from there.
-- API shapes are pinned by `server/test/api/contracts.test.js`; changing it is an API change.
+- API shapes are pinned by `server/test/api/contracts.test.ts`; changing it is an API change.
 
 ## Tests
 

@@ -1,10 +1,12 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import type { Express } from 'express';
 import supertest from 'supertest';
+import type { OwnUserDto } from '@mern-blog/shared';
 import { clearDb, connectDb, disconnectDb, getStore } from './support/db.js';
 import { createUserAndLogin, loadApp } from './support/helpers.js';
 
 describe('socials and profile updates', () => {
-  let app;
+  let app: Express;
 
   beforeAll(async () => {
     await connectDb();
@@ -13,7 +15,8 @@ describe('socials and profile updates', () => {
   beforeEach(clearDb);
   afterAll(disconnectDb);
 
-  const putSocials = (agent, user, body) => agent.put(`/api/user/${user._id}/socials`).send(body);
+  const putSocials = (agent: supertest.Agent, user: OwnUserDto, body: Record<string, unknown>) =>
+    agent.put(`/api/user/${user._id}/socials`).send(body);
 
   it('stores https links and leaves the other networks untouched', async () => {
     const { agent, user } = await createUserAndLogin(app);

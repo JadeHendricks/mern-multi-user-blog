@@ -1,10 +1,11 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import type { Express } from 'express';
 import supertest from 'supertest';
 import { clearDb, connectDb, disconnectDb } from './support/db.js';
 import { loadApp } from './support/helpers.js';
 
 describe('harness', () => {
-  let app;
+  let app: Express;
 
   beforeAll(async () => {
     await connectDb();

@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import type { Express } from 'express';
 import supertest from 'supertest';
-import { clearDb, connectDb, disconnectDb, getStore } from './support/db.js';
+import { clearDb, connectDb, disconnectDb, getStore, rawUser } from './support/db.js';
 import {
   createUserAndLogin,
   fakeConfig,
@@ -11,7 +12,7 @@ import {
 import { extractLink, readLatestMail, readMails, tokenFromLink } from './support/outbox.js';
 
 describe('forgot and reset password', () => {
-  let app;
+  let app: Express;
 
   beforeAll(async () => {
     await connectDb();
@@ -20,7 +21,7 @@ describe('forgot and reset password', () => {
   beforeEach(clearDb);
   afterAll(disconnectDb);
 
-  async function requestReset(user) {
+  async function requestReset(user: { email: string }) {
     const res = await supertest(app).put('/api/auth/forgot-password').send({ email: user.email });
     return { res, token: tokenFromLink(extractLink(readLatestMail(user.email))) };
   }
@@ -78,20 +79,21 @@ describe('forgot and reset password', () => {
 
     // Secrets are only returned when asked for, so no ordinary read can leak the hash.
     const plain = await getStore().users.findByEmail(user.email);
+    if (!plain) throw new Error('user not found');
     for (const key of ['resetHash', 'resetExpires', 'passwordHash'])
       expect(key in plain).toBe(false);
 
-    const raw = await getStore().admin.rawUserByEmail(user.email);
+    const raw = await rawUser(user.email);
     expect(raw.resetHash === token).toBe(false);
-    expect(/^[0-9a-f]{64}$/.test(raw.resetHash)).toBe(true);
-    const minutes = (raw.resetExpires.getTime() - Date.now()) / 60000;
+    expect(/^[0-9a-f]{64}$/.test(raw.resetHash ?? '')).toBe(true);
+    const minutes = ((raw.resetExpires?.getTime() ?? Number.NaN) - Date.now()) / 60000;
     expect(minutes).toBeGreaterThan(28);
     expect(minutes).toBeLessThanOrEqual(30);
 
     await supertest(app)
       .put('/api/auth/reset-password')
       .send({ resetPasswordLink: token, newPassword: 'another-secret-1' });
-    const after = await getStore().admin.rawUserByEmail(user.email);
+    const after = await rawUser(user.email);
     expect('resetHash' in after).toBe(false);
     expect('resetExpires' in after).toBe(false);
     expect(after.passwordChangedAt instanceof Date).toBe(true);
@@ -101,7 +103,7 @@ describe('forgot and reset password', () => {
     const user = fakeUser();
     await registerAndActivate(app, user);
     const { token } = await requestReset(user);
-    const stored = await getStore().admin.rawUserByEmail(user.email);
+    const stored = await rawUser(user.email);
     await getStore().admin.patchUser(stored._id, { resetExpires: new Date(Date.now() - 1000) });
 
     const res = await supertest(app)

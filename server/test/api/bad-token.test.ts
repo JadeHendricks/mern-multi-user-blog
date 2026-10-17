@@ -1,6 +1,8 @@
 import { spawn } from 'node:child_process';
+import type { ChildProcessByStdio } from 'node:child_process';
 import http from 'node:http';
 import path from 'node:path';
+import type { Readable } from 'node:stream';
 import { fileURLToPath } from 'node:url';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import jwt from 'jsonwebtoken';
@@ -11,55 +13,79 @@ import { createUserAndLogin, fakeConfig, LONG_DESCRIPTION, loadApp } from './sup
 const crashServer = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
   'support',
-  'crash-server.js',
+  'crash-server.ts',
 );
 
-let child;
+// The crash-server child plus a promise for its exit, which afterEach awaits.
+type CrashServer = ChildProcessByStdio<null, Readable, Readable> & {
+  exited: Promise<{ code: number | null; signal: NodeJS.Signals | null }>;
+};
+let child: CrashServer | undefined;
 
-// Starts support/crash-server.js with the same fake config as this worker.
-function startServer(extraEnv = {}) {
+// Starts support/crash-server.ts with the same fake config as this worker.
+function startServer(extraEnv: Record<string, string | undefined> = {}): Promise<number> {
   return new Promise((resolve, reject) => {
-    // `--import tsx`: the child imports server sources that are (becoming) TypeScript, which plain
-    // node cannot resolve from `.js` specifiers.
-    child = spawn(process.execPath, ['--import', 'tsx', crashServer], {
+    // `--import tsx`: the child imports server sources that are TypeScript, which plain node
+    // cannot resolve from `.js` specifiers.
+    const spawned = spawn(process.execPath, ['--import', 'tsx', crashServer], {
       env: { ...process.env, ...extraEnv },
       stdio: ['ignore', 'pipe', 'pipe'],
     });
-    child.exited = new Promise((done) =>
-      child.once('exit', (code, signal) => done({ code, signal })),
-    );
+    child = Object.assign(spawned, {
+      exited: new Promise<{ code: number | null; signal: NodeJS.Signals | null }>((done) =>
+        spawned.once('exit', (code, signal) => {
+          done({ code, signal });
+        }),
+      ),
+    });
     // Child output is not forwarded: it can contain stack traces and request details.
-    child.stderr.resume();
+    spawned.stderr.resume();
     let buffer = '';
-    const timer = setTimeout(() => reject(new Error('crash server did not start')), 15000);
-    child.stdout.on('data', (chunk) => {
-      buffer += chunk;
+    const timer = setTimeout(() => {
+      reject(new Error('crash server did not start'));
+    }, 15000);
+    spawned.stdout.on('data', (chunk: Buffer) => {
+      buffer += chunk.toString();
       const match = /PORT=(\d+)/.exec(buffer);
       if (match) {
         clearTimeout(timer);
         resolve(Number(match[1]));
       }
     });
-    child.once('exit', () => clearTimeout(timer));
+    spawned.once('exit', () => {
+      clearTimeout(timer);
+    });
   });
 }
 
 // Resolves { status } when the server answers, or { error } when it hangs up without a response.
-function request(port, method, urlPath, headers = {}, body) {
+function request(
+  port: number,
+  method: string,
+  urlPath: string,
+  headers: http.OutgoingHttpHeaders = {},
+  body?: string,
+): Promise<{ status?: number | undefined; error?: string }> {
   return new Promise((resolve) => {
     const req = http.request({ host: '127.0.0.1', port, method, path: urlPath, headers }, (res) => {
       res.resume();
-      res.on('end', () => resolve({ status: res.statusCode }));
+      res.on('end', () => {
+        resolve({ status: res.statusCode });
+      });
     });
-    req.on('error', (err) => resolve({ error: err.code || err.message }));
-    req.setTimeout(10000, () => req.destroy(new Error('timeout')));
+    req.on('error', (err: NodeJS.ErrnoException) => {
+      resolve({ error: err.code ?? err.message });
+    });
+    req.setTimeout(10000, () => {
+      req.destroy(new Error('timeout'));
+    });
     if (body) req.write(body);
     req.end();
   });
 }
 
 afterEach(async () => {
-  if (child && child.exitCode === null && child.signalCode === null) child.kill('SIGKILL');
+  if (child?.exitCode === null && child.signalCode === null) child.kill('SIGKILL');
   if (child) await child.exited;
   child = undefined;
 });
@@ -73,7 +99,7 @@ describe('protect with an invalid token', () => {
     });
 
     expect(result.status).toBe(401);
-    expect(child.exitCode).toBeNull();
+    expect(child?.exitCode).toBeNull();
     expect((await request(port, 'GET', '/api/nope')).status).toBe(404);
   });
 
@@ -88,7 +114,7 @@ describe('protect with an invalid token', () => {
     });
 
     expect(result.status).toBe(401);
-    expect(child.exitCode).toBeNull();
+    expect(child?.exitCode).toBeNull();
     expect((await request(port, 'GET', '/api/nope')).status).toBe(404);
   });
 
@@ -98,7 +124,7 @@ describe('protect with an invalid token', () => {
     const result = await request(port, 'GET', '/api/user/me', { Cookie: 'authtoken=garbage' });
 
     expect(result.status).toBe(401);
-    expect(child.exitCode).toBeNull();
+    expect(child?.exitCode).toBeNull();
     expect((await request(port, 'GET', '/api/nope')).status).toBe(404);
   });
 });
@@ -183,6 +209,6 @@ describe('editPost with an unknown post id', () => {
 
     expect(result.status).toBe(404);
     // The handler used to send 200 after the 404 and kill the process; Express 5 now contains it.
-    expect(child.exitCode).toBeNull();
+    expect(child?.exitCode).toBeNull();
   });
 });

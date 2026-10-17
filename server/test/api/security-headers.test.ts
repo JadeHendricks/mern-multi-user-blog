@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import supertest from 'supertest';
 import { createApp } from '../../src/app.js';
+import { stubStore } from './support/helpers.js';
 
 // The headers do not depend on the store, so a bare app is enough here.
-const app = createApp({ store: { users: {}, posts: {}, admin: {} } });
+const app = createApp({ store: stubStore() });
 
 describe('security headers', () => {
   it('sends an explicit CSP that allows the Google Fonts hosts and no eval', async () => {

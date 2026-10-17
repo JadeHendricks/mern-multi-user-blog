@@ -5,7 +5,7 @@ import { z } from 'zod';
 // and derive from these types (see server/src/store/types.ts).
 //
 // Schemas are not strict on purpose: the Mongo adapter may add bookkeeping keys such as `__v`.
-// The exact key sets are pinned by server/test/api/contracts.test.js and shared/test/dto.test.ts.
+// The exact key sets are pinned by server/test/api/contracts.test.ts and shared/test/dto.test.ts.
 
 /** 24-character lowercase hex id, the same on every storage adapter. */
 export const idSchema = z.string().regex(/^[0-9a-f]{24}$/);

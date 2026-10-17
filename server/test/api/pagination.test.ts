@@ -1,5 +1,7 @@
 import supertest from 'supertest';
+import type { OwnUserDto, PostDto, PublicUserDto } from '@mern-blog/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import type { Express } from 'express';
 import { clearDb, connectDb, disconnectDb, getStore } from './support/db.js';
 import {
   createUserAndLogin,
@@ -10,8 +12,8 @@ import {
 } from './support/helpers.js';
 
 describe('opt-in pagination', () => {
-  let app;
-  let alice;
+  let app: Express;
+  let alice: OwnUserDto;
 
   beforeAll(async () => {
     await connectDb();
@@ -23,12 +25,13 @@ describe('opt-in pagination', () => {
     // Five posts by alice; two share a date so a cursor has to cope with ties.
     const dates = ['2025-12-01', '2025-12-02', '2025-12-03', '2025-12-03', '2025-12-04'];
     for (const [i, date] of dates.entries()) {
-      await getStore().posts.create({
+      const fields = {
         user: alice._id,
         title: `Post ${i + 1}`,
         description: LONG_DESCRIPTION,
         date: new Date(`${date}T09:00:00.000Z`),
-      });
+      };
+      await getStore().posts.create(fields);
     }
     // Two more activated users, plus one that stays pending.
     for (let i = 0; i < 2; i++) await registerAndActivate(app, fakeUser());
@@ -36,16 +39,16 @@ describe('opt-in pagination', () => {
   });
   afterAll(disconnectDb);
 
-  const walk = async (url, listKey) => {
-    const seen = [];
-    let cursor;
+  const walk = async (url: string, listKey: string) => {
+    const seen: string[] = [];
+    let cursor: string | undefined;
     let pages = 0;
     do {
       const res = await supertest(app)
         .get(url)
         .query({ limit: 2, ...(cursor && { cursor }) });
       expect(res.status).toBe(200);
-      seen.push(...res.body[listKey].map((item) => item._id));
+      seen.push(...res.body[listKey].map((item: { _id: string }) => item._id));
       cursor = res.body.nextCursor ?? undefined;
       pages += 1;
     } while (cursor);
@@ -70,12 +73,12 @@ describe('opt-in pagination', () => {
     const mine = await supertest(app).get(`/api/post/user/${alice._id}`);
     const users = await supertest(app).get('/api/user');
 
-    const dates = posts.body.posts.map((post) => post.date);
+    const dates = posts.body.posts.map((post: PostDto) => post.date);
     expect(dates).toEqual([...dates].sort().reverse());
-    expect(mine.body.posts.map((post) => post._id)).toEqual(
-      posts.body.posts.map((post) => post._id),
+    expect(mine.body.posts.map((post: PostDto) => post._id)).toEqual(
+      posts.body.posts.map((post: PostDto) => post._id),
     );
-    const joined = users.body.users.map((user) => user.createdAt);
+    const joined = users.body.users.map((user: PublicUserDto) => user.createdAt);
     expect(joined).toEqual([...joined].sort());
     expect(users.body.users[0]._id).toBe(alice._id);
   });
@@ -84,7 +87,7 @@ describe('opt-in pagination', () => {
     ['/api/post', 'posts', 5, 3],
     ['/api/user', 'users', 3, 2],
   ])('pages %s with limit=2 and visits every item once', async (url, key, total, pages) => {
-    const all = (await supertest(app).get(url)).body[key].map((item) => item._id);
+    const all = (await supertest(app).get(url)).body[key].map((item: { _id: string }) => item._id);
 
     const walked = await walk(url, key);
 
@@ -95,7 +98,7 @@ describe('opt-in pagination', () => {
 
   it("pages one user's posts, including the two that share a date", async () => {
     const all = (await supertest(app).get(`/api/post/user/${alice._id}`)).body.posts.map(
-      (post) => post._id,
+      (post: PostDto) => post._id,
     );
 
     const walked = await walk(`/api/post/user/${alice._id}`, 'posts');

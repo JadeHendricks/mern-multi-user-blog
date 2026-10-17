@@ -1,5 +1,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import type { Express } from 'express';
 import supertest from 'supertest';
+import type { CommentDto, LikeDto } from '@mern-blog/shared';
 import { clearDb, connectDb, disconnectDb, newId } from './support/db.js';
 import {
   createPost,
@@ -14,7 +16,7 @@ import { extractLink, readLatestMail, tokenFromLink } from './support/outbox.js'
 // unchanged on every storage adapter, so a storage swap cannot change what the client receives.
 // Key names only, never values. `__v` (a Mongoose bookkeeping field) is deliberately not part of
 // the contract and is stripped before comparing.
-const keysOf = (object) =>
+const keysOf = (object: object) =>
   Object.keys(object)
     .filter((key) => key !== '__v')
     .sort();
@@ -35,7 +37,7 @@ const POST_KEYS = [
 const COMMENT_KEYS = ['_id', 'avatar', 'comment', 'date', 'name', 'userId'];
 
 describe('response shape contract', () => {
-  let app;
+  let app: Express;
 
   beforeAll(async () => {
     await connectDb();
@@ -268,7 +270,10 @@ describe('response shape contract', () => {
 
       const second = await bob.agent.put(`/api/post/like/${post._id}`);
       expect(second.body.results).toBe(2);
-      expect(second.body.likes.map((like) => like.user)).toEqual([bob.user._id, alice.user._id]);
+      expect(second.body.likes.map((like: LikeDto) => like.user)).toEqual([
+        bob.user._id,
+        alice.user._id,
+      ]);
 
       const again = await bob.agent.put(`/api/post/like/${post._id}`);
       expect(again.status).toBe(400);
@@ -299,7 +304,7 @@ describe('response shape contract', () => {
         .post(`/api/post/comment/${post._id}`)
         .send({ comment: 'second' });
       expect(two.body.results).toBe(2);
-      expect(two.body.comment.map((item) => item.comment)).toEqual(['second', 'first']);
+      expect(two.body.comment.map((item: CommentDto) => item.comment)).toEqual(['second', 'first']);
       expect(two.body.comment[0].userId).toBe(alice.user._id);
       expect(two.body.comment[0].name).toBe(alice.user.name);
       expect(two.body.comment[0].avatar).toBe(alice.user.avatar);

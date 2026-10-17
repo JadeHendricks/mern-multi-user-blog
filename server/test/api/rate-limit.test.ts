@@ -1,10 +1,11 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import type { Express } from 'express';
 import supertest from 'supertest';
 import { clearDb, connectDb, disconnectDb } from './support/db.js';
 import { fakeUser, loadApp } from './support/helpers.js';
 
 describe('auth rate limiter', () => {
-  let app;
+  let app: Express;
   const original = process.env.AUTH_RATE_LIMIT_MAX;
 
   beforeAll(async () => {

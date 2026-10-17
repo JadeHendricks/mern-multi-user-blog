@@ -1,7 +1,9 @@
 import { existsSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import type { Express } from 'express';
 import supertest from 'supertest';
+import type { PostDto } from '@mern-blog/shared';
 import { clearDb, connectDb, disconnectDb, getStore, newId } from './support/db.js';
 import {
   createPost,
@@ -10,16 +12,17 @@ import {
   loadApp,
   TINY_PNG,
 } from './support/helpers.js';
+import { dataDir } from './support/store.js';
 
 const clientPostImages = path.resolve(
   import.meta.dirname,
   '../../../client/src/assets/images/posts',
 );
-const list = (dir) => (existsSync(dir) ? readdirSync(dir).sort() : []);
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const list = (dir: string) => (existsSync(dir) ? readdirSync(dir).sort() : []);
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 describe('posts', () => {
-  let app;
+  let app: Express;
 
   beforeAll(async () => {
     await connectDb();
@@ -88,7 +91,7 @@ describe('posts', () => {
     expect(res.status).toBe(201);
     expect(res.body.post.image).toMatch(/^post-[0-9a-f]{32}\.png$/);
 
-    const uploaded = path.join(process.env.DATA_DIR, 'uploads', 'posts', res.body.post.image);
+    const uploaded = path.join(dataDir(), 'uploads', 'posts', res.body.post.image);
     expect(existsSync(uploaded)).toBe(true);
     expect(list(clientPostImages)).toEqual(beforeClient);
   });
@@ -141,7 +144,7 @@ describe('posts', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.results).toBe(3);
-    expect(res.body.posts.map((p) => p.title)).toEqual(['Third', 'Second', 'First']);
+    expect(res.body.posts.map((p: PostDto) => p.title)).toEqual(['Third', 'Second', 'First']);
   });
 
   it('lists the posts of one user', async () => {
@@ -156,7 +159,7 @@ describe('posts', () => {
     expect(res.status).toBe(200);
     expect(res.body.message).toBe('success');
     expect(res.body.results).toBe(2);
-    expect(res.body.posts.map((p) => p.title).sort()).toEqual(['Alice 1', 'Alice 2']);
+    expect(res.body.posts.map((p: PostDto) => p.title).sort()).toEqual(['Alice 1', 'Alice 2']);
   });
 
   it('edits a post as its owner (id is read from the body)', async () => {
@@ -193,9 +196,7 @@ describe('posts', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.post.image).toMatch(/^post-[0-9a-f]{32}\.png$/);
-    expect(
-      existsSync(path.join(process.env.DATA_DIR, 'uploads', 'posts', res.body.post.image)),
-    ).toBe(true);
+    expect(existsSync(path.join(dataDir(), 'uploads', 'posts', res.body.post.image))).toBe(true);
     expect(list(clientPostImages)).toEqual(beforeClient);
   });
 
@@ -234,7 +235,7 @@ describe('posts', () => {
 });
 
 describe('length limits', () => {
-  let app;
+  let app: Express;
 
   beforeAll(async () => {
     await connectDb();
@@ -258,7 +259,8 @@ describe('length limits', () => {
   });
 
   it('rejects a 33-character user name at the storage level', async () => {
-    const user = (name, email) => getStore().users.create({ name, email, passwordHash: 'x' });
+    const user = (name: string, email: string) =>
+      getStore().users.create({ name, email, passwordHash: 'x' });
 
     await expect(user('n'.repeat(33), 'long@example.test')).rejects.toThrow(
       /maximum allowed length/,

@@ -30,7 +30,7 @@ import {
   type PostDto,
 } from '../src/index.js';
 
-// Key sets pinned by server/test/api/contracts.test.js. Both sides must stay in step: a key added to
+// Key sets pinned by server/test/api/contracts.test.ts. Both sides must stay in step: a key added to
 // an API body has to be added to the schema, and to that contract test.
 const keysOf = (schema: { shape: Record<string, unknown> }) => Object.keys(schema.shape).sort();
 

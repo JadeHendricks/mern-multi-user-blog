@@ -93,6 +93,20 @@ export default [
     },
   },
   {
+    // supertest types every response body as `any` (it is whatever the server sent), and the tests
+    // assert on those bodies directly (`res.body.user.email`). The four `no-unsafe-*` rules would
+    // fire on every one of those reads. They stay on for src, scripts and shared; `no-explicit-any`
+    // stays on here too, so an `any` can only come from a library, never be written in a test.
+    // `bodyOf<T>()` in test/api/support/helpers.ts types a body where it flows into other code.
+    files: ['server/test/**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+    },
+  },
+  {
     // The repo contract (store/types.ts) is async for every adapter. The JSON adapter answers from
     // memory, but its methods stay `async` on purpose: a throw (for example "store not initialised")
     // must reach the caller as a rejected promise, never as a synchronous exception.

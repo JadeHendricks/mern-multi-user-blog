@@ -1,19 +1,22 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import type { Express } from 'express';
 import supertest from 'supertest';
+import type { PostDto, PublicUserDto } from '@mern-blog/shared';
 import { clearDb, connectDb, disconnectDb } from './support/db.js';
 import { createPost, createUserAndLogin, loadApp } from './support/helpers.js';
+import type { Session } from './support/helpers.js';
 import { extractLink, readLatestMail, tokenFromLink } from './support/outbox.js';
 
 // These tests pin KEY NAMES only, never values. Tokens, hashes and emails are not printed:
 // anything sensitive is compared inside the test and only a boolean reaches the assertion.
-const keysOf = (object) => Object.keys(object).sort();
+const keysOf = (object: object) => Object.keys(object).sort();
 
 describe('public user payloads expose only the public fields', () => {
-  let app;
-  let alice;
-  let bob;
-  let post;
-  let resetToken;
+  let app: Express;
+  let alice: Session;
+  let bob: Session;
+  let post: PostDto;
+  let resetToken: string;
 
   beforeAll(async () => {
     await connectDb();
@@ -56,7 +59,7 @@ describe('public user payloads expose only the public fields', () => {
   it('no secret field reaches /api/user or /api/user/:id, and a made-up token resets nothing', async () => {
     const one = await supertest(app).get(`/api/user/${alice.user._id}`);
     const all = await supertest(app).get('/api/user');
-    const fromList = all.body.users.find((user) => user._id === alice.user._id);
+    const fromList = all.body.users.find((user: PublicUserDto) => user._id === alice.user._id);
 
     expect('resetPasswordLink' in one.body.user).toBe(false);
     expect('resetPasswordLink' in fromList).toBe(false);

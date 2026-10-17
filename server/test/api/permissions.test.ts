@@ -1,14 +1,17 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import type { Express } from 'express';
 import supertest from 'supertest';
+import type { PostDto } from '@mern-blog/shared';
 import { clearDb, connectDb, disconnectDb } from './support/db.js';
 import { createPost, createUserAndLogin, LONG_DESCRIPTION, loadApp } from './support/helpers.js';
+import type { Session } from './support/helpers.js';
 
 describe('permissions', () => {
-  let app;
-  let alice;
-  let bob;
-  let post;
-  let commentId;
+  let app: Express;
+  let alice: Session;
+  let bob: Session;
+  let post: PostDto;
+  let commentId: string;
 
   beforeAll(async () => {
     await connectDb();

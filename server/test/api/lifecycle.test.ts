@@ -7,8 +7,8 @@ describe('startServer', () => {
   it('does not listen until connect has resolved', async () => {
     const app = express();
     const listen = vi.spyOn(app, 'listen');
-    let release;
-    const connect = vi.fn(() => new Promise((resolve) => (release = resolve)));
+    let release: () => void = () => undefined;
+    const connect = vi.fn(() => new Promise<void>((resolve) => (release = resolve)));
 
     const starting = startServer({ app, connect, port: 0 });
     await new Promise((resolve) => setTimeout(resolve, 50));
@@ -36,8 +36,8 @@ describe('startServer', () => {
 
 describe('createShutdown', () => {
   it('closes the server, closes the store and exits 0', async () => {
-    const store = { close: vi.fn(async () => {}) };
-    const server = await startServer({ app: express(), connect: async () => {}, port: 0 });
+    const store = { close: vi.fn(() => Promise.resolve()) };
+    const server = await startServer({ app: express(), connect: () => Promise.resolve(), port: 0 });
     const exit = vi.fn();
 
     await createShutdown({ server, store, exit })();

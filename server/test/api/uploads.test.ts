@@ -2,14 +2,16 @@ import { existsSync, readdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import supertest from 'supertest';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import type { Express } from 'express';
 import { clearDb, connectDb, disconnectDb, getStore } from './support/db.js';
 import { createUserAndLogin, LONG_DESCRIPTION, loadApp, TINY_PNG } from './support/helpers.js';
+import { dataDir } from './support/store.js';
 
-const uploadPath = (sub, name) => path.join(process.env.DATA_DIR, 'uploads', sub, name);
+const uploadPath = (sub: string, name: string) => path.join(dataDir(), 'uploads', sub, name);
 const png = { filename: 'tiny.png', contentType: 'image/png' };
 
 describe('uploads', () => {
-  let app;
+  let app: Express;
 
   beforeAll(async () => {
     await connectDb();
@@ -18,7 +20,7 @@ describe('uploads', () => {
   beforeEach(clearDb);
   afterAll(disconnectDb);
 
-  const createWithImage = (agent, file = TINY_PNG, options = png) =>
+  const createWithImage = (agent: supertest.Agent, file: Buffer = TINY_PNG, options = png) =>
     agent
       .post('/api/post')
       .field('title', 'With image')
@@ -27,14 +29,14 @@ describe('uploads', () => {
 
   it('answers 413 JSON for a file over 2 MB and stores nothing', async () => {
     const { agent } = await createUserAndLogin(app);
-    const before = readdirSync(path.join(process.env.DATA_DIR, 'uploads', 'posts'));
+    const before = readdirSync(path.join(dataDir(), 'uploads', 'posts'));
 
     const res = await createWithImage(agent, Buffer.alloc(3 * 1024 * 1024, 1));
 
     expect(res.status).toBe(413);
     expect(res.headers['content-type']).toMatch(/json/);
     expect(res.body.message).toBeDefined();
-    expect(readdirSync(path.join(process.env.DATA_DIR, 'uploads', 'posts'))).toEqual(before);
+    expect(readdirSync(path.join(dataDir(), 'uploads', 'posts'))).toEqual(before);
     expect((await getStore().admin.counts()).posts).toBe(0);
   });
 

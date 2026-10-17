@@ -1,10 +1,11 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import type { Express } from 'express';
 import supertest from 'supertest';
 import { clearDb, connectDb, disconnectDb, newId } from './support/db.js';
 import { createPost, createUserAndLogin, loadApp } from './support/helpers.js';
 
 describe('comments', () => {
-  let app;
+  let app: Express;
 
   beforeAll(async () => {
     await connectDb();
@@ -25,7 +26,7 @@ describe('comments', () => {
     expect(first.body.results).toBe(1);
     expect(second.body.results).toBe(2);
     // The response key is the singular `comment`, and it holds the whole array.
-    expect(second.body.comment.map((c) => c.comment)).toEqual(['Two', 'One']);
+    expect(second.body.comment.map((c: { comment: string }) => c.comment)).toEqual(['Two', 'One']);
     expect(second.body.comment[0].name).toBe(user.name);
     expect(second.body.comment[0].userId).toBe(user._id);
     expect(second.body.comment[0].avatar).toBe('default.jpg');
@@ -92,7 +93,7 @@ describe('comments', () => {
 });
 
 describe('likes', () => {
-  let app;
+  let app: Express;
 
   beforeAll(async () => {
     await connectDb();

@@ -1,12 +1,12 @@
-// Runs in every test worker BEFORE the test file (and therefore before app.js) is loaded.
-// The app reads its settings from process.env (see src/config.js), so the fake values go there.
+// Runs in every test worker BEFORE the test file (and therefore before app.ts) is loaded.
+// The app reads its settings from process.env (see src/config.ts), so the fake values go there.
 import { randomBytes } from 'node:crypto';
 import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterAll } from 'vitest';
 
-const fake = (label) => `test-${label}-${randomBytes(16).toString('hex')}`;
+const fake = (label: string): string => `test-${label}-${randomBytes(16).toString('hex')}`;
 
 const runDir = mkdtempSync(path.join(tmpdir(), 'mern-blog-test-'));
 for (const sub of ['outbox']) mkdirSync(path.join(runDir, sub));
@@ -20,7 +20,7 @@ Object.assign(process.env, {
   EMAIL_REPLY: 'reply@example.test',
   JWT_SECRET: fake('jwt'),
   COOKIE_EXPIRES_IN: '1',
-  // High so normal tests never hit the auth limiter; rate-limit.test.js lowers it.
+  // High so normal tests never hit the auth limiter; rate-limit.test.ts lowers it.
   AUTH_RATE_LIMIT_MAX: '1000',
   MAIL_TRANSPORT: 'file',
   // Mail goes to <DATA_DIR>/outbox and uploads to <DATA_DIR>/uploads, so nothing lands in client/.

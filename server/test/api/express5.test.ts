@@ -1,13 +1,20 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Express } from 'express';
 import supertest from 'supertest';
 import { createApp } from '../../src/app.js';
 import { clearDb, connectDb, disconnectDb } from './support/db.js';
-import { createPost, createUserAndLogin, LONG_DESCRIPTION, loadApp } from './support/helpers.js';
+import {
+  createPost,
+  createUserAndLogin,
+  LONG_DESCRIPTION,
+  loadApp,
+  stubStore,
+} from './support/helpers.js';
 
 // These replace the removed sanitizer middleware (xss-clean, express-mongo-sanitize, hpp) and cover
 // the Express 5 behaviour changes. They run on both drivers like the rest of test/api.
 describe('express 5 behaviour', () => {
-  let app;
+  let app: Express;
 
   beforeAll(async () => {
     await connectDb();
@@ -59,14 +66,14 @@ describe('express 5 behaviour', () => {
   });
 
   describe('empty bodies', () => {
-    it.each([
+    it.each<['POST' | 'PUT', string]>([
       ['POST', '/api/auth/register'],
       ['POST', '/api/auth/account-activation'],
       ['POST', '/api/auth/login'],
       ['PUT', '/api/auth/forgot-password'],
       ['PUT', '/api/auth/reset-password'],
     ])('%s %s without a body does not answer 500', async (method, url) => {
-      const res = await supertest(app)[method.toLowerCase()](url);
+      const res = await supertest(app)[method === 'POST' ? 'post' : 'put'](url);
       expect(res.status).toBeGreaterThanOrEqual(400);
       expect(res.status).toBeLessThan(500);
     });
@@ -93,17 +100,13 @@ describe('express 5 behaviour', () => {
     });
 
     it('answers an unexpected async throw with a generic 500 and keeps serving', async () => {
-      const failing = {
+      const failing = stubStore({
         users: {
-          findByEmail: async () => {
-            throw new Error('secret internal detail');
-          },
+          findByEmail: () => Promise.reject(new Error('secret internal detail')),
         },
-        posts: {},
-        admin: {},
-      };
+      });
       const broken = createApp({ store: failing });
-      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
       const res = await supertest(broken)
         .post('/api/auth/login')

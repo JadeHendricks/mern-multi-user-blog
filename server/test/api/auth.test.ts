@@ -1,19 +1,24 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import type { Express } from 'express';
 import jwt from 'jsonwebtoken';
 import supertest from 'supertest';
-import { clearDb, connectDb, disconnectDb, getStore } from './support/db.js';
+import { z } from 'zod';
+import { clearDb, connectDb, disconnectDb, getStore, rawUser } from './support/db.js';
 import {
+  authCookie,
   createUserAndLogin,
   fakeConfig,
   fakeUser,
   loadApp,
   login,
   registerAndActivate,
+  setCookies,
+  tokenOfCookie,
 } from './support/helpers.js';
 import { extractLink, readLatestMail, readMails, tokenFromLink } from './support/outbox.js';
 
 describe('auth', () => {
-  let app;
+  let app: Express;
 
   beforeAll(async () => {
     await connectDb();
@@ -77,14 +82,15 @@ describe('auth', () => {
       const token = tokenFromLink(extractLink(mail));
       expect(/^[0-9a-f]{64}$/.test(token)).toBe(true);
       expect(mail.html.includes(user.password)).toBe(false);
+      // eslint-disable-next-line @typescript-eslint/prefer-includes -- the assertion stays as it was written
       expect(/eyJ/.test(mail.html)).toBe(false);
 
       // Only the hash is stored, and the password is a bcrypt hash.
-      const raw = await getStore().admin.rawUserByEmail(user.email);
+      const raw = await rawUser(user.email);
       expect(raw.status).toBe('pending');
       expect(raw.activationHash === token).toBe(false);
-      expect(/^[0-9a-f]{64}$/.test(raw.activationHash)).toBe(true);
-      expect(raw.passwordHash.startsWith('$2')).toBe(true);
+      expect(/^[0-9a-f]{64}$/.test(raw.activationHash ?? '')).toBe(true);
+      expect(raw.passwordHash?.startsWith('$2')).toBe(true);
     });
 
     it('registering again while pending refreshes the link and the old link stops working', async () => {
@@ -159,7 +165,7 @@ describe('auth', () => {
       const user = fakeUser();
       await supertest(app).post('/api/auth/register').send(user);
       const token = tokenFromLink(extractLink(readLatestMail(user.email)));
-      const stored = await getStore().admin.rawUserByEmail(user.email);
+      const stored = await rawUser(user.email);
       await getStore().admin.patchUser(stored._id, {
         activationExpires: new Date(Date.now() - 1000),
       });
@@ -211,7 +217,7 @@ describe('auth', () => {
       expect(res.body.user.name).toBe(user.name);
       expect('password' in res.body.user).toBe(false);
 
-      const cookie = res.headers['set-cookie'].find((c) => c.startsWith('authtoken='));
+      const cookie = setCookies(res).find((c) => c.startsWith('authtoken='));
       expect(cookie).toBeDefined();
       expect(cookie).toMatch(/HttpOnly/i);
       expect(cookie).toMatch(/SameSite=Lax/i);
@@ -226,11 +232,11 @@ describe('auth', () => {
         .post('/api/auth/login')
         .send({ email: user.email, password: user.password });
 
-      const cookie = res.headers['set-cookie'].find((c) => c.startsWith('authtoken='));
-      const token = cookie.split(';')[0].slice('authtoken='.length);
-      const { exp, iat } = jwt.decode(token);
+      const cookie = authCookie(res);
+      const token = tokenOfCookie(cookie);
+      const { exp, iat } = z.object({ exp: z.number(), iat: z.number() }).parse(jwt.decode(token));
       expect(exp - iat).toBe(Number(fakeConfig().COOKIE_EXPIRES_IN) * 86400);
-      const expires = new Date(/Expires=([^;]+)/i.exec(cookie)[1]).getTime();
+      const expires = new Date(/Expires=([^;]+)/i.exec(cookie)?.[1] ?? '').getTime();
       expect(Math.abs(expires - exp * 1000)).toBeLessThan(5000);
     });
 
@@ -253,10 +259,7 @@ describe('auth', () => {
       const login = await supertest(app)
         .post('/api/auth/login')
         .send({ email: user.email, password: user.password });
-      const token = login.headers['set-cookie']
-        .find((c) => c.startsWith('authtoken='))
-        .split(';')[0]
-        .slice('authtoken='.length);
+      const token = tokenOfCookie(authCookie(login));
 
       const me = await supertest(app).get('/api/user/me').set('Authorization', `Bearer ${token}`);
 
@@ -308,7 +311,7 @@ describe('auth', () => {
       expect(res.status).toBe(200);
       expect(res.body.message).toBe('success');
       expect(res.headers.deprecation).toBeUndefined();
-      const cookie = res.headers['set-cookie'].find((c) => c.startsWith('authtoken='));
+      const cookie = authCookie(res);
       expect(cookie.startsWith('authtoken=;')).toBe(true);
       expect(cookie).toMatch(/HttpOnly/i);
       expect(cookie).toMatch(/SameSite=Lax/i);
@@ -324,7 +327,7 @@ describe('auth', () => {
 
       expect(res.status).toBe(200);
       expect(res.headers.deprecation).toBe('true');
-      const cookie = res.headers['set-cookie'].find((c) => c.startsWith('authtoken='));
+      const cookie = authCookie(res);
       expect(cookie.startsWith('authtoken=;')).toBe(true);
       expect((await agent.get('/api/auth/isloggedin')).status).toBe(401);
     });

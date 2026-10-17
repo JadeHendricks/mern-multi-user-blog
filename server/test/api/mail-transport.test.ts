@@ -1,28 +1,32 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { MockInstance } from 'vitest';
+import type { Express } from 'express';
 import sendGridMail from '@sendgrid/mail';
 import supertest from 'supertest';
 import { createMailer } from '../../src/lib/mailer.js';
+import type { MailerSettings } from '../../src/lib/mailer.js';
 import { clearDb, connectDb, disconnectDb } from './support/db.js';
 import { fakeConfig, fakeUser, loadApp } from './support/helpers.js';
 import { outboxDir } from './support/outbox.js';
+import { dataDir } from './support/store.js';
 
 // The mailer is handed to the app, so each transport gets its own app instead of flipping an env var.
-const mailSettings = (overrides = {}) => ({
+const mailSettings = (overrides: Partial<MailerSettings> = {}): MailerSettings => ({
   MAIL_TRANSPORT: 'file',
-  DATA_DIR: process.env.DATA_DIR,
-  EMAIL_FROM: process.env.EMAIL_FROM,
+  DATA_DIR: dataDir(),
+  EMAIL_FROM: fakeConfig().EMAIL_FROM,
   EMAIL_REPLY: process.env.EMAIL_REPLY,
   SG_API_KEY: process.env.SG_API_KEY,
   ...overrides,
 });
 
 describe('mail transport', () => {
-  let fileApp;
-  let sendgridApp;
-  let send;
-  let setApiKey;
+  let fileApp: Express;
+  let sendgridApp: Express;
+  let send: MockInstance<typeof sendGridMail.send>;
+  let setApiKey: MockInstance<typeof sendGridMail.setApiKey>;
 
   beforeAll(async () => {
     await connectDb();
@@ -32,7 +36,9 @@ describe('mail transport', () => {
   beforeEach(async () => {
     await clearDb();
     // Every SendGrid call in this file is stubbed: no request ever leaves the machine.
-    send = vi.spyOn(sendGridMail, 'send').mockResolvedValue([{ statusCode: 202 }]);
+    send = vi
+      .spyOn(sendGridMail, 'send')
+      .mockResolvedValue([{ statusCode: 202, body: {}, headers: {} }, {}]);
     setApiKey = vi.spyOn(sendGridMail, 'setApiKey');
   });
   afterEach(() => {
@@ -40,7 +46,17 @@ describe('mail transport', () => {
   });
   afterAll(disconnectDb);
 
-  const filesIn = (dir) => (existsSync(dir) ? readdirSync(dir) : []);
+  // The mail handed to the stubbed SendGrid client by its first call.
+  const firstSent = () => {
+    const call = send.mock.calls[0];
+    if (!call) throw new Error('SendGrid was not called.');
+    const [mail] = call;
+    // The mailer always sends one message, never a batch.
+    if (Array.isArray(mail)) throw new Error('SendGrid was called with a batch.');
+    return mail;
+  };
+
+  const filesIn = (dir: string) => (existsSync(dir) ? readdirSync(dir) : []);
 
   it('uses SendGrid exactly once and writes no file with the sendgrid transport', async () => {
     const outboxBefore = filesIn(outboxDir());
@@ -49,7 +65,7 @@ describe('mail transport', () => {
     const res = await supertest(sendgridApp).post('/api/auth/register').send(user);
     expect(res.status).toBe(200);
     expect(send).toHaveBeenCalledTimes(1);
-    const mail = send.mock.calls[0][0];
+    const mail = firstSent();
     expect(mail.to).toBe(user.email);
     expect(mail.from).toBe(fakeConfig().EMAIL_FROM);
     expect(mail.replyTo).toBe(process.env.EMAIL_REPLY);
@@ -80,7 +96,7 @@ describe('mail transport', () => {
       .send({ email: user.email });
     expect(res.status).toBe(200);
     expect(send).toHaveBeenCalledTimes(1);
-    expect(send.mock.calls[0][0].subject).toBe('Password Reset link');
+    expect(firstSent().subject).toBe('Password Reset link');
   });
 
   it('writes a JSON file and does not call SendGrid with the file transport', async () => {
@@ -91,7 +107,9 @@ describe('mail transport', () => {
     expect(setApiKey).not.toHaveBeenCalled();
     const files = filesIn(outboxDir());
     expect(files).toHaveLength(before + 1);
-    const written = JSON.parse(readFileSync(path.join(outboxDir(), files.sort().at(-1)), 'utf8'));
+    const written = JSON.parse(
+      readFileSync(path.join(outboxDir(), files.sort().at(-1) ?? ''), 'utf8'),
+    );
     expect(Object.keys(written).sort()).toEqual(['createdAt', 'from', 'html', 'subject', 'to']);
     expect(written.to).toBe(user.email);
     expect(written.from).toBe(process.env.EMAIL_FROM);
