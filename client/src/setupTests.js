@@ -1,1 +1,2 @@
-// Vitest setup file. Matchers such as jest-dom are registered here when a test needs them.
+// Vitest setup file. Registers the jest-dom matchers (toBeInTheDocument, toHaveValue, ...).
+import '@testing-library/jest-dom/vitest';
