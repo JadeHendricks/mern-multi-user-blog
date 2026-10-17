@@ -3,7 +3,8 @@ const { defineConfig, devices } = require('@playwright/test');
 const desktopOnly = ['**/smoke.spec.js', '**/a11y.spec.js'];
 
 // The client has to be served on exactly http://localhost:3000: AuthState.js hard-codes that origin
-// in its public-route allow-list (B14), and the CRA proxy forwards /api to the API on port 5000.
+// in its public-route allow-list (B14), and the Vite dev proxy (client/vite.config.mjs) forwards
+// /api and /uploads to the API on port 5000.
 module.exports = defineConfig({
   testDir: 'e2e',
   outputDir: 'e2e/test-results',
@@ -60,13 +61,11 @@ module.exports = defineConfig({
       stderr: 'pipe',
     },
     {
-      command: 'npm run start -w client',
+      // Vite dev server on the fixed port 3000 (strictPort in client/vite.config.mjs).
+      command: 'npm run dev -w client',
       url: 'http://localhost:3000',
       reuseExistingServer: false,
       timeout: 300000,
-      // SKIP_PREFLIGHT_CHECK: CRA 3.4 aborts because the root eslint 10 sits above client/ in the
-      // dependency tree. The client has its own eslint 6; the check does not apply to this layout.
-      env: { BROWSER: 'none', PORT: '3000', SKIP_PREFLIGHT_CHECK: 'true' },
       stdout: 'ignore',
       stderr: 'pipe',
     },
