@@ -1,11 +1,13 @@
-import React from 'react';
 import { screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import { Routes, Route } from 'react-router';
 import { toast } from 'react-toastify';
 import { queryKeys } from '../../lib/queryKeys';
 import Post from './Post';
 import { mockApi } from '../../testing/mockApi';
+import type { MockHandler, MockReply } from '../../testing/mockApi';
+import type { TestAuth } from '../../testing/testAuth';
 import { renderWithProviders } from '../../testing/renderWithProviders';
+import type { RenderOptions } from '../../testing/renderWithProviders';
 
 const me = { _id: 'u1', name: 'Ann' };
 const post = {
@@ -20,9 +22,14 @@ const post = {
     { _id: 'c2', userId: 'u2', name: 'Bob', avatar: 'b.png', comment: 'second', date: '2020-01-02' },
   ],
 };
-const auth = { loggedInUser: me, isAuthenticated: true, isUsersData: (a, b) => a === b, authLoading: false };
+const auth: TestAuth = {
+  loggedInUser: me,
+  isAuthenticated: true,
+  isUsersData: (a, b) => a === b,
+  authLoading: false,
+};
 
-const renderPost = (routes = {}, options = {}) => {
+const renderPost = (routes: Record<string, MockHandler> = {}, options: RenderOptions = {}) => {
   const api = mockApi({ 'GET /api/post/p1': { body: { post } }, ...routes });
   const utils = renderWithProviders(
     <Routes>
@@ -119,12 +126,12 @@ describe('Post page mutations (B21)', () => {
   });
 
   it('flips the like button at once, then rolls back and keeps the post when the like fails', async () => {
-    let fail;
-    renderPost({ 'PUT /api/post/like/p1': () => new Promise((resolve) => (fail = resolve)) });
+    const fail = Promise.withResolvers<MockReply>();
+    renderPost({ 'PUT /api/post/like/p1': () => fail.promise });
     fireEvent.click(await screen.findByRole('button', { name: 'Like Post' }));
     // Optimistic: the server has not answered yet.
     expect(await screen.findByRole('button', { name: 'Unlike Post' })).toBeInTheDocument();
-    fail({ status: 400, body: { message: 'Post has already been liked.' } });
+    fail.resolve({ status: 400, body: { message: 'Post has already been liked.' } });
     expect(await screen.findByRole('button', { name: 'Like Post' })).toBeInTheDocument();
     expect(toast.error).toHaveBeenCalledWith('Post has already been liked.');
     expect(screen.getByText('Hello world')).toBeInTheDocument();
@@ -132,8 +139,8 @@ describe('Post page mutations (B21)', () => {
 
   it('never shows the loader while a like or a comment delete is running', async () => {
     renderPost({
-      'PUT /api/post/like/p1': () => new Promise(() => {}),
-      'DELETE /api/post/comment/p1/c1': () => new Promise(() => {}),
+      'PUT /api/post/like/p1': () => new Promise<MockReply>(() => undefined),
+      'DELETE /api/post/comment/p1/c1': () => new Promise<MockReply>(() => undefined),
     });
     fireEvent.click(await screen.findByRole('button', { name: 'Like Post' }));
     fireEvent.click(screen.getByRole('button', { name: 'Delete Comment' }));
@@ -146,14 +153,14 @@ describe('Post page delete', () => {
   afterEach(() => vi.restoreAllMocks());
 
   it('asks first, deletes, toasts, marks the lists stale and goes home without asking for the post again', async () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
     const { api, queryClient } = renderPost({ 'DELETE /api/post/p1': { body: { message: 'Post has been deleted.' } } });
     queryClient.setQueryData(queryKeys.posts.list(), { posts: [post] });
     fireEvent.click(await screen.findByRole('button', { name: 'Delete Post' }));
     expect(await screen.findByText('home page')).toBeInTheDocument();
-    expect(window.confirm).toHaveBeenCalledWith('Delete this post? This cannot be undone.');
+    expect(confirmSpy).toHaveBeenCalledWith('Delete this post? This cannot be undone.');
     expect(toast.success).toHaveBeenCalledWith('Post has been deleted.');
-    expect(queryClient.getQueryState(queryKeys.posts.list()).isInvalidated).toBe(true);
+    expect(queryClient.getQueryState(queryKeys.posts.list())?.isInvalidated).toBe(true);
     expect(queryClient.getQueryData(queryKeys.posts.detail('p1'))).toBeUndefined();
     // Give a wrongly refetching detail query time to show itself.
     await new Promise((resolve) => setTimeout(resolve, 100));

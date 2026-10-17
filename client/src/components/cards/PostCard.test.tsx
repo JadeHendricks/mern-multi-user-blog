@@ -1,11 +1,13 @@
-import React from 'react';
 import { fireEvent, waitFor, cleanup } from '@testing-library/react';
 import { toast } from 'react-toastify';
 import PostCard from './PostCard';
 import { mockApi } from '../../testing/mockApi';
+import type { MockHandler, MockReply } from '../../testing/mockApi';
+import { makePost } from '../../testing/fixtures';
+import type { PostWithAuthor } from '../../lib/types';
 import { renderWithProviders } from '../../testing/renderWithProviders';
 
-const post = {
+const post = makePost({
   _id: 'p1',
   title: 'Hello',
   image: 'a.png',
@@ -15,9 +17,9 @@ const post = {
   user: { _id: 'u1', name: 'Ann', avatar: 'x.png' },
   likes: [],
   comments: [],
-};
+});
 
-const renderCard = (likes, routes = {}) => {
+const renderCard = (likes: PostWithAuthor['likes'], routes: Record<string, MockHandler> = {}) => {
   const api = mockApi({
     'PUT /api/post/like/p1': { body: { message: 'Post has been liked.', likes: [{ user: 'u2' }] } },
     'PUT /api/post/unlike/p1': { body: { message: 'Post has been disliked.', likes: [] } },
@@ -28,6 +30,7 @@ const renderCard = (likes, routes = {}) => {
   });
   // The heart is the interaction icon that is not the comment icon.
   const heart = utils.container.querySelector('svg.card__interaction-icon:not(.card__interaction-icon-comment)');
+  if (!heart) throw new Error('the card has no heart icon');
   return { ...utils, heart, api };
 };
 
@@ -68,15 +71,15 @@ describe('PostCard like toggle', () => {
   });
 
   it('ignores more clicks while the request is still running', async () => {
-    let release;
+    const gate = Promise.withResolvers<MockReply>();
     const { heart, api } = renderCard([], {
-      'PUT /api/post/like/p1': () => new Promise((resolve) => (release = resolve)),
+      'PUT /api/post/like/p1': () => gate.promise,
     });
     fireEvent.click(heart);
     fireEvent.click(heart);
     fireEvent.click(heart);
     await waitFor(() => expect(api.callsTo('PUT /api/post/like/p1')).toHaveLength(1));
-    release({ body: { message: 'Post has been liked.', likes: [{ user: 'u2' }] } });
+    gate.resolve({ body: { message: 'Post has been liked.', likes: [{ user: 'u2' }] } });
     await waitFor(() => expect(toast.success).toHaveBeenCalledTimes(1));
   });
 });

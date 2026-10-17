@@ -1,16 +1,17 @@
-import React from 'react';
 import { screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import { Routes, Route, Link } from 'react-router';
 import { toast } from 'react-toastify';
 import CreatePost from './CreatePost';
 import EditPost from './EditPost';
 import { queryKeys } from '../../lib/queryKeys';
-import { mockApi } from '../../testing/mockApi';
+import { mockApi, asFormData } from '../../testing/mockApi';
+import type { MockHandler } from '../../testing/mockApi';
+import type { TestAuth } from '../../testing/testAuth';
 import { renderWithProviders } from '../../testing/renderWithProviders';
 
-const auth = { loggedInUser: { _id: 'u1' }, isAuthenticated: true, authLoading: false };
+const auth: TestAuth = { loggedInUser: { _id: 'u1' }, isAuthenticated: true, authLoading: false };
 const saved = { _id: 'p1', title: 'Saved title', tag: 'travel', description: 'Saved body', image: 'saved.png' };
-const fields = (body) => Object.fromEntries(body.entries());
+const fields = (body: unknown) => Object.fromEntries(asFormData(body).entries());
 
 beforeEach(() => {
   vi.spyOn(toast, 'success').mockImplementation(() => 0);
@@ -22,7 +23,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-const renderCreate = (routes = {}) => {
+const renderCreate = (routes: Record<string, MockHandler> = {}) => {
   const api = mockApi({
     'POST /api/post': { status: 201, body: { message: 'Post "T", has been created', post: { _id: 'new1' } } },
     'GET /api/post/new1': { body: { post: { ...saved, _id: 'new1', title: 'Created' } } },
@@ -38,7 +39,7 @@ const renderCreate = (routes = {}) => {
   return { ...utils, api };
 };
 
-const fillCreate = (image) => {
+const fillCreate = (image?: File) => {
   fireEvent.change(screen.getByLabelText('Post Title'), { target: { name: 'title', value: 'T' } });
   fireEvent.click(screen.getByLabelText('travel'));
   fireEvent.change(screen.getByLabelText('Post Body'), { target: { name: 'description', value: 'Body' } });
@@ -53,20 +54,20 @@ describe('CreatePost', () => {
     const file = new File(['x'], 'photo.png', { type: 'image/png' });
     fillCreate(file);
     expect(await screen.findByText('post page')).toBeInTheDocument();
-    const [call] = api.callsTo('POST /api/post');
+    const call = api.firstCallTo('POST /api/post');
     expect(call.body).toBeInstanceOf(FormData);
     expect(call.headers).toBeUndefined();
     expect(fields(call.body)).toMatchObject({ title: 'T', tag: 'travel', description: 'Body' });
     expect(fields(call.body).image).toBeInstanceOf(File);
     expect(toast.success).toHaveBeenCalledWith('Post "T", has been created');
-    expect(queryClient.getQueryState(queryKeys.posts.list()).isInvalidated).toBe(true);
+    expect(queryClient.getQueryState(queryKeys.posts.list())?.isInvalidated).toBe(true);
   });
 
   it('leaves the image field out when no photo was picked', async () => {
     const { api } = renderCreate();
     fillCreate();
     await screen.findByText('post page');
-    expect(fields(api.callsTo('POST /api/post')[0].body)).not.toHaveProperty('image');
+    expect(fields(api.firstCallTo('POST /api/post').body)).not.toHaveProperty('image');
   });
 
   it('stays on the form with the typed text and toasts the server message when it fails', async () => {
@@ -78,7 +79,7 @@ describe('CreatePost', () => {
   });
 });
 
-const renderEdit = (routes = {}, route = '/edit-post/p1') => {
+const renderEdit = (routes: Record<string, MockHandler> = {}, route = '/edit-post/p1') => {
   const api = mockApi({
     'GET /api/post/p1': { body: { post: saved } },
     'GET /api/post/p2': { body: { post: { ...saved, _id: 'p2', title: 'Other title', description: 'Other body', tag: 'funny' } } },
@@ -136,7 +137,7 @@ describe('EditPost', () => {
     fireEvent.change(screen.getByLabelText('Post Title'), { target: { name: 'title', value: 'New title' } });
     fireEvent.click(screen.getByRole('button', { name: 'Update Post' }));
     expect(await screen.findByText('post page')).toBeInTheDocument();
-    const [call] = api.callsTo('PUT /api/post/p1');
+    const call = api.firstCallTo('PUT /api/post/p1');
     expect(call.body).toBeInstanceOf(FormData);
     expect(call.headers).toBeUndefined();
     expect(fields(call.body)).toEqual({ id: 'p1', title: 'New title', tag: 'travel', description: 'Saved body' });

@@ -1,11 +1,10 @@
-import React from 'react';
 import { screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import { toast } from 'react-toastify';
 import AllUsers from './AllUsers';
 import { mockApi } from '../../testing/mockApi';
 import { renderWithProviders } from '../../testing/renderWithProviders';
 
-const user = (n) => ({ _id: `u${n}`, name: `User ${n}`, avatar: 'a.png', createdAt: '2020-01-01T00:00:00.000Z', socials: {} });
+const user = (n: number) => ({ _id: `u${n}`, name: `User ${n}`, avatar: 'a.png', createdAt: '2020-01-01T00:00:00.000Z', socials: {} });
 
 beforeEach(() => {
   vi.spyOn(toast, 'error').mockImplementation(() => 0);
@@ -45,7 +44,7 @@ describe('AllUsers load more', () => {
     await screen.findAllByRole('link', { name: 'User 1' });
     expect(loadMore()).toBeInTheDocument();
 
-    fireEvent.click(loadMore());
+    fireEvent.click(screen.getByRole('button', { name: 'Load more' }));
     await screen.findAllByRole('link', { name: 'User 3' });
     expect(document.querySelectorAll('.card-user')).toHaveLength(3);
     expect(loadMore()).not.toBeInTheDocument();

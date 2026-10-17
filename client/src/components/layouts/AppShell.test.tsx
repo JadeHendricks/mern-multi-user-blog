@@ -1,14 +1,14 @@
-﻿import React from 'react';
 import { render, screen, cleanup } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router';
 import AuthContext from '../../context/authContext/AuthContext';
 import AppShell from './AppShell';
+import { testAuth } from '../../testing/testAuth';
 
 afterEach(cleanup);
 
-const renderAt = path =>
+const renderAt = (path: string) =>
   render(
-    <AuthContext.Provider value={{ isAuthenticated: false, loggedInUser: null }}>
+    <AuthContext.Provider value={testAuth({ isAuthenticated: false, loggedInUser: null })}>
       <MemoryRouter initialEntries={[path]}>
         <Routes>
           <Route element={<AppShell />}>

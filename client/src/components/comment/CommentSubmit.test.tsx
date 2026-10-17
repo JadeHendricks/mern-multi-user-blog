@@ -1,16 +1,16 @@
-﻿import React from 'react';
 import { fireEvent, waitFor, cleanup } from '@testing-library/react';
 import { toast } from 'react-toastify';
 import CommentSubmit from './CommentSubmit';
 import { mockApi } from '../../testing/mockApi';
+import type { MockHandler } from '../../testing/mockApi';
 import { renderWithProviders } from '../../testing/renderWithProviders';
 
-const renderSubmit = (isAuthenticated, routes = {}) => {
+const renderSubmit = (isAuthenticated: boolean, routes: Record<string, MockHandler> = {}) => {
   const api = mockApi({
     'POST /api/post/comment/p1': { status: 201, body: { message: 'Comment has been added.', comment: [] } },
     ...routes,
   });
-  const utils = renderWithProviders(<CommentSubmit postId="p1" postUser="u1" comments={[]} />, {
+  const utils = renderWithProviders(<CommentSubmit postId="p1" comments={[]} />, {
     auth: { isAuthenticated },
   });
   return { ...utils, api };
@@ -33,7 +33,7 @@ describe('CommentSubmit', () => {
     fireEvent.change(box, { target: { value: 'nice post' } });
     fireEvent.click(getByText('Submit comment'));
     await waitFor(() => expect(box).toHaveValue(''));
-    expect(api.callsTo('POST /api/post/comment/p1')[0].body).toEqual({ comment: 'nice post' });
+    expect(api.callsTo('POST /api/post/comment/p1')[0]?.body).toEqual({ comment: 'nice post' });
     expect(toast.success).toHaveBeenCalledWith('Comment has been added.');
   });
 

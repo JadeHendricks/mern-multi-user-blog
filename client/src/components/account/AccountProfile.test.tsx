@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import { MemoryRouter, Routes, Route, Link } from 'react-router';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -7,7 +6,10 @@ import AuthContext from '../../context/authContext/AuthContext';
 import Profile from './AccountProfile';
 import { createQueryClient } from '../../lib/queryClient';
 import { queryKeys } from '../../lib/queryKeys';
-import { mockApi } from '../../testing/mockApi';
+import { mockApi, asFormData } from '../../testing/mockApi';
+import type { MockHandler } from '../../testing/mockApi';
+import { mustQuery } from '../../testing/dom';
+import { testAuth } from '../../testing/testAuth';
 
 const ann = { _id: 'u1', name: 'Ann', avatar: 'a.png', socials: { facebook: 'https://fb.test/ann' } };
 const bob = { _id: 'u2', name: 'Bob', avatar: 'b.png', socials: { facebook: 'https://fb.test/bob' } };
@@ -29,11 +31,11 @@ const Page = () => (
 const tree = (loggedIn = 'u1') => (
   <QueryClientProvider client={queryClient}>
     <AuthContext.Provider
-      value={{
+      value={testAuth({
         loggedInUser: { _id: loggedIn, email: 'me@test.dev' },
         isUsersData: (a, b) => a === b,
         authLoading: false,
-      }}
+      })}
     >
       <MemoryRouter initialEntries={['/profile/u1']}>
         <Routes>
@@ -44,7 +46,7 @@ const tree = (loggedIn = 'u1') => (
   </QueryClientProvider>
 );
 
-const baseRoutes = () => {
+const baseRoutes = (): Record<string, MockHandler> => {
   // The fake server remembers the like, so the refetch after the mutation agrees with the cache.
   let liked = false;
   return {
@@ -112,14 +114,14 @@ describe('AccountProfile account settings form', () => {
     fireEvent.change(screen.getByLabelText('Choose a new profile picture'), { target: { files: [file] } });
     fireEvent.click(screen.getByRole('button', { name: 'Update Account' }));
     await waitFor(() => expect(toast.success).toHaveBeenCalledWith('Profile updated'));
-    const [call] = api.callsTo('PUT /api/user/me');
+    const call = api.firstCallTo('PUT /api/user/me');
     expect(call.body).toBeInstanceOf(FormData);
     expect(call.headers).toBeUndefined();
-    expect(call.body.get('name')).toBe('Ann Lee');
-    expect(call.body.get('avatar')).toBeInstanceOf(File);
+    expect(asFormData(call.body).get('name')).toBe('Ann Lee');
+    expect(asFormData(call.body).get('avatar')).toBeInstanceOf(File);
     // The open profile was refetched.
     await waitFor(() => expect(api.callsTo('GET /api/user/u1').length).toBeGreaterThan(1));
-    expect(queryClient.getQueryState(queryKeys.me).isInvalidated).toBe(true);
+    expect(queryClient.getQueryState(queryKeys.me)?.isInvalidated).toBe(true);
   });
 
   it('sends the socials as JSON and refreshes the profile', async () => {
@@ -129,7 +131,7 @@ describe('AccountProfile account settings form', () => {
     fireEvent.change(screen.getByLabelText('Twitter URL'), { target: { name: 'twitter', value: 'https://tw.test/ann' } });
     fireEvent.click(screen.getByRole('button', { name: 'Update Socials' }));
     await waitFor(() => expect(toast.success).toHaveBeenCalledWith('Socials updated'));
-    const [call] = api.callsTo('PUT /api/user/u1/socials');
+    const call = api.firstCallTo('PUT /api/user/u1/socials');
     expect(call.headers).toEqual({ 'Content-Type': 'application/json' });
     expect(call.body).toEqual({ facebook: 'https://fb.test/ann', linkedin: '', twitter: 'https://tw.test/ann' });
     await waitFor(() => expect(api.callsTo('GET /api/user/u1').length).toBeGreaterThan(1));
@@ -153,7 +155,7 @@ describe('AccountProfile post cards (B21)', () => {
     mockApi(baseRoutes());
     const { container } = render(tree());
     expect(await screen.findByText('0 Likes')).toBeInTheDocument();
-    fireEvent.click(container.querySelector('svg.card__interaction-icon:not(.card__interaction-icon-comment)'));
+    fireEvent.click(mustQuery(container, 'svg.card__interaction-icon:not(.card__interaction-icon-comment)'));
     expect(await screen.findByText('1 Like')).toBeInTheDocument();
     await waitFor(() => expect(toast.success).toHaveBeenCalledWith('Post has been liked.'));
   });
@@ -163,7 +165,7 @@ describe('AccountProfile post cards (B21)', () => {
     // Bob looks at Ann's profile.
     const { container } = render(tree('u2'));
     expect(await screen.findByText('0 Likes')).toBeInTheDocument();
-    fireEvent.click(container.querySelector('svg.card__interaction-icon:not(.card__interaction-icon-comment)'));
+    fireEvent.click(mustQuery(container, 'svg.card__interaction-icon:not(.card__interaction-icon-comment)'));
     expect(await screen.findByText('1 Like')).toBeInTheDocument();
   });
 

@@ -1,21 +1,24 @@
-import React from 'react';
 import { screen, fireEvent, waitFor, within, cleanup } from '@testing-library/react';
 import { toast } from 'react-toastify';
 import Base from './Base';
 import MostPopularPosts from './MostPopularPosts';
 import { uploadUrl } from '../../utils/imageUrl';
+import type * as ImageUrl from '../../utils/imageUrl';
 import { queryKeys } from '../../lib/queryKeys';
 import { mockApi } from '../../testing/mockApi';
+import type { MockReply } from '../../testing/mockApi';
+import { mustQuery } from '../../testing/dom';
+import type { TestAuth } from '../../testing/testAuth';
 import { renderWithProviders } from '../../testing/renderWithProviders';
 
 // PostCard calls uploadUrl on every render, with its own image name, so counting calls per name
 // counts renders per card.
 vi.mock('../../utils/imageUrl', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal<typeof ImageUrl>();
   return { ...actual, uploadUrl: vi.fn(actual.uploadUrl) };
 });
 
-const makePost = (n, likes = 0) => ({
+const makePost = (n: number, likes = 0) => ({
   _id: `p${n}`,
   title: `Post ${n}`,
   image: `img-${n}.png`,
@@ -27,9 +30,13 @@ const makePost = (n, likes = 0) => ({
   comments: [],
 });
 const FEED = 'GET /api/post?limit=12';
-const auth = { loggedInUser: { _id: 'me' }, isAuthenticated: true, isUsersData: (a, b) => a === b };
-const cardOf = (title) => screen.getByRole('link', { name: title }).closest('.card');
-const rendersOf = (image) => uploadUrl.mock.calls.filter(([kind, name]) => kind === 'posts' && name === image).length;
+const auth: TestAuth = { loggedInUser: { _id: 'me' }, isAuthenticated: true, isUsersData: (a, b) => a === b };
+const cardOf = (title: string) => {
+  const card = screen.getByRole('link', { name: title }).closest<HTMLElement>('.card');
+  if (!card) throw new Error(`no card for ${title}`);
+  return card;
+};
+const rendersOf = (image: string) => vi.mocked(uploadUrl).mock.calls.filter(([kind, name]) => kind === 'posts' && name === image).length;
 
 beforeEach(() => {
   vi.spyOn(toast, 'success').mockImplementation(() => 0);
@@ -39,7 +46,7 @@ afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
-  uploadUrl.mockClear();
+  vi.mocked(uploadUrl).mockClear();
 });
 
 describe('home feed', () => {
@@ -71,7 +78,7 @@ describe('home feed', () => {
     await screen.findByRole('link', { name: 'Post 2' });
     const before = { 1: rendersOf('img-1.png'), 2: rendersOf('img-2.png'), 3: rendersOf('img-3.png') };
 
-    fireEvent.click(cardOf('Post 2').querySelector('svg.card__interaction-icon:not(.card__interaction-icon-comment)'));
+    fireEvent.click(mustQuery(cardOf('Post 2'), 'svg.card__interaction-icon:not(.card__interaction-icon-comment)'));
     await waitFor(() => expect(within(cardOf('Post 2')).getByText('1 Like')).toBeInTheDocument());
     await waitFor(() => expect(toast.success).toHaveBeenCalledWith('Post has been liked.'));
 
@@ -92,7 +99,7 @@ describe('home feed', () => {
     });
     renderWithProviders(<Base />, { auth });
     await screen.findByRole('link', { name: 'Post 1' });
-    fireEvent.click(cardOf('Post 1').querySelector('svg.card__interaction-icon:not(.card__interaction-icon-comment)'));
+    fireEvent.click(mustQuery(cardOf('Post 1'), 'svg.card__interaction-icon:not(.card__interaction-icon-comment)'));
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Server broke'));
     await waitFor(() => expect(within(cardOf('Post 1')).getByText('0 Likes')).toBeInTheDocument());
     expect(cardOf('Post 2')).toBeInTheDocument();
@@ -107,7 +114,7 @@ describe('most popular posts', () => {
     await screen.findByRole('link', { name: 'Post 2' });
     const titles = [...document.querySelectorAll('.card__title')].map((el) => el.textContent);
     expect(titles).toEqual(['Post 7', 'Post 2', 'Post 5', 'Post 3', 'Post 6', 'Post 1']);
-    expect(queryClient.getQueryData(queryKeys.posts.list()).posts.map((p) => p._id)).toEqual(
+    expect(queryClient.getQueryData<{ posts: { _id: string }[] }>(queryKeys.posts.list())?.posts.map((p) => p._id)).toEqual(
       posts.map((p) => p._id),
     );
   });
@@ -125,7 +132,7 @@ describe('home feed load more', () => {
     await screen.findByRole('link', { name: 'Post 1' });
     expect(loadMore()).toBeInTheDocument();
 
-    fireEvent.click(loadMore());
+    fireEvent.click(screen.getByRole('button', { name: 'Load more' }));
     await screen.findByRole('link', { name: 'Post 3' });
     expect(document.querySelectorAll('.card')).toHaveLength(3);
     expect(loadMore()).not.toBeInTheDocument();
@@ -140,16 +147,16 @@ describe('home feed load more', () => {
   });
 
   it('disables the button while the next page loads', async () => {
-    let release;
+    const gate = Promise.withResolvers<MockReply>();
     mockApi({
       [FEED]: { body: { posts: [makePost(1)], nextCursor: 'c1' } },
-      'GET /api/post?limit=12&cursor=c1': () => new Promise((resolve) => (release = resolve)),
+      'GET /api/post?limit=12&cursor=c1': () => gate.promise,
     });
     renderWithProviders(<Base />, { auth });
     await screen.findByRole('link', { name: 'Post 1' });
-    fireEvent.click(loadMore());
+    fireEvent.click(screen.getByRole('button', { name: 'Load more' }));
     await waitFor(() => expect(loadMore()).toBeDisabled());
-    release({ body: { posts: [makePost(2)], nextCursor: null } });
+    gate.resolve({ body: { posts: [makePost(2)], nextCursor: null } });
     await screen.findByRole('link', { name: 'Post 2' });
   });
 
@@ -160,7 +167,7 @@ describe('home feed load more', () => {
     });
     renderWithProviders(<Base />, { auth });
     await screen.findByRole('link', { name: 'Post 1' });
-    fireEvent.click(loadMore());
+    fireEvent.click(screen.getByRole('button', { name: 'Load more' }));
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Server broke'));
     expect(screen.getByRole('link', { name: 'Post 1' })).toBeInTheDocument();
     expect(loadMore()).toBeInTheDocument();
@@ -179,11 +186,11 @@ describe('home feed load more', () => {
     });
     renderWithProviders(<Base />, { auth });
     await screen.findByRole('link', { name: 'Post 1' });
-    fireEvent.click(loadMore());
+    fireEvent.click(screen.getByRole('button', { name: 'Load more' }));
     await screen.findByRole('link', { name: 'Post 3' });
     const before = { 1: rendersOf('img-1.png'), 2: rendersOf('img-2.png') };
 
-    fireEvent.click(cardOf('Post 3').querySelector('svg.card__interaction-icon:not(.card__interaction-icon-comment)'));
+    fireEvent.click(mustQuery(cardOf('Post 3'), 'svg.card__interaction-icon:not(.card__interaction-icon-comment)'));
     await waitFor(() => expect(within(cardOf('Post 3')).getByText('1 Like')).toBeInTheDocument());
     expect(within(cardOf('Post 1')).getByText('0 Likes')).toBeInTheDocument();
     expect(rendersOf('img-1.png')).toBe(before[1]);
