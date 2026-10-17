@@ -6,7 +6,7 @@ import { randomBytes } from 'node:crypto';
 const PROCESS_RANDOM = randomBytes(5).toString('hex');
 let counter = randomBytes(3).readUIntBE(0, 3);
 
-export function newId() {
+export function newId(): string {
   counter = (counter + 1) % 0x1000000;
   const time = Math.floor(Date.now() / 1000)
     .toString(16)
@@ -17,4 +17,5 @@ export function newId() {
 
 const ID_PATTERN = /^[0-9a-f]{24}$/;
 
-export const isValidId = (value) => typeof value === 'string' && ID_PATTERN.test(value);
+export const isValidId = (value: unknown): value is string =>
+  typeof value === 'string' && ID_PATTERN.test(value);

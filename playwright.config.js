@@ -51,7 +51,8 @@ module.exports = defineConfig({
   // Playwright starts these before globalSetup. The API launcher seeds a JSON-file store in a temp folder.
   webServer: [
     {
-      command: 'node e2e/support/start-api.js',
+      // --import tsx: the server sources are TypeScript, which plain node cannot import.
+      command: 'node --import tsx e2e/support/start-api.js',
       url: 'http://localhost:5000/api/post',
       reuseExistingServer: false,
       timeout: 300000,

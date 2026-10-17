@@ -19,7 +19,9 @@ let child;
 // Starts support/crash-server.js with the same fake config as this worker.
 function startServer(extraEnv = {}) {
   return new Promise((resolve, reject) => {
-    child = spawn(process.execPath, [crashServer], {
+    // `--import tsx`: the child imports server sources that are (becoming) TypeScript, which plain
+    // node cannot resolve from `.js` specifiers.
+    child = spawn(process.execPath, ['--import', 'tsx', crashServer], {
       env: { ...process.env, ...extraEnv },
       stdio: ['ignore', 'pipe', 'pipe'],
     });

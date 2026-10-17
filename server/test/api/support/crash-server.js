@@ -1,5 +1,5 @@
 // Child process for tests that expect the server to crash (KNOWN BUG B1 / B2).
-// Plain node script on purpose: it is run with `node`, not through Vitest.
+// A real node process on purpose (`node --import tsx`), not run through Vitest.
 // Settings come from the parent's process.env (support/env.js); the port is printed as `PORT=<n>`.
 import { mkdtempSync } from 'node:fs';
 import path from 'node:path';

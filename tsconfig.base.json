@@ -1,0 +1,26 @@
+{
+  // Shared compiler options for the server and shared workspaces (the client stays on CRA/JS).
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    // TypeScript 6 no longer loads every @types/* package by default, so each project opts in.
+    "types": ["node"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    // Array and record reads can be undefined: narrow them, do not assert them away.
+    "noUncheckedIndexedAccess": true,
+    // `{ a?: string }` means "absent", not "undefined". Matches how the JSON store and the API
+    // treat optional keys (for example `socials` is absent until one is set).
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    // Keep imports explicit so tsx, vitest and Node's own type stripping agree with tsc.
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "erasableSyntaxOnly": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}

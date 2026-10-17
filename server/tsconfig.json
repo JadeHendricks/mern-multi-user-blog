@@ -1,0 +1,12 @@
+{
+  // Type-check only (nothing is emitted from this file). The compiled output comes from
+  // tsconfig.build.json once the conversion is finished.
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    // Source is converted file by file; JS files are imported but not type-checked yet.
+    "allowJs": true,
+    "checkJs": false
+  },
+  "include": ["src", "scripts", "test", "vitest.config.mjs"]
+}
