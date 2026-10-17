@@ -30,7 +30,7 @@ const CommentSubmit = ({ postId, comments }: CommentSubmitProps) => {
                 ) }
             </div>
             { isAuthenticated && (
-                <form className="comment-form" onSubmit={ handleSubmit }>
+                <form className="comment__form" onSubmit={ handleSubmit }>
                     <div className="form-group">
                         <textarea id="comment" name="comment" className="input input--textarea" value={ comment } onChange={ handleOnChange } placeholder="Comment..."></textarea>
                     </div>

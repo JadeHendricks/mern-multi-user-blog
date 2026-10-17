@@ -1,35 +1,40 @@
-.comment-form {
-  padding-bottom: 2rem; }
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
 
+// Comment section under a post: heading, the add-comment form and the list (see comment-post).
 .comment {
-  margin: 4rem 0;
-  background-color: #ffffff;
-  padding: 4rem 2.5rem;
-  border-radius: 0.3rem;
+  margin: $space-40 0;
+  background-color: $color-white;
+  padding: $space-40 $space-25;
+  border-radius: $radius-3;
   overflow: hidden;
-  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.1); }
+  box-shadow: $shadow-md;
 
-.comment__header {
-    margin-bottom: 2.5rem; }
+  @include respond-to('sm') {
+    padding: $space-20;
+  }
 
-.comment__title {
-    margin-bottom: 0.5rem; }
+  &__header {
+    margin-bottom: $space-25;
+  }
 
-.comment__auth {
-    color: #3f4bf9;
-    font-weight: 500;
+  &__title {
+    margin-bottom: $space-5;
+  }
+
+  &__auth {
+    color: $color-blue;
+    font-weight: $weight-medium;
     text-decoration: none;
-    font-size: 1.8rem; }
+    font-size: $font-18;
+  }
 
-.comment .button {
-    display: block;
-    margin-left: auto; }
+  &__form {
+    padding-bottom: $space-20;
+  }
 
-.comment__total {
+  &__total {
     float: right;
-    font-size: 1.8rem; }
-
-@media screen and (max-width: 580px) {
-  .comment {
-    margin: 4rem 0;
-    padding: 2rem; } }
+    font-size: $font-18;
+  }
+}
