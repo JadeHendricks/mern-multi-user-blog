@@ -1,13 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
+import type { MessageResponse } from '@mern-blog/shared';
 import { api } from '../lib/api';
 import { patchPostInCaches } from '../lib/postCache';
 
-/** Deletes one comment of a post. mutate(commentId). @param {string} postId */
-export const useDeleteComment = (postId) => {
+/** Deletes one comment of a post. mutate(commentId). */
+export const useDeleteComment = (postId: string) => {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (commentId) => api.delete(`/api/post/comment/${postId}/${commentId}`),
+  return useMutation<MessageResponse, Error, string>({
+    mutationFn: (commentId) =>
+      api.delete<MessageResponse>(`/api/post/comment/${postId}/${commentId}`),
     onSuccess: (res, commentId) => {
       toast.success(res.message);
       patchPostInCaches(queryClient, postId, (post) => ({
