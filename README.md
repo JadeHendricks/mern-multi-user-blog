@@ -210,7 +210,7 @@ npm run check
 
 | | Before (CRA 3.4) | After (Vite 8) |
 | --- | --- | --- |
-| Main JS, gzip | 94,687 B (3 chunks) | 92,564 B (1 chunk) |
+| Main JS, gzip | 94,687 B (3 chunks) | 92,302 B (1 chunk) |
 | CSS, gzip | 6,063 B (2 files) | 5,542 B (1 file) |
 | `npm audit` (all and `--omit=dev`) | 196 (11 low, 134 moderate, 46 high, 5 critical) | 3 high |
 | `express` copies in `npm ls` | 5.3.0 and 4.17.1 | 5.3.0 only |
