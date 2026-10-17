@@ -135,7 +135,7 @@ Run from the repo root.
 | `npm run test:api` | Vitest + supertest on the JSON store, plus the store contract tests on both stores and the shared package tests. |
 | `npm run test:api:mongo` | The same API tests on the Mongo store (in-memory MongoDB). |
 | `npm run test:client` | Client unit tests (Vitest + jsdom + Testing Library). |
-| `npm run test:e2e` | Playwright: screenshots, smoke flows, axe report. Builds `shared/` and `server/` first (`pretest:e2e`) because it runs the compiled API. |
+| `npm run test:e2e` | Playwright: screenshots, smoke flows, axe report and the `prod-smoke` project (the built client served by Express). Builds `shared/`, `server/` and the client first (`pretest:e2e`). |
 | `npm run test:e2e:update` | Re-record screenshot baselines (only for intended visual changes). |
 | `npm run e2e:install` | Download the Chromium build Playwright uses. |
 | `npm run serve:memory` | Compiled API on :5000 with seeded throwaway data, to click around by hand. |
@@ -192,7 +192,10 @@ npm run check
 
 - Screenshot baselines live in `e2e/__screenshots__` and are compared with zero tolerance. They were
   rendered on Windows and need regenerating when CI moves to Linux.
-- Ports 3000 and 5000 must be free while the E2E tests run. E2E uses the JSON store by default;
+- `prod-smoke` (`e2e/prod-smoke.spec.js`) runs against `client/dist` served by a second API instance on port
+  5001, so the production bundle is checked without the Vite dev server. Run only it with
+  `npm run pretest:e2e` then `npx playwright test --project=prod-smoke`.
+- Ports 3000, 5000 and 5001 must be free while the E2E tests run. E2E uses the JSON store by default;
   `E2E_DB_DRIVER=mongo npm run test:e2e` runs it on the in-memory Mongo.
 
 ## Decisions
@@ -213,6 +216,49 @@ npm run check
 | CSS, gzip | 6,063 B (2 files) | 5,542 B (1 file) |
 | `npm audit` (all and `--omit=dev`) | 196 (11 low, 134 moderate, 46 high, 5 critical) | 3 high |
 | `express` copies in `npm ls` | 5.3.0 and 4.17.1 | 5.3.0 only |
+
+## Client architecture
+
+React 19 with React Router 8 and TanStack Query 5 (JavaScript, Vite). Source is in `client/src`.
+
+- **Providers, outside in** (`App.jsx`): `QueryClientProvider` > `BrowserRouter` > `AuthState` > `Routes`.
+  Query is outermost so the router and auth can use it; auth sits inside the router because its actions navigate.
+- **Routes:** one layout route (`AppShell`: navigation, `main`, footer, toasts) holds every page.
+  `RequireAuth` wraps `/create-post` and `/edit-post/:id` and redirects a visitor to `/login` once the session
+  check has finished. An unknown URL keeps the shell with an empty `main` (a `*` route that renders nothing).
+- **Auth context** (`context/authContext`): `AuthState` reads the session with `useMe` and exposes
+  `loggedInUser`, `loading` and the actions (`login`, `logout`, `register`, `forgotPassword`, ...) through
+  `AuthContext`. The value is memoised, so a parent re-render does not re-render consumers. A visitor is
+  `null` (a 401 from `/api/user/me` is a normal answer, not an error). Logout clears the whole query cache.
+- **Folders:** `components/` (by feature), `hooks/` (one query or mutation each), `lib/` (`api`, `queryKeys`,
+  `queryClient`, `postCache`, `formatDate`), `utils/` (image and URL helpers), `testing/` (`mockApi`,
+  `renderWithProviders`).
+- **Router version:** React Router 8.4 (needs React >= 19.2.7). The move went 5 to 7 on React 18, then React 19,
+  then router 8, because router 5 uses legacy context that React 19 removed. Imports come from `react-router`.
+- **Devtools:** in `npm run dev` the TanStack Query devtools button sits in the bottom corner. It is not part
+  of the production build. Set `VITE_QUERY_DEVTOOLS=false` to hide it (Playwright does, for screenshots).
+
+## Client data layer
+
+- **`lib/api.js`:** a small `fetch` wrapper (`api.get/post/put/delete`) that always sends cookies. A plain object
+  goes out as JSON; a `FormData` goes out untouched with no `Content-Type`, so the browser adds the multipart
+  boundary. Every failure becomes an `ApiError { status, message }` (status `0` for a network failure; the
+  message is the server's `message` or `msg`). Aborts pass through as `AbortError`.
+- **Query keys** (`lib/queryKeys.js`): the only place keys are written. They nest, e.g.
+  `['posts', 'list', params]` and `['posts', 'detail', id]`, so invalidating `posts.all` hits every post query.
+- **Query client** (`lib/queryClient.js`): 30 s stale time, no refetch on window focus, one retry only for
+  network and 5xx errors.
+- **Hooks:** reads are `useMe`, `usePost`, `usePosts`, `usePostsInfinite`, `useUser`, `useUsers`,
+  `useUserPosts`; writes are `useCreatePost`, `useEditPost`, `useDeletePost`, `useToggleLike`, `useAddComment`,
+  `useDeleteComment`, `useUpdateProfile`, `useUpdateSocials`. Failed reads show the server message in a toast
+  (`useErrorToast`), as the old contexts did.
+- **Cache patching** (`lib/postCache.js`): a like changes a post that can sit in the feed pages, the post page
+  and a profile list at once. `useToggleLike` snapshots those caches, flips the heart at once in all of them,
+  replaces the guess with the server's answer, and restores the snapshot on failure. Only that card changes.
+- **Pagination:** the feed and the users page use `useInfiniteQuery` with `limit=12` and the API's `nextCursor`.
+  `LoadMore` shows a "Load more" button while there is a next page, disables it while the page loads and
+  removes it when `nextCursor` is `null`. Most popular posts keep one unpaginated list because they sort the whole set.
+- **Dates:** `lib/formatDate.js` prints `DD/MM/YYYY` with `Intl` (en-GB); `moment` is gone.
 
 ## Tooling notes
 
@@ -238,7 +284,7 @@ server/           Express 5 API (TypeScript, ESM)
   seed-assets/      sample images copied by the seed
   test/             api, store and unit tests (TypeScript)
   dist/             compiled output of src/ and scripts/ (generated, gitignored)
-client/           React 16 app (Vite, JavaScript; `tsconfig.json` allows TypeScript files to be added one by one)
+client/           React 19 app (Vite, JavaScript; `tsconfig.json` allows TypeScript files to be added one by one)
 shared/           @mern-blog/shared: zod schemas, DTO types, constants
   dist/             compiled package the server and client load (generated, gitignored)
 e2e/              Playwright specs (CommonJS JavaScript), support and screenshot baselines
