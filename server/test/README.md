@@ -15,7 +15,7 @@ test file (and before `app.js`) is loaded. It sets:
 - `DATA_DIR` and `MAIL_TRANSPORT=file`: mail is written to `<DATA_DIR>/outbox` instead of
   SendGrid. Tests read the activation and reset links from there. A test that needs SendGrid passes
   `loadApp({ mailer: createMailer({ MAIL_TRANSPORT: 'sendgrid', ... }) })` and stubs `send`.
-- `UPLOAD_DIR`: uploads land in a temp folder, not in `client/src/assets/images`.
+- Uploads land in `<DATA_DIR>/uploads` (a temp folder), not in `client/src/assets/images`.
 
 The temp folder is `os.tmpdir()/mern-blog-test-<random>` and is removed after each test file.
 Child processes (see `crash-server.js`) receive the same env.

@@ -1,10 +1,11 @@
 import { existsSync, readdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
+import supertest from 'supertest';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { clearDb, connectDb, disconnectDb, getStore } from './support/db.js';
 import { createUserAndLogin, LONG_DESCRIPTION, loadApp, TINY_PNG } from './support/helpers.js';
 
-const uploadPath = (sub, name) => path.join(process.env.UPLOAD_DIR, sub, name);
+const uploadPath = (sub, name) => path.join(process.env.DATA_DIR, 'uploads', sub, name);
 const png = { filename: 'tiny.png', contentType: 'image/png' };
 
 describe('uploads', () => {
@@ -26,14 +27,14 @@ describe('uploads', () => {
 
   it('answers 413 JSON for a file over 2 MB and stores nothing', async () => {
     const { agent } = await createUserAndLogin(app);
-    const before = readdirSync(path.join(process.env.UPLOAD_DIR, 'posts'));
+    const before = readdirSync(path.join(process.env.DATA_DIR, 'uploads', 'posts'));
 
     const res = await createWithImage(agent, Buffer.alloc(3 * 1024 * 1024, 1));
 
     expect(res.status).toBe(413);
     expect(res.headers['content-type']).toMatch(/json/);
     expect(res.body.message).toBeDefined();
-    expect(readdirSync(path.join(process.env.UPLOAD_DIR, 'posts'))).toEqual(before);
+    expect(readdirSync(path.join(process.env.DATA_DIR, 'uploads', 'posts'))).toEqual(before);
     expect((await getStore().admin.counts()).posts).toBe(0);
   });
 
@@ -120,5 +121,65 @@ describe('uploads', () => {
     expect(second.status).toBe(200);
     expect(existsSync(firstFile)).toBe(false);
     expect(existsSync(uploadPath('users', second.body.user.avatar))).toBe(true);
+  });
+
+  describe('serving at /uploads', () => {
+    it('serves an uploaded post image and avatar with long-lived cache headers', async () => {
+      const { agent } = await createUserAndLogin(app);
+      const created = await createWithImage(agent);
+      const avatar = await agent.put('/api/user/me').field('name', 'Has Avatar').attach('avatar', TINY_PNG, png);
+
+      const post = await supertest(app).get(`/uploads/posts/${created.body.post.image}`);
+      const user = await supertest(app).get(`/uploads/users/${avatar.body.user.avatar}`);
+
+      for (const res of [post, user]) {
+        expect(res.status).toBe(200);
+        expect(res.headers['content-type']).toBe('image/png');
+        expect(res.headers['cache-control']).toMatch(/max-age=2592000/);
+        expect(res.headers['cache-control']).toMatch(/immutable/);
+        expect(res.headers['x-content-type-options']).toBe('nosniff');
+        expect(res.body.equals(TINY_PNG)).toBe(true);
+      }
+    });
+
+    it('answers 404 for traversal attempts, the data file, directories and unknown names', async () => {
+      const paths = [
+        '/uploads/..%2f..%2fdb.json',
+        '/uploads/posts/..%2f..%2fdb.json',
+        '/uploads/%2e%2e/db.json',
+        '/uploads/db.json',
+        '/uploads/posts/',
+        '/uploads/posts',
+        '/uploads/posts/post-missing.png',
+        '/uploads/posts/.hidden',
+      ];
+      for (const url of paths) {
+        const res = await supertest(app).get(url);
+        expect(res.status, url).toBe(404);
+        expect(res.text, url).not.toContain('"users"');
+      }
+    });
+
+    it('answers 404 once an image was replaced or its post deleted', async () => {
+      const { agent } = await createUserAndLogin(app);
+      const created = await createWithImage(agent);
+      const oldName = created.body.post.image;
+      expect((await supertest(app).get(`/uploads/posts/${oldName}`)).status).toBe(200);
+
+      const replaced = await agent
+        .put(`/api/post/${created.body.post._id}`)
+        .field('title', 'New image')
+        .field('description', LONG_DESCRIPTION)
+        .attach('image', TINY_PNG, png);
+      expect((await supertest(app).get(`/uploads/posts/${oldName}`)).status).toBe(404);
+      expect((await supertest(app).get(`/uploads/posts/${replaced.body.post.image}`)).status).toBe(200);
+
+      await agent.delete(`/api/post/${created.body.post._id}`);
+      expect((await supertest(app).get(`/uploads/posts/${replaced.body.post.image}`)).status).toBe(404);
+    });
+
+    it('does not serve default.jpg (it is a bundled client asset)', async () => {
+      expect((await supertest(app).get('/uploads/posts/default.jpg')).status).toBe(404);
+    });
   });
 });

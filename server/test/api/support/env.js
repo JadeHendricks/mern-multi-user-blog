@@ -9,7 +9,7 @@ import { afterAll } from 'vitest';
 const fake = (label) => `test-${label}-${randomBytes(16).toString('hex')}`;
 
 const runDir = mkdtempSync(path.join(tmpdir(), 'mern-blog-test-'));
-for (const sub of ['posts', 'users', 'outbox']) mkdirSync(path.join(runDir, sub));
+for (const sub of ['outbox']) mkdirSync(path.join(runDir, sub));
 
 // All values are generated here and are not real credentials. A real .env is never loaded:
 // the test scripts do not pass --env-file, and these assignments win anyway.
@@ -23,9 +23,8 @@ Object.assign(process.env, {
   // High so normal tests never hit the auth limiter; rate-limit.test.js lowers it.
   AUTH_RATE_LIMIT_MAX: '1000',
   MAIL_TRANSPORT: 'file',
-  // Mail goes to <DATA_DIR>/outbox; uploads go to UPLOAD_DIR, so nothing lands in client/.
+  // Mail goes to <DATA_DIR>/outbox and uploads to <DATA_DIR>/uploads, so nothing lands in client/.
   DATA_DIR: runDir,
-  UPLOAD_DIR: runDir,
 });
 
 afterAll(() => {

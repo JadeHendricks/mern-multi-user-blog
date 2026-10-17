@@ -7,6 +7,7 @@ import path from 'path';
 import rateLimit from 'express-rate-limit';
 import { config } from './config.js';
 import { createMailer } from './lib/mailer.js';
+import { ensureUploadDirs, uploadsRoot } from './lib/upload.js';
 import { createAuthController } from './modules/auth/controller.js';
 import { createUserController } from './modules/users/controller.js';
 import { createPostController } from './modules/posts/controller.js';
@@ -66,6 +67,23 @@ export function createApp({ store, mailer = createMailer(config) }) {
     app.use('/api/auth', createAuthRouter({ auth }));
     app.use('/api/user', createUserRouter({ auth, user: createUserController({ store }) }));
     app.use('/api/post', createPostRouter({ auth, post: createPostController({ store }) }));
+
+    // Uploaded images. default.jpg is NOT here: it is a bundled client asset. File names are random and
+    // never change (a replaced image gets a new name), so they can be cached for a long time.
+    // Registered before the /api 404 and the production catch-all so a missing file stays a 404.
+    ensureUploadDirs();
+    app.use('/uploads', express.static(uploadsRoot(), {
+        index: false,
+        redirect: false,
+        dotfiles: 'ignore',
+        maxAge: '30d',
+        immutable: true,
+        fallthrough: true,
+        setHeaders: (res) => res.set('X-Content-Type-Options', 'nosniff')
+    }));
+    app.use('/uploads', (req, res) => {
+        res.status(404).json({ message: 'Not found' });
+    });
 
     // Unknown API paths answer JSON; without this the production catch-all below would return index.html
     app.use('/api', (req, res) => {

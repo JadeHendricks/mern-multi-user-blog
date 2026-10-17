@@ -16,7 +16,7 @@ const load = (relative) => import(pathToFileURL(path.join(__dirname, relative)).
 const fake = (label) => `e2e-${label}-${randomBytes(16).toString('hex')}`;
 const runDir = mkdtempSync(path.join(tmpdir(), 'mern-blog-e2e-'));
 const dataDir = path.join(runDir, 'data');
-for (const sub of ['posts', 'users', 'outbox']) mkdirSync(path.join(runDir, sub));
+for (const sub of ['outbox']) mkdirSync(path.join(runDir, sub));
 mkdirSync(dataDir);
 
 // Fake, per-run values. They are not real credentials and are never printed. A real .env is
@@ -31,7 +31,6 @@ Object.assign(process.env, {
   MAIL_TRANSPORT: 'file',
   // Mail goes to <DATA_DIR>/outbox; the store keeps its files in DATA_DIR too
   DATA_DIR: runDir,
-  UPLOAD_DIR: runDir,
 });
 // Development mode enables the CORS rule and keeps cookies usable over plain http.
 process.env.NODE_ENV = 'development';

@@ -71,7 +71,7 @@ describe('posts', () => {
     expect(shortDescription.body.message).toBe('Description must be atleast 50 characters long.');
   });
 
-  it('stores an uploaded image under UPLOAD_DIR and not in the client source tree', async () => {
+  it('stores an uploaded image under DATA_DIR/uploads and not in the client source tree', async () => {
     const beforeClient = list(clientPostImages);
     const { agent } = await createUserAndLogin(app);
 
@@ -85,7 +85,7 @@ describe('posts', () => {
     expect(res.status).toBe(201);
     expect(res.body.post.image).toMatch(/^post-[0-9a-f]{32}\.png$/);
 
-    const uploaded = path.join(process.env.UPLOAD_DIR, 'posts', res.body.post.image);
+    const uploaded = path.join(process.env.DATA_DIR, 'uploads', 'posts', res.body.post.image);
     expect(existsSync(uploaded)).toBe(true);
     expect(list(clientPostImages)).toEqual(beforeClient);
   });
@@ -190,7 +190,7 @@ describe('posts', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.post.image).toMatch(/^post-[0-9a-f]{32}\.png$/);
-    expect(existsSync(path.join(process.env.UPLOAD_DIR, 'posts', res.body.post.image))).toBe(true);
+    expect(existsSync(path.join(process.env.DATA_DIR, 'uploads', 'posts', res.body.post.image))).toBe(true);
     expect(list(clientPostImages)).toEqual(beforeClient);
   });
 
