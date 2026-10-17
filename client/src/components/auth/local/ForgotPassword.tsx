@@ -16,9 +16,9 @@ const ForgotPassword = () => {
     
     return (
         <div className="container">
-            <div className="forgot-password-form">
-                <h2 className="forgot-password-form__title">Forgot password?</h2>
-                <p className="forgot-password-form__description">
+            <div className="recover-form">
+                <h2 className="recover-form__title">Forgot password?</h2>
+                <p className="recover-form__description">
                     Enter in your email and a reset link will be sent for you to change your password.
                 </p>
                 <form onSubmit={ handleOnSubmit }>

@@ -25,9 +25,9 @@ const ActivateAccount = () => {
     }
     return (
         <div className="container">
-            <div className="forgot-password-form">
-                <h2 className="forgot-password-form__title">Hello { name.split(' ')[0] }, activate your account now!</h2>
-                <p className="forgot-password-form__description">
+            <div className="recover-form">
+                <h2 className="recover-form__title">Hello { name.split(' ')[0] }, activate your account now!</h2>
+                <p className="recover-form__description">
                     By clicking activate, your account with be verified and ready to use.
                 </p>
                 <form>

@@ -22,9 +22,9 @@ const ResetPassword = () => {
 
     return (
         <div className="container">
-            <div className="reset-password-form">
-                <h2 className="reset-password-form__title">Reset your password</h2>
-                <p className="reset-password-form__description">
+            <div className="recover-form">
+                <h2 className="recover-form__title">Reset your password</h2>
+                <p className="recover-form__description">
                     Enter in your new password to proceed.
                 </p>
                 <form onSubmit={ handleOnSubmit }>

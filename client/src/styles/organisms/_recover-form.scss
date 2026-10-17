@@ -1,28 +1,34 @@
-.forgot-password-form, .reset-password-form {
-  margin: 0 auto;
-  margin-top: 4rem;
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+// Panel for the forgot password, reset password and activate account pages.
+.recover-form {
+  @include auth-card;
+
+  margin: $space-40 auto 0;
   max-width: 80rem;
-  background-color: #ffffff;
-  box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
-  padding: 5rem 7rem;
-  border-radius: 5px; }
 
-.forgot-password-form__title, .reset-password-form__title {
-    margin: 2.5rem 0 1rem 0;
-    color: #55c57a; }
+  @include respond-to('md') {
+    padding: $space-30;
+  }
 
-.forgot-password-form__description, .reset-password-form__description {
-    font-size: 1.8rem;
-    color: #777777;
-    margin-bottom: 4rem; }
+  &__title {
+    margin: $space-25 0 $space-10;
+    color: $color-green;
 
-@media screen and (max-width: 767px) {
-  .forgot-password-form, .reset-password-form {
-    padding: 3rem; }
-  .forgot-password-form__title, .reset-password-form__title {
-      margin: 1.5rem 0 1rem 0;
-      color: #55c57a; }
-  .forgot-password-form__description, .reset-password-form__description {
-      font-size: 1.6rem;
-      color: #777777;
-      margin-bottom: 2.5rem; } }
+    @include respond-to('md') {
+      margin: $space-15 0 $space-10;
+    }
+  }
+
+  &__description {
+    font-size: $font-18;
+    color: $color-muted;
+    margin-bottom: $space-40;
+
+    @include respond-to('md') {
+      font-size: $font-16;
+      margin-bottom: $space-25;
+    }
+  }
+}
