@@ -46,14 +46,6 @@ const legacy = {
     'rule-empty-line-before',
     'shorthand-property-no-redundant-values',
   ],
-  'client/src/styles/organisms/_nav.scss': [
-    'color-hex-length',
-    'media-feature-range-notation',
-    'rule-empty-line-before',
-    'selector-max-class',
-    'selector-max-combinators',
-    'value-keyword-case',
-  ],
   'client/src/styles/organisms/_recover-form.scss': [
     'alpha-value-notation',
     'color-function-alias-notation',
