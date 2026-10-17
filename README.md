@@ -12,7 +12,7 @@ A blog written in the mern stack that handles:
 ## Installation
 ```bash
 1 - npm install (once, at the repo root: installs the server, client and shared workspaces)
-2 - copy .env.example to .env at the repo root and fill it in (the keys are documented there)
+2 - npm run setup (creates .env from .env.example with a random JWT_SECRET; never overwrites an existing .env, and runs automatically before npm run dev)
 3 - npm run dev (API on :5000 and client on :3000 together)
 ```
 
