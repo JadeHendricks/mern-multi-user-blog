@@ -4,18 +4,23 @@
   "private": true,
   "type": "module",
   "description": "Express API for the MERN multi-user blog",
-  "main": "src/server.ts",
+  "main": "dist/src/server.js",
   "engines": {
     "node": ">=24"
   },
   "scripts": {
     "dev": "tsx watch --env-file-if-exists=../.env src/server.ts",
-    "start": "tsx --env-file-if-exists=../.env src/server.ts",
+    "build": "tsc -b tsconfig.build.json && node build-assets.mjs",
+    "start": "node --env-file-if-exists=../.env --enable-source-maps dist/src/server.js",
+    "typecheck": "tsc -b tsconfig.json",
     "test:api": "vitest run --config vitest.config.ts",
     "test:api:mongo": "cross-env TEST_DB_DRIVER=mongo vitest run --config vitest.config.ts test/api",
     "seed": "tsx --env-file-if-exists=../.env scripts/seed.ts",
     "db:export": "tsx --env-file-if-exists=../.env scripts/db-export.ts",
-    "db:import": "tsx --env-file-if-exists=../.env scripts/db-import.ts"
+    "db:import": "tsx --env-file-if-exists=../.env scripts/db-import.ts",
+    "seed:dist": "node --env-file-if-exists=../.env --enable-source-maps dist/scripts/seed.js",
+    "db:export:dist": "node --env-file-if-exists=../.env --enable-source-maps dist/scripts/db-export.js",
+    "db:import:dist": "node --env-file-if-exists=../.env --enable-source-maps dist/scripts/db-import.js"
   },
   "dependencies": {
     "@mern-blog/shared": "1.0.0",
