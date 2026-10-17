@@ -1,6 +1,6 @@
 import React, { memo, useContext } from 'react';
 import svg from '../../assets/images/icons/sprite.svg'
-import Moment from 'react-moment';
+import { formatDate } from '../../lib/formatDate';
 import { Link } from 'react-router';
 import AuthContext from '../../context/authContext/AuthContext';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
@@ -50,7 +50,7 @@ const PostCard = ({ post: { _id, title, image, date, tag, description, user, lik
                     <img className="card__user-image" src={ uploadUrl('users', user?.avatar) } onError={ onImageError('users') } alt={ user?.name } title={ user?.name } />
                     <div className="card__user-info">
                         <div>{ user?.name }</div>
-                        <div>Posted on: <Moment format="DD/MM/YYYY">{ date }</Moment></div>
+                        <div>Posted on: { formatDate(date) }</div>
                     </div>
                 </div>
             </Link>

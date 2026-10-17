@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import Moment from 'react-moment';
+import { formatDate } from '../../lib/formatDate';
 import AuthContext from '../../context/authContext/AuthContext';
 import { useDeleteComment } from '../../hooks/useDeleteComment';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
@@ -12,7 +12,7 @@ const CommentPost = ({ comment: { userId, avatar, comment, name, date, _id }, po
                 <img src={ uploadUrl('users', avatar) } onError={ onImageError('users') } alt={ name } title={ name } />
             </div>
             <div className="comment-post__information">
-                <h5 className="comment-post__user-name">{ name } <span><Moment format="DD/MM/YYYY">{ date }</Moment></span></h5>
+                <h5 className="comment-post__user-name">{ name } <span>{ formatDate(date) }</span></h5>
                 <p className="comment-post__user-comment">
                     { comment }
                 </p>
