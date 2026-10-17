@@ -1,15 +1,20 @@
-import React, { memo, useContext } from 'react';
+import { memo } from 'react';
 import svg from '../../assets/images/icons/sprite.svg'
 import { formatDate } from '../../lib/formatDate';
 import { Link } from 'react-router';
-import AuthContext from '../../context/authContext/AuthContext';
+import { useAuth } from '../../context/authContext/AuthContext';
+import type { PostWithAuthor } from '../../lib/types';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
 import { descriptionTrimmer, postIsLiked } from '../../utils/postUtils';
 import { useToggleLike } from '../../hooks/useToggleLike';
 
-const PostCard = ({ post: { _id, title, image, date, tag, description, user, likes, comments } }) => {
+interface PostCardProps {
+    post: PostWithAuthor;
+}
 
-    const { loggedInUser } = useContext(AuthContext);	    
+const PostCard = ({ post: { _id, title, image, date, tag, description, user, likes, comments } }: PostCardProps) => {
+
+    const { loggedInUser } = useAuth();	    
     const toggleLike = useToggleLike();
 
     return (
@@ -34,10 +39,10 @@ const PostCard = ({ post: { _id, title, image, date, tag, description, user, lik
                     </div>
                     <div className="card__interaction-block">	
                         { postIsLiked(likes, loggedInUser) ? 	
-                            <svg className="card__interaction-icon" onClick={ () => toggleLike(_id, true) }>	
+                            <svg className="card__interaction-icon" onClick={ () => { toggleLike(_id, true); } }>	
                                 <use xlinkHref={`${svg}#icon-heart`}></use>	
                             </svg> :
-                            <svg className="card__interaction-icon" onClick={ () => toggleLike(_id, false) }>	
+                            <svg className="card__interaction-icon" onClick={ () => { toggleLike(_id, false); } }>	
                                 <use xlinkHref={`${svg}#icon-heart-o`}></use>	
                             </svg>	
                         }
@@ -45,7 +50,8 @@ const PostCard = ({ post: { _id, title, image, date, tag, description, user, lik
                     </div>
                 </div>
             </div>
-            <Link to={`/profile/${user?._id}`} className="card__user-link">
+            {/* String(): a post whose author is gone has user null and has always linked to /profile/undefined. Kept as is. */}
+            <Link to={`/profile/${String(user?._id)}`} className="card__user-link">
                 <div className="card__user">
                     <img className="card__user-image" src={ uploadUrl('users', user?.avatar) } onError={ onImageError('users') } alt={ user?.name } title={ user?.name } />
                     <div className="card__user-info">

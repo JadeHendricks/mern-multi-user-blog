@@ -1,10 +1,15 @@
-import React, { useContext } from 'react';
+import type { CommentDto } from '@mern-blog/shared';
 import { formatDate } from '../../lib/formatDate';
-import AuthContext from '../../context/authContext/AuthContext';
+import { useAuth } from '../../context/authContext/AuthContext';
 import { useDeleteComment } from '../../hooks/useDeleteComment';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
-const CommentPost = ({ comment: { userId, avatar, comment, name, date, _id }, postId }) => {
-    const { loggedInUser, isUsersData } = useContext(AuthContext);
+interface CommentPostProps {
+    comment: CommentDto;
+    postId: string;
+}
+
+const CommentPost = ({ comment: { userId, avatar, comment, name, date, _id }, postId }: CommentPostProps) => {
+    const { loggedInUser, isUsersData } = useAuth();
     const deleteComment = useDeleteComment(postId);
     return (
         <div className="comment-post">
@@ -19,7 +24,7 @@ const CommentPost = ({ comment: { userId, avatar, comment, name, date, _id }, po
             </div>
             { loggedInUser && isUsersData(loggedInUser._id, userId) && (
                 <div className="comment-post__interaction">
-                    <button className="button button--red" onClick={ () => deleteComment.mutate(_id) }>Delete Comment</button>
+                    <button className="button button--red" onClick={ () => { deleteComment.mutate(_id); } }>Delete Comment</button>
                 </div>
             ) }
         </div>

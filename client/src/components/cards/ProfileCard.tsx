@@ -1,13 +1,17 @@
-import React, { useContext } from 'react';
 import svg from '../../assets/images/icons/sprite.svg';
-import AuthContext from '../../context/authContext/AuthContext';
+import { useAuth } from '../../context/authContext/AuthContext';
+import type { PostWithAuthor } from '../../lib/types';
 import { Link } from 'react-router';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
 import { descriptionTrimmer, postIsLiked } from '../../utils/postUtils';
 import { useToggleLike } from '../../hooks/useToggleLike';
 import { useDeletePost } from '../../hooks/useDeletePost';
-const ProfileCard = ({ post: { _id, title, image, tag, description, comments, likes } }) => {
-    const { loggedInUser } = useContext(AuthContext);
+interface ProfileCardProps {
+    post: PostWithAuthor;
+}
+
+const ProfileCard = ({ post: { _id, title, image, tag, description, comments, likes } }: ProfileCardProps) => {
+    const { loggedInUser } = useAuth();
     const toggleLike = useToggleLike();
     const deletePost = useDeletePost();
     // useDeletePost only leaves the page once the server confirmed the delete.
@@ -41,10 +45,10 @@ const ProfileCard = ({ post: { _id, title, image, tag, description, comments, li
                     </div>
                     <div className="card__interaction-block">	
                         { postIsLiked(likes, loggedInUser) ? 	
-                            <svg className="card__interaction-icon" onClick={ () => toggleLike(_id, true) }>	
+                            <svg className="card__interaction-icon" onClick={ () => { toggleLike(_id, true); } }>	
                                 <use xlinkHref={`${svg}#icon-heart`}></use>	
                             </svg> :
-                            <svg className="card__interaction-icon" onClick={ () => toggleLike(_id, false) }>	
+                            <svg className="card__interaction-icon" onClick={ () => { toggleLike(_id, false); } }>	
                                 <use xlinkHref={`${svg}#icon-heart-o`}></use>	
                             </svg>	
                         } 	

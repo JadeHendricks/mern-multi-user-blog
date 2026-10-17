@@ -1,11 +1,15 @@
-import React from 'react';
+import type { PublicUserDto } from '@mern-blog/shared';
 import { formatDate } from '../../lib/formatDate';
 import svg from '../../assets/images/icons/sprite.svg'
 import { Link } from 'react-router';
 import { isHttpsUrl } from '../../utils/safeUrl';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
 
-const UserCard = ({ user: { createdAt, name, _id, avatar, socials } }) => {
+interface UserCardProps {
+    user: PublicUserDto;
+}
+
+const UserCard = ({ user: { createdAt, name, _id, avatar, socials } }: UserCardProps) => {
     return (
         <div className="card-user">
             <div className="card-user__header">

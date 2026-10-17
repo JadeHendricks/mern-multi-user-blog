@@ -1,17 +1,25 @@
-import React, { useState, useContext } from 'react';
+import { useState } from 'react';
+import type { ChangeEvent, SubmitEvent } from 'react';
+import type { CommentDto } from '@mern-blog/shared';
 import CommentPost from './CommentPost';
 import { Link } from 'react-router';
-import AuthContext from '../../context/authContext/AuthContext';
+import { useAuth } from '../../context/authContext/AuthContext';
 import { useAddComment } from '../../hooks/useAddComment';
-const CommentSubmit = ({ postId, postUser, comments }) => {
-    const { isAuthenticated } = useContext(AuthContext);
+interface CommentSubmitProps {
+    postId: string;
+    // Undefined while the post page has no post yet (it renders the empty frame).
+    comments: CommentDto[] | undefined;
+}
+
+const CommentSubmit = ({ postId, comments }: CommentSubmitProps) => {
+    const { isAuthenticated } = useAuth();
     const addComment = useAddComment(postId);
     const [ comment, setComment] = useState('');
-    const handleOnChange = e => setComment(e.target.value);
-    const handleSubmit = e => {
+    const handleOnChange = (e: ChangeEvent<HTMLTextAreaElement>) => { setComment(e.target.value); };
+    const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         // The API expects { comment }; clear the box only after it was saved.
-        addComment.mutate(comment, { onSuccess: () => setComment('') });
+        addComment.mutate(comment, { onSuccess: () => { setComment(''); } });
     }
     return (
         <div className="comment">
@@ -34,7 +42,7 @@ const CommentSubmit = ({ postId, postUser, comments }) => {
                     </div>
                 </form>
             )}
-            { comments?.map( comment => <CommentPost key={ comment._id } postId={ postId } postUser={ postUser } comment={ comment }/>) }
+            { comments?.map( comment => <CommentPost key={ comment._id } postId={ postId } comment={ comment }/>) }
         </div>
     )
 }
