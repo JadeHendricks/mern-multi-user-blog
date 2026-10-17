@@ -35,7 +35,8 @@
     "e2e:install": "playwright install chromium",
     "serve:memory": "npm run build:api && node e2e/support/start-api.js",
     "prelint": "npm run build:shared",
-    "lint": "eslint .",
+    "lint": "eslint . && npm run lint:styles",
+    "lint:styles": "stylelint \"client/src/styles/**/*.scss\"",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "npm run lint && npm run typecheck && npm run test:api && npm run test:api:mongo && npm run test:client && npm run test:e2e",
@@ -76,6 +77,8 @@
     "globals": "17.13.0",
     "jsdom": "30.1.3",
     "prettier": "3.9.10",
+    "stylelint": "17.16.0",
+    "stylelint-config-standard-scss": "17.0.0",
     "tsx": "4.23.15",
     "typescript": "6.0.3",
     "typescript-eslint": "8.71.2"

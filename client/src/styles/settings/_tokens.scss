@@ -4,7 +4,6 @@
 // Sass twin can never drift apart (client/src/styles/tokens.test.ts proves it).
 // Partials use the Sass variables (media queries cannot read var()); the custom properties are the
 // runtime and theming surface.
-//
 // Names: spacing, radii and font sizes use the value in tenths of a rem ($space-15 = 1.5rem,
 // $font-18 = 1.8rem). A decimal tenth is written with a dash ($space-7-5 = 0.75rem).
 // Not tokenised on purpose (component geometry): widths, heights, flex bases, percentages, z-index
@@ -21,18 +20,18 @@ $color-yellow-dark: #f7c74f;
 $color-orange: #d67d17;
 $color-red: #cd2d2d;
 $color-blue: #3f4bf9;
-$color-white: #ffffff;
+$color-white: #fff;
 $color-black: #000;
-$color-text: #444444;
-$color-muted: #777777;
+$color-text: #444;
+$color-muted: #777;
 $color-grey: #999;
 $color-grey-light: #b7b7b7;
 $color-border: #eaeaea;
 $color-surface: #f2f2f2;
 $color-background: #f7f7f7;
-$color-shadow-sm: rgba(0, 0, 0, 0.15);
-$color-shadow-md: rgba(0, 0, 0, 0.1);
-$color-shadow-lg: rgba(0, 0, 0, 0.06);
+$color-shadow-sm: rgb(0 0 0 / 15%);
+$color-shadow-md: rgb(0 0 0 / 10%);
+$color-shadow-lg: rgb(0 0 0 / 6%);
 
 // Spacing (margin, padding, gap)
 $space-3: 0.3rem;
@@ -106,6 +105,7 @@ $duration-slow: 0.4s;
 $duration-radio: 250ms;
 $duration-spin: 1s;
 
+// Map: colors
 $colors: (
   'green': $color-green,
   'green-mid': $color-green-mid,
@@ -131,6 +131,7 @@ $colors: (
   'shadow-lg': $color-shadow-lg,
 );
 
+// Map: spacing
 $spacing: (
   '3': $space-3,
   '5': $space-5,
@@ -151,6 +152,7 @@ $spacing: (
   '80': $space-80,
 );
 
+// Map: radii
 $radii: (
   '3': $radius-3,
   '4px': $radius-4px,
@@ -161,6 +163,7 @@ $radii: (
   'round': $radius-round,
 );
 
+// Map: shadows
 $shadows: (
   'sm': $shadow-sm,
   'md': $shadow-md,
@@ -168,6 +171,7 @@ $shadows: (
   'dot': $shadow-dot,
 );
 
+// Map: gradients
 $gradients: (
   'green': $gradient-green,
   'green-flat': $gradient-green-flat,
@@ -175,6 +179,7 @@ $gradients: (
   'yellow-diagonal': $gradient-yellow-diagonal,
 );
 
+// Map: font-sizes
 $font-sizes: (
   '10': $font-10,
   '12': $font-12,
@@ -194,6 +199,7 @@ $font-sizes: (
   '60': $font-60,
 );
 
+// Map: font-weights
 $font-weights: (
   'light': $weight-light,
   'regular': $weight-regular,
@@ -202,6 +208,7 @@ $font-weights: (
   'bold': $weight-bold,
 );
 
+// Map: durations
 $durations: (
   'fast': $duration-fast,
   'base': $duration-base,
