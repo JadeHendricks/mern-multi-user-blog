@@ -18,7 +18,7 @@
     "db:import": "node --env-file-if-exists=../.env scripts/db-import.js"
   },
   "dependencies": {
-    "@sendgrid/mail": "7.2.1",
+    "@sendgrid/mail": "8.1.6",
     "bcryptjs": "3.0.3",
     "cookie-parser": "1.4.5",
     "cors": "2.8.5",

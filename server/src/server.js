@@ -13,6 +13,7 @@ try {
 const { createApp } = await import('./app.js');
 const { createStore } = await import('./store/index.js');
 const { startServer, createShutdown } = await import('./lib/lifecycle.js');
+const { createMailer } = await import('./lib/mailer.js');
 
 let store;
 try {
@@ -21,7 +22,7 @@ try {
     console.error(err.message);
     process.exit(1);
 }
-const app = createApp({ store });
+const app = createApp({ store, mailer: createMailer(config) });
 
 startServer({ app, connect: () => store.init(), port: config.PORT })
     .then((server) => {

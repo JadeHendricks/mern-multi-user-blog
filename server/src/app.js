@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import rateLimit from 'express-rate-limit';
 import { config } from './config.js';
+import { createMailer } from './lib/mailer.js';
 import { createAuthController } from './controllers/authController.js';
 import { createUserController } from './controllers/userController.js';
 import { createPostController } from './controllers/postController.js';
@@ -15,8 +16,8 @@ import createPostRouter from './routes/postRoute.js';
 import { DuplicateEmailError, InvalidCursorError, StoreValidationError } from './store/errors.js';
 
 // The app only knows the repo interface (see store/types.js), never a database driver,
-// so any storage adapter can be plugged in.
-export function createApp({ store }) {
+// so any storage adapter can be plugged in. Mail goes through mailer.send the same way.
+export function createApp({ store, mailer = createMailer(config) }) {
     const app = express();
 
     //Middleware
@@ -60,7 +61,7 @@ export function createApp({ store }) {
         next();
     });
 
-    const auth = createAuthController({ store });
+    const auth = createAuthController({ store, mailer });
     app.use('/api/auth', createAuthRouter({ auth }));
     app.use('/api/user', createUserRouter({ auth, user: createUserController({ store }) }));
     app.use('/api/post', createPostRouter({ auth, post: createPostController({ store }) }));

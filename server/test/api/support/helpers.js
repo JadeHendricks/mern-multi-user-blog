@@ -18,8 +18,8 @@ const currentStore = {
   },
 };
 
-export function loadApp() {
-  return createApp({ store: currentStore });
+export function loadApp(options = {}) {
+  return createApp({ store: currentStore, ...options });
 }
 
 // The settings tests need (e.g. to sign tokens), read from the env that support/env.js set up.

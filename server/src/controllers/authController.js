@@ -1,29 +1,7 @@
 import jwt from 'jsonwebtoken';
-import sendGridMail from '@sendgrid/mail';
-import { config, readConfig } from '../config.js';
+import { config } from '../config.js';
 import { newToken, hashToken } from '../lib/tokens.js';
 import { hashPassword, verifyPassword } from '../lib/password.js';
-import fs from 'fs';
-import path from 'path';
-
-// MAIL_TRANSPORT=file (the default) writes mail to <DATA_DIR>/outbox instead of calling SendGrid.
-// Read on every send so a test can switch transport without reloading the app.
-const sendMail = (emailData) => {
-    const mail = readConfig();
-    if (mail.MAIL_TRANSPORT === 'file') {
-        const dir = path.join(mail.DATA_DIR, 'outbox');
-        fs.mkdirSync(dir, { recursive: true });
-        const name = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}.json`;
-        const { from, to, subject, html } = emailData;
-        fs.writeFileSync(
-            path.join(dir, name),
-            JSON.stringify({ from, to, subject, html, createdAt: new Date().toISOString() }, null, 2)
-        );
-        return Promise.resolve();
-    }
-    sendGridMail.setApiKey(mail.SG_API_KEY);
-    return sendGridMail.send(emailData);
-};
 
 const ACTIVATION_TTL_MS = 24 * 60 * 60 * 1000;
 const RESET_TTL_MS = 30 * 60 * 1000;
@@ -70,7 +48,7 @@ export const restrictTo = (...roles) => {
 
 // `store` is read at call time (store.users.x), never copied, so the app works with whichever
 // store is plugged in and tests can swap it between files.
-export const createAuthController = ({ store }) => {
+export const createAuthController = ({ store, mailer }) => {
     // Shared by protect and isLoggedIn: returns the user for a valid token, or null for a bad/expired
     // token, a user that no longer exists, an inactive user, or a token issued before the last
     // password change. Never throws on a bad token.
@@ -99,7 +77,6 @@ export const createAuthController = ({ store }) => {
 
         if (existing && existing.status === 'active') {
             emailData = {
-                from: config.EMAIL_FROM,
                 to: email,
                 subject: `You already have an account`,
                 html: `
@@ -123,7 +100,6 @@ export const createAuthController = ({ store }) => {
             }
 
             emailData = {
-                from: config.EMAIL_FROM,
                 to: email,
                 subject: `Account activation link`,
                 html: `
@@ -136,7 +112,7 @@ export const createAuthController = ({ store }) => {
             }
         }
 
-        await sendMail(emailData);
+        await mailer.send(emailData);
         res.status(200).json({
             message: registerMessage(email)
         });
@@ -259,7 +235,6 @@ export const createAuthController = ({ store }) => {
             const { raw, hash } = newToken();
 
             const emailData = {
-                from: config.EMAIL_FROM,
                 to: email,
                 subject: `Password Reset link`,
                 html: `
@@ -273,7 +248,7 @@ export const createAuthController = ({ store }) => {
 
             await store.users.setResetToken(user._id, hash, new Date(Date.now() + RESET_TTL_MS));
 
-            await sendMail(emailData);
+            await mailer.send(emailData);
         }
 
         res.status(200).json({
