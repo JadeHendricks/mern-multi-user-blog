@@ -25,8 +25,9 @@ npm run dev        # API on http://localhost:5000 and the client on http://local
 
 `npm run dev` runs `npm run setup` and builds `shared/` first, so you can skip that step. It then runs
 three processes: `tsc --watch` on `shared/`, the API under `tsx watch` (it restarts when a server
-file or `shared/dist` changes, so an edit in `shared/src` reaches the API a moment later) and the CRA
-dev server, which proxies API and image requests (`/api`, `/uploads`) to the API.
+file or `shared/dist` changes, so an edit in `shared/src` reaches the API a moment later) and the Vite
+dev server. Vite must own port 3000 (`strictPort`: it fails instead of picking another port) and it proxies API
+and image requests (`/api`, `/uploads`) to the API on port 5000.
 
 To run what you would deploy, use `npm start`: it compiles `shared/` and `server/` to `dist/` and starts
 the compiled server with plain `node` (no tsx).
@@ -121,19 +122,19 @@ Run from the repo root.
 | `npm run setup` | Create `.env` with a random `JWT_SECRET` if there is none (runs through `tsx`). |
 | `npm run dev` | `shared` watch (`dev:shared`), API under `tsx watch` (`dev:api`) and client (`dev:web`) together. |
 | `npm run dev:shared`, `dev:api`, `dev:web` | Only one of the three. |
-| `npm run build` | Compile `shared/` and `server/` to `dist/`, then build the client into `client/build`. |
+| `npm run build` | Compile `shared/` and `server/` to `dist/`, then build the client into `client/dist`. |
 | `npm run build:shared`, `npm run build:api` | Only `shared/`, or `shared/` plus `server/`. |
-| `npm start` | Build `shared/` and `server/`, then start the compiled API (`node server/dist/src/server.js`). With `NODE_ENV=production` it also serves `client/build`. |
+| `npm start` | Build `shared/` and `server/`, then start the compiled API (`node server/dist/src/server.js`). With `NODE_ENV=production` it also serves `client/dist` (hashed files under `assets/` are cached as immutable, `index.html` is not, and unknown page routes fall back to `index.html`). |
 | `npm run typecheck` | `tsc -b`: builds `shared/`, then type-checks the server (sources, scripts, tests), the shared tests and the root scripts. Nothing is emitted except `shared/dist`. |
 | `npm run seed [-- --reset]` | Fill the store with demo data (runs the TypeScript through `tsx`). |
 | `npm run db:export [-- file]` | Export users and posts to JSON. |
 | `npm run db:import -- file [--replace] [--driver d] [--allow-remote]` | Import an export file. |
-| `npm run lint` | ESLint with type-aware rules on all server, shared and root-script TypeScript (the client keeps its own CRA lint). |
+| `npm run lint` | ESLint with type-aware rules on all server, shared and root-script TypeScript and the React client (`eslint-plugin-react`, `react-hooks`, `jsx-a11y`). |
 | `npm run format`, `npm run format:check` | Prettier (legacy files are skipped, see `.prettierignore`). |
 | `npm test` | `test:api` and `test:client`. |
 | `npm run test:api` | Vitest + supertest on the JSON store, plus the store contract tests on both stores and the shared package tests. |
 | `npm run test:api:mongo` | The same API tests on the Mongo store (in-memory MongoDB). |
-| `npm run test:client` | Client unit tests (react-scripts / Jest). |
+| `npm run test:client` | Client unit tests (Vitest + jsdom + Testing Library). |
 | `npm run test:e2e` | Playwright: screenshots, smoke flows, axe report. Builds `shared/` and `server/` first (`pretest:e2e`) because it runs the compiled API. |
 | `npm run test:e2e:update` | Re-record screenshot baselines (only for intended visual changes). |
 | `npm run e2e:install` | Download the Chromium build Playwright uses. |
@@ -158,7 +159,7 @@ shared/src (zod schemas)  --z.infer-->  DTO and request types  -->  server (view
   makes every response body prove the same.
 - `validateBody(schema)` (`src/lib/validate.ts`) runs the shared request schemas and answers
   `422 { message }`; a valid body reaches the controller unchanged.
-- `shared` is compiled (`shared/dist`, ES2020) because Node and the CRA client cannot load TypeScript from
+- `shared` is compiled (`shared/dist`, ES2020) because Node and the client's JavaScript tooling cannot load TypeScript from
   `node_modules`. The server's Vitest config aliases the package to `shared/src` so tests never see a stale build.
 - The compiler settings are in `tsconfig.base.json` (strict, `noUncheckedIndexedAccess`,
   `exactOptionalPropertyTypes`, `verbatimModuleSyntax`, `erasableSyntaxOnly`, NodeNext). TypeScript is pinned
@@ -202,12 +203,17 @@ npm run check
   Settings, pagination parameters and import files use `zod` too.
 - **Storage:** JSON files by default so the project runs anywhere with no setup; Mongo sits behind the
   same interface for when you want it.
-- **Known dependency warning:** `npm audit --omit=dev -w server` reports 14 findings (3 low, 5 moderate,
-  4 high, 2 critical), the same count as before the TypeScript work. All of them are copies hoisted to
-  the root `node_modules` by the old CRA 3.4 client (`express@4.17.1` and its `body-parser`, `qs`, `send`,
-  `path-to-regexp`, `cookie`, plus `request`, `form-data`, `tough-cookie`, `uuid`). The server itself
-  resolves `express@5.3.0` from `server/node_modules`; `express-rate-limit` never imports express at
-  runtime. They go away with the CRA to Vite move.
+- **Known dependency warning:** `npm audit` reports 3 high findings, all in client dependencies that
+  are pinned on purpose (`axios`, `follow-redirects`, `moment`). `npm audit -w server` is clean.
+  Upgrading them is a separate change.
+- **Client build:** Vite replaced create-react-app 3.4. Measured sizes and audit counts:
+
+| | Before (CRA 3.4) | After (Vite 8) |
+| --- | --- | --- |
+| Main JS, gzip | 94,687 B (3 chunks) | 92,564 B (1 chunk) |
+| CSS, gzip | 6,063 B (2 files) | 5,542 B (1 file) |
+| `npm audit` (all and `--omit=dev`) | 196 (11 low, 134 moderate, 46 high, 5 critical) | 3 high |
+| `express` copies in `npm ls` | 5.3.0 and 4.17.1 | 5.3.0 only |
 
 ## Workspace layout
 
@@ -223,7 +229,7 @@ server/           Express 5 API (TypeScript, ESM)
   seed-assets/      sample images copied by the seed
   test/             api, store and unit tests (TypeScript)
   dist/             compiled output of src/ and scripts/ (generated, gitignored)
-client/           React 16 app (create-react-app 3.4, JavaScript)
+client/           React 16 app (Vite, JavaScript; `tsconfig.json` allows TypeScript files to be added one by one)
 shared/           @mern-blog/shared: zod schemas, DTO types, constants
   dist/             compiled package the server and client load (generated, gitignored)
 e2e/              Playwright specs (CommonJS JavaScript), support and screenshot baselines
