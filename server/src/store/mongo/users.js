@@ -48,7 +48,7 @@ export function createUserRepo({ User }) {
   async function updateOne(id, update, { secrets = false } = {}) {
     const filter = byId(id);
     if (!filter) return null;
-    let query = User.findOneAndUpdate(filter, update, { new: true, useFindAndModify: false }).lean();
+    let query = User.findOneAndUpdate(filter, update, { returnDocument: 'after' }).lean();
     if (secrets) query = query.select(USER_SECRET_SELECT);
     return view(await guard(query));
   }
@@ -87,12 +87,12 @@ export function createUserRepo({ User }) {
 
     async findByResetHash(hash) {
       if (typeof hash !== 'string' || !hash) return null;
-      const doc = await User.findOne(trust({ resetPasswordLink: hash, resetPasswordExpires: { $gt: new Date() } })).lean();
+      const doc = await User.findOne({ resetPasswordLink: hash, resetPasswordExpires: trust({ $gt: new Date() }) }).lean();
       return view(doc);
     },
 
     async listPublic({ cursor, limit } = {}) {
-      const { rows, nextCursor } = await findPage(User, trust({ status: { $ne: 'pending' } }), {
+      const { rows, nextCursor } = await findPage(User, { status: trust({ $ne: 'pending' }) }, {
         cursor,
         limit,
         field: 'createdAt',

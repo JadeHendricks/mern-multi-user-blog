@@ -41,7 +41,7 @@ export function createPostRepo({ User, Post }) {
       for (const comment of record.comments) if (isValidId(comment.user)) ids.add(comment.user);
     }
     if (ids.size === 0) return new Map();
-    const docs = await User.find(trust({ _id: { $in: [...ids].map(oid) } }))
+    const docs = await User.find({ _id: trust({ $in: [...ids].map(oid) }) })
       .select('name avatar socials')
       .lean();
     return new Map(docs.map((doc) => [String(doc._id), { ...doc, _id: String(doc._id) }]));
@@ -94,7 +94,7 @@ export function createPostRepo({ User, Post }) {
       if (fields.image !== undefined) set.image = fields.image || DEFAULT_AVATAR;
       const doc =
         Object.keys(set).length > 0
-          ? await guard(Post.findOneAndUpdate(filter, { $set: set }, { new: true, useFindAndModify: false }).lean())
+          ? await guard(Post.findOneAndUpdate(filter, { $set: set }, { returnDocument: 'after' }).lean())
           : await Post.findOne(filter).lean();
       return doc ? toPostView(toPostRecord(doc), new Map(), 'id') : null;
     },
@@ -109,7 +109,7 @@ export function createPostRepo({ User, Post }) {
     async delete(id) {
       const filter = postFilter(id);
       if (!filter) return null;
-      const doc = await Post.findOneAndDelete(filter, { useFindAndModify: false }).lean();
+      const doc = await Post.findOneAndDelete(filter).lean();
       return doc ? { image: doc.image } : null;
     },
 
@@ -120,9 +120,9 @@ export function createPostRepo({ User, Post }) {
       const filter = postFilter(id);
       if (!filter || !isValidId(userId)) return { status: 'not-found' };
       const doc = await Post.findOneAndUpdate(
-        trust({ ...filter, 'likes.user': { $ne: oid(userId) } }),
+        { ...filter, 'likes.user': trust({ $ne: oid(userId) }) },
         { $push: { likes: { $each: [{ _id: oid(newId()), user: oid(userId) }], $position: 0 } } },
-        { new: true, useFindAndModify: false },
+        { returnDocument: 'after' },
       )
         .select('likes')
         .lean();
@@ -136,7 +136,7 @@ export function createPostRepo({ User, Post }) {
       const doc = await Post.findOneAndUpdate(
         { ...filter, 'likes.user': oid(userId) },
         { $pull: { likes: { user: oid(userId) } } },
-        { new: true, useFindAndModify: false },
+        { returnDocument: 'after' },
       )
         .select('likes')
         .lean();
@@ -152,7 +152,7 @@ export function createPostRepo({ User, Post }) {
       const doc = await Post.findOneAndUpdate(
         filter,
         { $push: { comments: { $each: [{ _id: oid(newId()), userId, comment, date: new Date() }], $position: 0 } } },
-        { new: true, useFindAndModify: false },
+        { returnDocument: 'after' },
       ).lean();
       if (!doc) return null;
       const record = toPostRecord(doc);
@@ -167,7 +167,7 @@ export function createPostRepo({ User, Post }) {
       const doc = await Post.findOneAndUpdate(
         { ...filter, 'comments._id': oid(commentId) },
         { $pull: { comments: { _id: oid(commentId) } } },
-        { new: true, useFindAndModify: false },
+        { returnDocument: 'after' },
       )
         .select('_id')
         .lean();

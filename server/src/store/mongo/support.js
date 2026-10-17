@@ -7,9 +7,9 @@ const { ObjectId } = mongoose.Types;
 // Ids are hex strings outside this folder. Callers check isValidId first.
 export const oid = (hex) => new ObjectId(hex);
 
-// Marks a filter the code built itself (not user input) as safe. A no-op until the mongoose
-// version that ships sanitizeFilter, where it becomes mongoose.trusted().
-export const trust = (filter) => filter;
+// sanitizeFilter is on, so a query operator ({ $gt: ... }) in a filter only works when the code
+// that built it marks it as trusted. User input never goes through this.
+export const trust = (value) => mongoose.trusted(value);
 
 // Maps a driver or Mongoose error to the adapter-neutral errors the callers know.
 export function translateError(err) {
@@ -46,10 +46,10 @@ export async function findPage(Model, base, { cursor, limit, field, direction, s
     if (Number.isNaN(key.getTime())) throw new InvalidCursorError();
     const op = sign === 1 ? '$gt' : '$lt';
     filter = {
-      $and: [base, { $or: [{ [field]: { [op]: key } }, { [field]: key, _id: { [op]: oid(after.id) } }] }],
+      $and: [base, { $or: [{ [field]: trust({ [op]: key }) }, { [field]: key, _id: trust({ [op]: oid(after.id) }) }] }],
     };
   }
-  let query = Model.find(trust(filter)).sort({ [field]: sign, _id: sign }).lean();
+  let query = Model.find(filter).sort({ [field]: sign, _id: sign }).lean();
   if (select) query = query.select(select);
   if (limit !== undefined) query = query.limit(limit + 1);
   const rows = await query;

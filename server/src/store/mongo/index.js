@@ -13,6 +13,10 @@ import { createUserRepo } from './users.js';
  */
 export function createMongoStore(config) {
   const instance = new mongoose.Mongoose();
+  // Explicit because the default changed between majors: filter on schema paths only.
+  instance.set('strictQuery', true);
+  // Any query operator inside a filter is wrapped in $eq unless the code marks it trusted.
+  instance.set('sanitizeFilter', true);
   const models = { User: createUserModel(instance), Post: createPostModel(instance) };
   let connected = false;
 
@@ -22,13 +26,7 @@ export function createMongoStore(config) {
     admin: createAdmin(models),
     async init() {
       if (!config.MONGO_URI) throw new Error('MONGO_URI is not set');
-      // Legacy options the 5.x driver still needs; removed with the mongoose 6 upgrade.
-      await instance.connect(config.MONGO_URI, {
-        useNewUrlParser: true,
-        useCreateIndex: true,
-        useFindAndModify: false,
-        useUnifiedTopology: true,
-      });
+      await instance.connect(config.MONGO_URI);
       connected = true;
       // Waits for the unique email index so the first duplicate signup is already rejected.
       await Promise.all([models.User.init(), models.Post.init()]);
