@@ -1,0 +1,9 @@
+{
+  // Type-checks the tests (the build in ../tsconfig.json only covers src).
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["."]
+}

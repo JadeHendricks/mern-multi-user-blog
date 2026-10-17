@@ -20,7 +20,7 @@
     "build": "npm run build -w client",
     "start": "npm start -w server",
     "test": "npm run test:api && npm run test:client",
-    "test:api": "npm run test:api -w server",
+    "test:api": "npm run test -w shared && npm run test:api -w server",
     "test:api:mongo": "npm run test:api:mongo -w server",
     "test:client": "cross-env SKIP_PREFLIGHT_CHECK=true npm test -w client -- --watchAll=false --passWithNoTests",
     "test:e2e": "playwright test",
