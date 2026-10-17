@@ -60,14 +60,15 @@ export function createApp({
   app.use(
     helmet({
       // Explicit policy so a helmet upgrade cannot change it silently. 'unsafe-inline' is for styles only:
-      // react-toastify injects <style> tags. The Vite build has no inline scripts. Google Fonts hosts stay until Lato is self-hosted.
+      // react-toastify injects <style> tags. The Vite build has no inline scripts. Lato is self-hosted
+      // (@fontsource/lato), so no third-party style or font hosts are allowed.
       contentSecurityPolicy: {
         useDefaults: false,
         directives: {
           defaultSrc: ["'self'"],
           scriptSrc: ["'self'"],
-          styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-          fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          fontSrc: ["'self'"],
           imgSrc: ["'self'", 'data:', 'blob:'],
           connectSrc: ["'self'"],
           objectSrc: ["'none'"],

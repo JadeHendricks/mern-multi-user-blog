@@ -7,14 +7,16 @@ import { stubStore } from './support/helpers.js';
 const app = createApp({ store: stubStore() });
 
 describe('security headers', () => {
-  it('sends an explicit CSP that allows the Google Fonts hosts and no eval', async () => {
+  it('sends an explicit CSP with no third-party font hosts and no eval', async () => {
     const res = await supertest(app).get('/api/nope');
     const csp = res.headers['content-security-policy'];
     expect(csp).toBeDefined();
     expect(csp).toContain("default-src 'self'");
     expect(csp).toContain("script-src 'self'");
-    expect(csp).toContain('https://fonts.googleapis.com');
-    expect(csp).toContain('https://fonts.gstatic.com');
+    // Lato is self-hosted, so fonts and styles come from this origin only.
+    expect(csp).not.toContain('https://fonts.googleapis.com');
+    expect(csp).not.toContain('https://fonts.gstatic.com');
+    expect(csp).toContain("font-src 'self'");
     expect(csp).toContain("object-src 'none'");
     expect(csp).toContain("frame-ancestors 'none'");
     expect(csp).not.toContain('unsafe-eval');
