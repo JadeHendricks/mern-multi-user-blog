@@ -110,13 +110,19 @@ export function runPostContract(label: string, makeStore: MakeStore): void {
       for (let n = 1; n <= 4; n += 1) {
         await store.posts.insertMany([postInput(alice._id, { title: `Tie ${n}`, date: sameDate })]);
       }
-      const newest = await store.posts.create(
-        postInput(alice._id, { title: 'Newest', date: new Date('2026-01-01T00:00:00.000Z') }),
-      );
+      // insertMany keeps the date; create() ignores it, so it could not place a post in the past.
+      const newestId = newId();
+      await store.posts.insertMany([
+        postInput(alice._id, {
+          _id: newestId,
+          title: 'Newest',
+          date: new Date('2026-01-01T00:00:00.000Z'),
+        }),
+      ]);
 
       const everything = await store.posts.list();
       expect(everything.nextCursor).toBeNull();
-      expect(everything.items[0]?._id).toBe(newest._id);
+      expect(everything.items[0]?._id).toBe(newestId);
 
       const seen: string[] = [];
       let cursor: string | undefined;
@@ -137,13 +143,11 @@ export function runPostContract(label: string, makeStore: MakeStore): void {
     });
 
     it("lists one user's posts", async () => {
-      await store.posts.create(
+      await store.posts.insertMany([
         postInput(alice._id, { title: 'First', date: new Date('2025-12-01T00:00:00.000Z') }),
-      );
-      await store.posts.create(postInput(bob._id, { title: 'Bob' }));
-      await store.posts.create(
+        postInput(bob._id, { title: 'Bob' }),
         postInput(alice._id, { title: 'Second', date: new Date('2025-12-02T00:00:00.000Z') }),
-      );
+      ]);
 
       const page = await store.posts.listByUser(alice._id);
 
