@@ -21,11 +21,31 @@ export function createApp({ store }) {
 
     //Middleware
     app.use(morgan('dev'));
-    app.use(helmet());
+    app.use(helmet({
+        // Explicit policy so a helmet upgrade cannot change it silently. 'unsafe-inline' is for styles only:
+        // CRA and react-toastify inject <style> tags. Google Fonts hosts stay until Lato is self-hosted.
+        contentSecurityPolicy: {
+            useDefaults: false,
+            directives: {
+                defaultSrc: ["'self'"],
+                scriptSrc: ["'self'"],
+                styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+                fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+                imgSrc: ["'self'", 'data:', 'blob:'],
+                connectSrc: ["'self'"],
+                objectSrc: ["'none'"],
+                frameAncestors: ["'none'"],
+                baseUri: ["'self'"],
+                ...(config.NODE_ENV === 'production' ? { upgradeInsecureRequests: [] } : {})
+            }
+        },
+        // Uploaded images are served to the client dev server on another port (:3000 -> :5000).
+        crossOriginResourcePolicy: { policy: 'same-site' }
+    }));
     if (config.NODE_ENV === 'development') { app.use(cors({ origin: `http://localhost:3000` })) }
 
     const limiter = rateLimit({
-        max: 1000,
+        limit: 1000,
         windowMs: 60 * 60 * 1000,
         message: 'Too many requests from this IP, please try again in an hour!'
     });

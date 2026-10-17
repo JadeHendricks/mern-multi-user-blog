@@ -6,7 +6,7 @@ import { readConfig } from '../config.js';
 // (and the local E2E server) can raise or lower it through AUTH_RATE_LIMIT_MAX.
 const authLimiter = () => rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: () => readConfig().AUTH_RATE_LIMIT_MAX,
+    limit: () => readConfig().AUTH_RATE_LIMIT_MAX,
     handler: (req, res) => {
         res.status(429).json({
             message: 'Too many attempts, please try again in 15 minutes.'
