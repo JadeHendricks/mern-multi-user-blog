@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { InvalidCursorError } from '../store/errors.js';
 
 // Cursor = base64url of `<sort key>|<id>`. Rows are ordered by (key, id), so rows that share a key
@@ -33,4 +34,24 @@ export function paginate(items, { cursor, limit, key, direction = 'asc' }) {
   const page = rows.slice(0, limit);
   const last = page[page.length - 1];
   return { items: page, nextCursor: encodeCursor(key(last), last._id) };
+}
+
+// ?cursor=&limit= for the list endpoints. Both are optional; a bad value raises InvalidCursorError,
+// which the error handler answers with 422. Repeated params (?limit=1&limit=2) are rejected too.
+const pageQuery = z.object({
+  cursor: z.string().min(1).optional(),
+  limit: z
+    .string()
+    .regex(/^\d+$/)
+    .transform(Number)
+    .pipe(z.number().int().min(1).max(100))
+    .optional(),
+});
+
+export function parsePageQuery(query) {
+  const result = pageQuery.safeParse({ cursor: query.cursor, limit: query.limit });
+  if (!result.success) throw new InvalidCursorError('cursor must be a string and limit a whole number from 1 to 100');
+  // A malformed cursor is caught here too, so the answer does not depend on the driver.
+  if (result.data.cursor !== undefined) decodeCursor(result.data.cursor);
+  return result.data;
 }

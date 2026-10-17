@@ -118,7 +118,7 @@ describe('response shape contract', () => {
 
       const list = await supertest(app).get('/api/user');
       expect(list.status).toBe(200);
-      expect(keysOf(list.body)).toEqual(['message', 'users']);
+      expect(keysOf(list.body)).toEqual(['message', 'nextCursor', 'users']);
       expect(list.body.users).toHaveLength(2);
       for (const item of list.body.users) expect(keysOf(item)).toEqual(PUBLIC_USER_KEYS);
 
@@ -191,7 +191,7 @@ describe('response shape contract', () => {
 
       const list = await supertest(app).get('/api/post');
       expect(list.status).toBe(200);
-      expect(keysOf(list.body)).toEqual(['posts', 'results']);
+      expect(keysOf(list.body)).toEqual(['nextCursor', 'posts', 'results']);
       expect(list.body.results).toBe(1);
       expect(keysOf(list.body.posts[0])).toEqual(POST_KEYS);
       expect(keysOf(list.body.posts[0].user)).toEqual(['_id', 'avatar', 'name']);
@@ -214,7 +214,7 @@ describe('response shape contract', () => {
 
       const mine = await supertest(app).get(`/api/post/user/${user._id}`);
       expect(mine.status).toBe(200);
-      expect(keysOf(mine.body)).toEqual(['message', 'posts', 'results']);
+      expect(keysOf(mine.body)).toEqual(['message', 'nextCursor', 'posts', 'results']);
       expect(keysOf(mine.body.posts[0])).toEqual(POST_KEYS);
       expect(keysOf(mine.body.posts[0].user)).toEqual(['_id', 'avatar', 'name']);
 

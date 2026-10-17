@@ -1,4 +1,5 @@
 import { makeUpload, removeStoredFile } from '../../lib/upload.js';
+import { parsePageQuery } from '../../lib/pagination.js';
 
 export const uploadUserAvatar = makeUpload({ subdir: 'users', prefix: 'user', field: 'avatar' });
 
@@ -34,11 +35,12 @@ export const createUserController = ({ store }) => {
 
     const getAllUsers = async (req, res) => {
         // Pending (not yet activated) accounts are never listed by the repo
-        const { items: users } = await store.users.listPublic();
+        const { items: users, nextCursor } = await store.users.listPublic(parsePageQuery(req.query));
 
         res.status(200).json({
             message: 'success',
-            users
+            users,
+            nextCursor
         });
     }
 

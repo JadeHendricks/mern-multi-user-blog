@@ -1,14 +1,16 @@
 import { makeUpload, removeStoredFile } from '../../lib/upload.js';
+import { parsePageQuery } from '../../lib/pagination.js';
 
 export const uploadPostPhoto = makeUpload({ subdir: 'posts', prefix: 'post', field: 'image' });
 
 export const createPostController = ({ store }) => {
     const getAllPosts = async (req, res) => {
-        const { items: posts } = await store.posts.list();
+        const { items: posts, nextCursor } = await store.posts.list(parsePageQuery(req.query));
 
         res.status(200).json({
             results: posts.length,
-            posts
+            posts,
+            nextCursor
         });
     }
 
@@ -60,11 +62,12 @@ export const createPostController = ({ store }) => {
     }
 
     const getAllUsersPosts = async (req, res) => {
-        const { items: posts } = await store.posts.listByUser(req.params.id);
+        const { items: posts, nextCursor } = await store.posts.listByUser(req.params.id, parsePageQuery(req.query));
         res.status(200).json({
             message: 'success',
             results: posts.length,
-            posts
+            posts,
+            nextCursor
         });
     }
 

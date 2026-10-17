@@ -102,7 +102,7 @@ export function runPostContract(label, makeStore) {
 
       const page = await store.posts.listByUser(alice._id);
 
-      expect(page.items.map((post) => post.title)).toEqual(['First', 'Second']);
+      expect(page.items.map((post) => post.title)).toEqual(['Second', 'First']);
       expect(page.items[0].user).toEqual({ _id: alice._id, name: 'Alice', avatar: 'default.jpg' });
       expect((await store.posts.listByUser(newId())).items).toEqual([]);
       expect((await store.posts.listByUser('nope')).items).toEqual([]);

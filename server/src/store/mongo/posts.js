@@ -83,10 +83,10 @@ export function createPostRepo({ User, Post }) {
       return { items: views(rows, 'list'), nextCursor };
     },
 
-    // Oldest first: the order this endpoint has always returned.
+    // Newest first, like the main list (this endpoint used to return oldest first).
     async listByUser(userId, { cursor, limit } = {}) {
       if (!isValidId(userId)) return { items: [], nextCursor: null };
-      const { rows, nextCursor } = await findPage(Post, { user: oid(userId) }, { cursor, limit, field: 'date', direction: 'asc', populate: POPULATE });
+      const { rows, nextCursor } = await findPage(Post, { user: oid(userId) }, { cursor, limit, field: 'date', direction: 'desc', populate: POPULATE });
       return { items: views(rows, 'list'), nextCursor };
     },
 

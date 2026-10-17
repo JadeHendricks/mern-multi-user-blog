@@ -99,7 +99,7 @@ export function createApp({ store, mailer = createMailer(config) }) {
         }
         // Store errors are the caller's input problems, not crashes: answer with the store's own message.
         if (err instanceof DuplicateEmailError) return res.status(409).json({ message: err.message });
-        if (err instanceof InvalidCursorError) return res.status(400).json({ message: err.message });
+        if (err instanceof InvalidCursorError) return res.status(422).json({ message: err.message });
         if (err instanceof StoreValidationError) return res.status(422).json({ message: err.message });
 
         // body-parser and similar errors carry a 4xx status (e.g. malformed JSON, payload too large)

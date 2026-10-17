@@ -11,7 +11,6 @@ const iso = (value) => new Date(value).toISOString();
 
 // Newest first, with the id as a tie-break so the order is stable.
 const byDateDesc = (a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : a._id < b._id ? 1 : -1);
-const byDateAsc = (a, b) => -byDateDesc(a, b);
 
 function buildPost(data) {
   if (data._id !== undefined && !isValidId(data._id)) throw new StoreValidationError('Path `_id` is not a valid id.');
@@ -52,12 +51,12 @@ export function createPostRepo(db) {
     },
 
     async listByUser(userId, { cursor, limit } = {}) {
-      // Oldest first: the order this endpoint has always returned (insertion order).
+      // Newest first, like the main list (this endpoint used to return oldest first).
       const rows = db
         .read()
         .posts.filter((post) => post.user === userId)
-        .sort(byDateAsc);
-      const page = paginate(rows, { cursor, limit, key: (post) => post.date, direction: 'asc' });
+        .sort(byDateDesc);
+      const page = paginate(rows, { cursor, limit, key: (post) => post.date, direction: 'desc' });
       const byId = authors();
       return { items: page.items.map((post) => toPostView(post, byId, 'list')), nextCursor: page.nextCursor };
     },
