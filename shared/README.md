@@ -19,7 +19,11 @@ and declaration maps, ES2020). `main`, `types` and `exports` all point at `dist`
   `dist` too, so the client can use the package without a config change.
 - The server's Vitest config aliases `@mern-blog/shared` to `shared/src/index.ts`, so tests never run
   against a stale build.
-- `shared/dist` is generated and gitignored.
+- `shared/dist` is generated and gitignored. The root scripts build it before anything that loads the
+  package outside Vitest (`predev`, `prelint`, `pretest:api`, `build:api`). While you work, `npm run dev`
+  runs `tsc --watch` on it (`npm run watch -w shared`); the API's `tsx watch` restarts when `dist` changes.
+- `tsc -b` at the repo root (`npm run typecheck`) builds this package first because `server/` lists it
+  as a project reference.
 
 ```ts
 import { registerRequestSchema, type PostDto, NAME_MAX } from '@mern-blog/shared';
@@ -41,6 +45,7 @@ A valid body is returned unchanged (same keys and values, extra keys kept), so i
 
 ```bash
 npm run build -w shared       # tsc -> shared/dist
+npm run watch -w shared       # tsc --watch (part of `npm run dev`)
 npm run typecheck -w shared   # src and test
 npm run test -w shared        # Vitest (also part of `npm run test:api`)
 ```

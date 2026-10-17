@@ -6,6 +6,9 @@ posts with an optional image, like and comment, and edit a profile with an avata
 It runs on your own machine with no database server: data is kept in plain files under
 `server/data/`. MongoDB is optional and can be switched on later without code changes.
 
+The API and the package it shares with the client are written in TypeScript. The client is still
+JavaScript (Create React App) and is not part of this conversion.
+
 ## Prerequisites
 
 - Node.js 24 or newer (`.nvmrc` pins it; `nvm use` picks it up) and npm 11.
@@ -20,9 +23,13 @@ npm run seed       # optional: fills the store with demo users, posts and pictur
 npm run dev        # API on http://localhost:5000 and the client on http://localhost:3000
 ```
 
-`npm run dev` runs `npm run setup` first, so you can skip that step. The API restarts when its files
-change (`node --watch`). The client uses the CRA dev server, which proxies API and image requests
-(`/api`, `/uploads`) to the API.
+`npm run dev` runs `npm run setup` and builds `shared/` first, so you can skip that step. It then runs
+three processes: `tsc --watch` on `shared/`, the API under `tsx watch` (it restarts when a server
+file or `shared/dist` changes, so an edit in `shared/src` reaches the API a moment later) and the CRA
+dev server, which proxies API and image requests (`/api`, `/uploads`) to the API.
+
+To run what you would deploy, use `npm start`: it compiles `shared/` and `server/` to `dist/` and starts
+the compiled server with plain `node` (no tsx).
 
 ### Demo data
 
@@ -111,25 +118,56 @@ Run from the repo root.
 
 | Script | What it does |
 | --- | --- |
-| `npm run setup` | Create `.env` with a random `JWT_SECRET` if there is none. |
-| `npm run dev` | API (`dev:api`) and client (`dev:web`) together. |
-| `npm run dev:api`, `npm run dev:web` | Only one of the two. |
-| `npm start` | Start the API once (no watch). With `NODE_ENV=production` it also serves `client/build`. |
-| `npm run build` | Production build of the client into `client/build`. |
-| `npm run seed [-- --reset]` | Fill the store with demo data. |
+| `npm run setup` | Create `.env` with a random `JWT_SECRET` if there is none (runs through `tsx`). |
+| `npm run dev` | `shared` watch (`dev:shared`), API under `tsx watch` (`dev:api`) and client (`dev:web`) together. |
+| `npm run dev:shared`, `dev:api`, `dev:web` | Only one of the three. |
+| `npm run build` | Compile `shared/` and `server/` to `dist/`, then build the client into `client/build`. |
+| `npm run build:shared`, `npm run build:api` | Only `shared/`, or `shared/` plus `server/`. |
+| `npm start` | Build `shared/` and `server/`, then start the compiled API (`node server/dist/src/server.js`). With `NODE_ENV=production` it also serves `client/build`. |
+| `npm run typecheck` | `tsc -b`: builds `shared/`, then type-checks the server (sources, scripts, tests), the shared tests and the root scripts. Nothing is emitted except `shared/dist`. |
+| `npm run seed [-- --reset]` | Fill the store with demo data (runs the TypeScript through `tsx`). |
 | `npm run db:export [-- file]` | Export users and posts to JSON. |
 | `npm run db:import -- file [--replace] [--driver d] [--allow-remote]` | Import an export file. |
-| `npm run lint` | ESLint (the client keeps its own CRA lint). |
+| `npm run lint` | ESLint with type-aware rules on all server, shared and root-script TypeScript (the client keeps its own CRA lint). |
 | `npm run format`, `npm run format:check` | Prettier (legacy files are skipped, see `.prettierignore`). |
 | `npm test` | `test:api` and `test:client`. |
-| `npm run test:api` | Vitest + supertest on the JSON store, plus the store contract tests on both stores. |
+| `npm run test:api` | Vitest + supertest on the JSON store, plus the store contract tests on both stores and the shared package tests. |
 | `npm run test:api:mongo` | The same API tests on the Mongo store (in-memory MongoDB). |
 | `npm run test:client` | Client unit tests (react-scripts / Jest). |
-| `npm run test:e2e` | Playwright: screenshots, smoke flows, axe report. |
+| `npm run test:e2e` | Playwright: screenshots, smoke flows, axe report. Builds `shared/` and `server/` first (`pretest:e2e`) because it runs the compiled API. |
 | `npm run test:e2e:update` | Re-record screenshot baselines (only for intended visual changes). |
 | `npm run e2e:install` | Download the Chromium build Playwright uses. |
-| `npm run serve:memory` | API on :5000 with seeded throwaway data, to click around by hand. |
-| `npm run check` | lint + `test:api` + `test:api:mongo` + `test:client` + `test:e2e`. Run before a commit. |
+| `npm run serve:memory` | Compiled API on :5000 with seeded throwaway data, to click around by hand. |
+| `npm run check` | lint + typecheck + `test:api` + `test:api:mongo` + `test:client` + `test:e2e`. Run before a commit. |
+
+Scripts inside `server/` (`npm run <name> -w server`) add the compiled variants `seed:dist`,
+`db:export:dist` and `db:import:dist`, which run `node dist/scripts/<name>.js` instead of `tsx`.
+Both produce the same output; the `:dist` ones prove the build.
+
+## TypeScript layout and how types flow
+
+```text
+shared/src (zod schemas)  --z.infer-->  DTO and request types  -->  server (views, controllers, validateBody)
+                                                                -->  client (Phase 6: not wired yet)
+```
+
+- `shared/` (`@mern-blog/shared`) holds the zod schemas for requests and responses, plus the constants.
+  A DTO type is always `z.infer` of its schema, so a shape is defined once.
+- The server's repository views keep `Date` objects. A compile-time check (`server/src/store/types.check.ts`)
+  proves each view, once turned into JSON, still fits its DTO, and `sendJson` in `src/lib/respond.ts`
+  makes every response body prove the same.
+- `validateBody(schema)` (`src/lib/validate.ts`) runs the shared request schemas and answers
+  `422 { message }`; a valid body reaches the controller unchanged.
+- `shared` is compiled (`shared/dist`, ES2020) because Node and the CRA client cannot load TypeScript from
+  `node_modules`. The server's Vitest config aliases the package to `shared/src` so tests never see a stale build.
+- The compiler settings are in `tsconfig.base.json` (strict, `noUncheckedIndexedAccess`,
+  `exactOptionalPropertyTypes`, `verbatimModuleSyntax`, `erasableSyntaxOnly`, NodeNext). TypeScript is pinned
+  to 6.0.x because `typescript-eslint` does not support 7 yet. Relative imports keep their `.js` extension.
+- `server/tsconfig.json` is the type-check project (noEmit, includes tests); `server/tsconfig.build.json`
+  emits `server/dist/src` and `server/dist/scripts` (`rootDir` is `server/`, so the folders keep their depth).
+  `server/build-assets.mjs` then copies `scripts/seed-data.cjs`, the one CommonJS file (Playwright must
+  `require` it), next to the compiled seed script.
+- `any`, `@ts-ignore` and unexplained non-null assertions are lint errors in `server/` and `shared/`.
 
 ## API notes
 
@@ -158,31 +196,43 @@ npm run check
 
 ## Decisions
 
-- **Validation:** request bodies are validated with `express-validator` (the messages the client shows
-  are pinned by tests). Settings, pagination parameters and import files use `zod`. Both stay: moving
-  request validation to zod is a possible later cleanup, not needed now.
+- **Validation:** request bodies are validated with zod schemas from `@mern-blog/shared`, written to
+  answer exactly as the old `express-validator` chains did (about 550 recorded bodies pin it). One
+  difference is deliberate: only the body is validated, no longer the query string, cookies or headers.
+  Settings, pagination parameters and import files use `zod` too.
 - **Storage:** JSON files by default so the project runs anywhere with no setup; Mongo sits behind the
   same interface for when you want it.
+- **Known dependency warning:** `npm audit --omit=dev -w server` reports 14 findings (3 low, 5 moderate,
+  4 high, 2 critical), the same count as before the TypeScript work. All of them are copies hoisted to
+  the root `node_modules` by the old CRA 3.4 client (`express@4.17.1` and its `body-parser`, `qs`, `send`,
+  `path-to-regexp`, `cookie`, plus `request`, `form-data`, `tough-cookie`, `uuid`). The server itself
+  resolves `express@5.3.0` from `server/node_modules`; `express-rate-limit` never imports express at
+  runtime. They go away with the CRA to Vite move.
 
 ## Workspace layout
 
 ```text
-server/           Express 5 API (ESM)
-  src/app.js        app factory: createApp({ store, mailer })
-  src/server.js     reads config, opens the store, listens, shuts down cleanly
-  src/modules/      auth, users, posts (routes, controller, schema each)
-  src/store/        json/ and mongo/ adapters behind one repository interface
-  src/lib/          mailer, upload, pagination, tokens, password, ...
-  scripts/          seed, db-export, db-import
+server/           Express 5 API (TypeScript, ESM)
+  src/app.ts        app factory: createApp({ store, mailer })
+  src/server.ts     reads config, opens the store, listens, shuts down cleanly
+  src/modules/      auth, users, posts (routes and controller each)
+  src/store/        json/ and mongo/ adapters behind one repository interface (types.ts)
+  src/lib/          mailer, upload, pagination, tokens, password, validate, paths, ...
+  src/types/        express.d.ts (adds req.user)
+  scripts/          seed, db-export, db-import (+ seed-data.cjs, the one CommonJS file)
   seed-assets/      sample images copied by the seed
-  test/             api, store and unit tests
-client/           React 16 app (create-react-app 3.4)
-shared/           placeholder workspace for code shared later
-e2e/              Playwright specs, support and screenshot baselines
+  test/             api, store and unit tests (TypeScript)
+  dist/             compiled output of src/ and scripts/ (generated, gitignored)
+client/           React 16 app (create-react-app 3.4, JavaScript)
+shared/           @mern-blog/shared: zod schemas, DTO types, constants
+  dist/             compiled package the server and client load (generated, gitignored)
+e2e/              Playwright specs (CommonJS JavaScript), support and screenshot baselines
 scripts/          setup.mts
+tsconfig.base.json shared compiler options
+tsconfig.json     solution file for `npm run typecheck`
 ```
 
 ## Roadmap
 
-Phases 3 to 9 (client modernisation, state, styling, accessibility, performance and deployment) are
+Phases 4 to 9 (client modernisation, state, styling, accessibility, performance and deployment) are
 planned separately and are not part of this setup.
