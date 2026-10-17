@@ -1,23 +1,34 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+// Site header: the logo and the navigation (see nav).
 .header {
-  background-color: #444444;
-  padding: 2rem 3rem;
+  background-color: $color-text;
+  padding: $space-20 $space-30;
   display: flex;
   justify-content: space-between;
-  align-items: center; }
+  align-items: center;
 
-.header__logo img {
-    height: 3.5rem;
-    display: block;
-    margin-right: 1.5rem; }
-
-@media screen and (max-width: 767px) {
-  .header {
-    background-color: #444444;
-    padding: 2rem 1.5rem;
-    display: flex;
+  @include respond-to('md') {
+    padding: $space-20 $space-15;
     flex-direction: column;
     justify-content: center;
-    align-items: center; }
-  .header__logo img {
+  }
+
+  &__logo {
+    @include respond-to('xs') {
+      margin-bottom: $space-20;
+    }
+  }
+
+  &__logo-img {
+    height: 3.5rem;
+    display: block;
+    margin-right: $space-15;
+
+    @include respond-to('md') {
       height: 3rem;
-      margin-right: 1rem; } }
+      margin-right: $space-10;
+    }
+  }
+}

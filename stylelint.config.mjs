@@ -37,13 +37,6 @@ const legacy = {
     'selector-max-type',
     'selector-pseudo-element-colon-notation',
   ],
-  'client/src/styles/organisms/_header.scss': [
-    'color-hex-length',
-    'media-feature-range-notation',
-    'rule-empty-line-before',
-    'selector-max-combinators',
-    'selector-max-type',
-  ],
   'client/src/styles/organisms/_login-form.scss': [
     'alpha-value-notation',
     'color-function-alias-notation',

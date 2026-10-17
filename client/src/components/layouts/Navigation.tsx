@@ -12,7 +12,7 @@ const Navigation = () => {
         <header className="header">
             <nav className="nav nav--posts">
                 <div className="header__logo">
-                    <Link to='/'><img src={ SiteLogoW } alt="Multi User Blog" title="Multi User Blog"/></Link>
+                    <Link to='/'><img className="header__logo-img" src={ SiteLogoW } alt="Multi User Blog" title="Multi User Blog"/></Link>
                 </div>
                 <Link to='/' className="nav__el">All Posts</Link>
             </nav>
