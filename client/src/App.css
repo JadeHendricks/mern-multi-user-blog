@@ -223,6 +223,15 @@ strong {
   justify-content: space-between;
   flex-wrap: wrap; }
 
+.load-more {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0 0 0; }
+
+.load-more__button:disabled {
+  opacity: 0.6;
+  cursor: default; }
+
 .cards--account .card {
   flex: 0 1 48%;
   margin-bottom: 6rem; }

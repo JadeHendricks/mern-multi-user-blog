@@ -26,6 +26,7 @@ const makePost = (n, likes = 0) => ({
   likes: Array.from({ length: likes }, (_, i) => ({ user: `liker${i}` })),
   comments: [],
 });
+const FEED = 'GET /api/post?limit=12';
 const auth = { loggedInUser: { _id: 'me' }, isAuthenticated: true, isUsersData: (a, b) => a === b };
 const cardOf = (title) => screen.getByRole('link', { name: title }).closest('.card');
 const rendersOf = (image) => uploadUrl.mock.calls.filter(([kind, name]) => kind === 'posts' && name === image).length;
@@ -43,14 +44,14 @@ afterEach(() => {
 
 describe('home feed', () => {
   it('lists the posts from /api/post', async () => {
-    mockApi({ 'GET /api/post': { body: { posts: [makePost(1), makePost(2)] } } });
+    mockApi({ [FEED]: { body: { posts: [makePost(1), makePost(2)], nextCursor: null } } });
     renderWithProviders(<Base />, { auth });
     expect(await screen.findByRole('link', { name: 'Post 1' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Post 2' })).toBeInTheDocument();
   });
 
   it('shows the empty state and a toast when the list cannot be loaded', async () => {
-    mockApi({ 'GET /api/post': { status: 500, body: { message: 'Server broke' } } });
+    mockApi({ [FEED]: { status: 500, body: { message: 'Server broke' } } });
     renderWithProviders(<Base />, { auth });
     expect(await screen.findByText('No Content Found...')).toBeInTheDocument();
     expect(toast.error).toHaveBeenCalledWith('Server broke');
@@ -60,7 +61,7 @@ describe('home feed', () => {
     // The fake server remembers the like, so the refetch after the mutation agrees with the cache.
     let liked = false;
     mockApi({
-      'GET /api/post': () => ({ body: { posts: [makePost(1), { ...makePost(2), likes: liked ? [{ user: 'me' }] : [] }, makePost(3)] } }),
+      [FEED]: () => ({ body: { posts: [makePost(1), { ...makePost(2), likes: liked ? [{ user: 'me' }] : [] }, makePost(3)], nextCursor: null } }),
       'PUT /api/post/like/p2': () => {
         liked = true;
         return { body: { message: 'Post has been liked.', likes: [{ user: 'liker0' }] } };
@@ -86,7 +87,7 @@ describe('home feed', () => {
 
   it('puts a failed like back and keeps every card', async () => {
     mockApi({
-      'GET /api/post': { body: { posts: [makePost(1), makePost(2)] } },
+      [FEED]: { body: { posts: [makePost(1), makePost(2)], nextCursor: null } },
       'PUT /api/post/like/p1': { status: 500, body: { message: 'Server broke' } },
     });
     renderWithProviders(<Base />, { auth });
@@ -109,5 +110,83 @@ describe('most popular posts', () => {
     expect(queryClient.getQueryData(queryKeys.posts.list()).posts.map((p) => p._id)).toEqual(
       posts.map((p) => p._id),
     );
+  });
+});
+
+describe('home feed load more', () => {
+  const loadMore = () => screen.queryByRole('button', { name: 'Load more' });
+
+  it('shows Load more only while the server has a next page, appends it and hides at the end', async () => {
+    const api = mockApi({
+      [FEED]: { body: { posts: [makePost(1), makePost(2)], nextCursor: 'c1' } },
+      'GET /api/post?limit=12&cursor=c1': { body: { posts: [makePost(3)], nextCursor: null } },
+    });
+    renderWithProviders(<Base />, { auth });
+    await screen.findByRole('link', { name: 'Post 1' });
+    expect(loadMore()).toBeInTheDocument();
+
+    fireEvent.click(loadMore());
+    await screen.findByRole('link', { name: 'Post 3' });
+    expect(document.querySelectorAll('.card')).toHaveLength(3);
+    expect(loadMore()).not.toBeInTheDocument();
+    expect(api.callsTo('GET /api/post?limit=12&cursor=c1')).toHaveLength(1);
+  });
+
+  it('hides Load more when nextCursor is null', async () => {
+    mockApi({ [FEED]: { body: { posts: [makePost(1)], nextCursor: null } } });
+    renderWithProviders(<Base />, { auth });
+    await screen.findByRole('link', { name: 'Post 1' });
+    expect(loadMore()).not.toBeInTheDocument();
+  });
+
+  it('disables the button while the next page loads', async () => {
+    let release;
+    mockApi({
+      [FEED]: { body: { posts: [makePost(1)], nextCursor: 'c1' } },
+      'GET /api/post?limit=12&cursor=c1': () => new Promise((resolve) => (release = resolve)),
+    });
+    renderWithProviders(<Base />, { auth });
+    await screen.findByRole('link', { name: 'Post 1' });
+    fireEvent.click(loadMore());
+    await waitFor(() => expect(loadMore()).toBeDisabled());
+    release({ body: { posts: [makePost(2)], nextCursor: null } });
+    await screen.findByRole('link', { name: 'Post 2' });
+  });
+
+  it('keeps the loaded cards and toasts when the next page fails', async () => {
+    mockApi({
+      [FEED]: { body: { posts: [makePost(1)], nextCursor: 'c1' } },
+      'GET /api/post?limit=12&cursor=c1': { status: 500, body: { message: 'Server broke' } },
+    });
+    renderWithProviders(<Base />, { auth });
+    await screen.findByRole('link', { name: 'Post 1' });
+    fireEvent.click(loadMore());
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Server broke'));
+    expect(screen.getByRole('link', { name: 'Post 1' })).toBeInTheDocument();
+    expect(loadMore()).toBeInTheDocument();
+  });
+
+  it('a like on a card from the second page changes only that card', async () => {
+    // The fake server remembers the like, so the refetch of both pages after the mutation agrees.
+    let liked = false;
+    mockApi({
+      [FEED]: { body: { posts: [makePost(1), makePost(2)], nextCursor: 'c1' } },
+      'GET /api/post?limit=12&cursor=c1': () => ({ body: { posts: [{ ...makePost(3), likes: liked ? [{ user: 'me' }] : [] }], nextCursor: null } }),
+      'PUT /api/post/like/p3': () => {
+        liked = true;
+        return { body: { message: 'Post has been liked.', likes: [{ user: 'me' }] } };
+      },
+    });
+    renderWithProviders(<Base />, { auth });
+    await screen.findByRole('link', { name: 'Post 1' });
+    fireEvent.click(loadMore());
+    await screen.findByRole('link', { name: 'Post 3' });
+    const before = { 1: rendersOf('img-1.png'), 2: rendersOf('img-2.png') };
+
+    fireEvent.click(cardOf('Post 3').querySelector('svg.card__interaction-icon:not(.card__interaction-icon-comment)'));
+    await waitFor(() => expect(within(cardOf('Post 3')).getByText('1 Like')).toBeInTheDocument());
+    expect(within(cardOf('Post 1')).getByText('0 Likes')).toBeInTheDocument();
+    expect(rendersOf('img-1.png')).toBe(before[1]);
+    expect(rendersOf('img-2.png')).toBe(before[2]);
   });
 });

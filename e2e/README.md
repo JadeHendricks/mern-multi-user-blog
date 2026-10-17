@@ -31,10 +31,15 @@ their cookies to `e2e/.auth/*.json` (ignored by git).
   variants, hover and focus states and one toast.
 - `smoke.spec.js` (desktop only): seeded titles on the home page, login and logout through the UI,
   and the logged-out `/create-post` behaviour (known bug B15).
+- `load-more.spec.js`: the "Load more" button on Home and Users. Two screenshots per project use the
+  real API answer with a `nextCursor` added by `page.route`; one desktop-only test creates 8 posts
+  through the API, pages through them and deletes them again, so later specs see the seeded 6.
+  Create its baselines with `npx playwright test e2e/load-more.spec.js --update-snapshots=missing`
+  (`npm run test:e2e:update -- <file>` passes the file to the wrong option).
 - `a11y.spec.js` (desktop only): runs axe on every route, attaches the JSON result to the report and
   logs counts by impact. It is informational and never fails the run.
 
-No spec submits a form that changes data, so the database is identical at the start of every run.
+Only the desktop load-more test writes data, and it deletes it again, so the database is identical at the start of every run.
 Failed logins and logins are the only writes (a cookie, no database change).
 
 ## Determinism
