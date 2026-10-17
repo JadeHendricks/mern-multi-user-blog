@@ -17,13 +17,6 @@ const legacy = {
     'rule-empty-line-before',
     'selector-max-class',
   ],
-  'client/src/styles/generic/_base.scss': [
-    'color-hex-length',
-    'font-family-name-quotes',
-    'media-feature-range-notation',
-    'rule-empty-line-before',
-    'selector-no-vendor-prefix',
-  ],
   'client/src/styles/molecules/_comment-post.scss': [
     'color-hex-length',
     'media-feature-range-notation',

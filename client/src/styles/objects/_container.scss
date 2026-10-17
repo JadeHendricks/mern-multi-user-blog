@@ -1,6 +1,9 @@
+@use '../settings/tokens' as *;
+
 .container {
   max-width: 120rem;
-  padding: 2rem;
+  padding: $space-20;
   margin: 0 auto;
   display: block;
-  position: relative; }
+  position: relative;
+}
