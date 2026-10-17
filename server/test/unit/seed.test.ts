@@ -13,9 +13,11 @@ import {
 } from '../../scripts/seed.js';
 import { hashToken } from '../../src/lib/tokens.js';
 import { freshMongoUri, stopOwnMongo } from '../support/mongo.js';
+import { present } from '../store/contract/support.js';
 import { makeJsonStore, makeMongoStore } from '../store/support.js';
+import type { ExportData, PostView } from '../../src/store/types.js';
 
-const tmpDirs = [];
+const tmpDirs: string[] = [];
 const tmp = () => {
   const dir = mkdtempSync(path.join(tmpdir(), 'mern-blog-seed-'));
   tmpDirs.push(dir);
@@ -26,8 +28,12 @@ afterAll(async () => {
   for (const dir of tmpDirs) rmSync(dir, { recursive: true, force: true });
 });
 
+// find and list populate the author; create and update answer a plain id.
+const authorId = (post: PostView): string | undefined =>
+  typeof post.user === 'object' && post.user !== null ? post.user._id : undefined;
+
 // Bcrypt salts every hash, so those are the only fields allowed to differ between two seeds.
-const stable = (data) => ({
+const stable = (data: ExportData) => ({
   ...data,
   users: data.users.map(({ passwordHash, ...rest }) => ({
     ...rest,
@@ -36,8 +42,12 @@ const stable = (data) => ({
 });
 
 const io = () => {
-  const lines = { out: [], err: [] };
-  return { lines, out: (line) => lines.out.push(line), err: (line) => lines.err.push(line) };
+  const lines: { out: string[]; err: string[] } = { out: [], err: [] };
+  return {
+    lines,
+    out: (line: string) => lines.out.push(line),
+    err: (line: string) => lines.err.push(line),
+  };
 };
 
 describe.each([
@@ -51,8 +61,8 @@ describe.each([
 
       expect(counts).toEqual({ users: 4, posts: 6, pending: 1 });
       expect(await store.admin.counts()).toEqual({ users: 5, posts: 6 });
-      const first = await store.posts.findById(SEED_IDS.posts[0]);
-      expect(first.user._id).toBe(SEED_IDS.users.alice);
+      const first = present(await store.posts.findById(SEED_IDS.posts[0]));
+      expect(authorId(first)).toBe(SEED_IDS.users.alice);
       expect(first.likes.map((like) => like.user)).toEqual([
         SEED_IDS.users.bob,
         SEED_IDS.users.carol,
@@ -60,9 +70,9 @@ describe.each([
       ]);
       expect(first.comments).toHaveLength(2);
       expect(first.date.toISOString()).toBe('2025-12-01T09:00:00.000Z');
-      expect((await store.users.findPublicById(SEED_IDS.users.alice)).createdAt.toISOString()).toBe(
-        '2025-11-20T09:00:00.000Z',
-      );
+      expect(
+        present(await store.users.findPublicById(SEED_IDS.users.alice)).createdAt.toISOString(),
+      ).toBe('2025-11-20T09:00:00.000Z');
       // Images are on by default (the CLI and the E2E run); this test opted out of copying them.
       expect(SEED_IMAGES).toBe(true);
       expect(first.image).toBe('default.jpg');
@@ -76,9 +86,11 @@ describe.each([
     try {
       await seed(store, { images: false });
 
-      const alice = await store.users.findByEmail('alice@example.test', { secrets: true });
-      expect(await verifyPassword(E2E_PASSWORD, alice.passwordHash)).toBe(true);
-      const pending = await store.users.findByActivationHash(hashToken(SEED_ACTIVATION_TOKEN));
+      const alice = present(await store.users.findByEmail('alice@example.test', { secrets: true }));
+      expect(await verifyPassword(E2E_PASSWORD, alice.passwordHash ?? '')).toBe(true);
+      const pending = present(
+        await store.users.findByActivationHash(hashToken(SEED_ACTIVATION_TOKEN)),
+      );
       expect(pending.status).toBe('pending');
       expect(pending.email).toBe('erin@example.test');
       expect(await store.users.listPublic()).toMatchObject({ items: expect.any(Array) });
@@ -117,11 +129,11 @@ describe.each([
         'seed-user-4.svg',
       ]);
       expect(readdirSync(path.join(dataDir, 'uploads', 'posts'))).toHaveLength(3);
-      expect((await store.users.findPublicById(SEED_IDS.users.alice)).avatar).toBe(
+      expect(present(await store.users.findPublicById(SEED_IDS.users.alice)).avatar).toBe(
         'seed-user-1.svg',
       );
-      expect((await store.posts.findById(SEED_IDS.posts[0])).image).toBe('seed-post-1.svg');
-      expect((await store.posts.findById(SEED_IDS.posts[3])).image).toBe('seed-post-1.svg');
+      expect(present(await store.posts.findById(SEED_IDS.posts[0])).image).toBe('seed-post-1.svg');
+      expect(present(await store.posts.findById(SEED_IDS.posts[3])).image).toBe('seed-post-1.svg');
     } finally {
       await cleanup();
     }
@@ -129,8 +141,12 @@ describe.each([
 });
 
 describe('npm run seed (CLI)', () => {
-  const envFor = (dir, extra = {}) => ({ DB_DRIVER: 'json', DATA_DIR: dir, ...extra });
-  const exportOf = async (dir) => {
+  const envFor = (dir: string, extra: Record<string, string> = {}) => ({
+    DB_DRIVER: 'json',
+    DATA_DIR: dir,
+    ...extra,
+  });
+  const exportOf = async (dir: string) => {
     const { createJsonStore } = await import('../../src/store/json/index.js');
     const store = createJsonStore({ DATA_DIR: dir, BACKUP_KEEP: 3 });
     await store.init();

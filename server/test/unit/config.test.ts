@@ -1,16 +1,18 @@
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ConfigError, loadConfig } from '../../src/config.js';
+import { errorMessage } from '../../src/lib/errors.js';
 
 // Fake values only. SECRET is a marker the error text must never contain.
 const SECRET = 'a-very-long-fake-secret-value-0123456789abcdef';
 const valid = { JWT_SECRET: SECRET };
 
-const problemsFor = (env) => {
+const problemsFor = (env: Record<string, string | undefined>): string[] => {
   try {
     loadConfig(env);
   } catch (err) {
     expect(err).toBeInstanceOf(ConfigError);
+    if (!(err instanceof ConfigError)) throw err;
     return err.problems;
   }
   throw new Error('expected loadConfig to throw');
@@ -106,7 +108,7 @@ describe('loadConfig', () => {
         SG_API_KEY: 'fake-key',
       });
     } catch (err) {
-      message = err.message;
+      message = errorMessage(err);
     }
 
     expect(message).toContain('PORT');

@@ -8,8 +8,7 @@ export default defineConfig({
     },
   },
   test: {
-    // .js is only here until the store and unit tests are converted.
-    include: ['test/{api,store,unit}/**/*.test.{js,ts}'],
+    include: ['test/{api,store,unit}/**/*.test.ts'],
     // One forked process per test file: each file gets a fresh `config`, mongoose and app instance.
     pool: 'forks',
     fileParallelism: false,

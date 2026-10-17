@@ -49,7 +49,7 @@ describe('findServerRoot', () => {
 
 describe('the exported folders', () => {
   it('are the ones the server has always used', () => {
-    // This file is server/test/unit/paths.test.js, so the server folder is two levels up.
+    // This file is server/test/unit/paths.test.ts, so the server folder is two levels up.
     const expectedRoot = path.resolve(import.meta.dirname, '../..');
 
     expect(SERVER_ROOT).toBe(expectedRoot);

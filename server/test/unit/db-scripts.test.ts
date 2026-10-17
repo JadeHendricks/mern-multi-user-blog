@@ -3,12 +3,14 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterAll, describe, expect, it, vi } from 'vitest';
 import { run as exportRun } from '../../scripts/db-export.js';
+import type { ScriptEnv } from '../../scripts/lib/cli.js';
 import { run as importRun } from '../../scripts/db-import.js';
 import { run as seedRun } from '../../scripts/seed.js';
 import { isLocalMongoUri } from '../../src/lib/mongo-uri.js';
 import { freshMongoUri, stopOwnMongo } from '../support/mongo.js';
+import { present } from '../store/contract/support.js';
 
-const tmpDirs = [];
+const tmpDirs: string[] = [];
 const tmp = () => {
   const dir = mkdtempSync(path.join(tmpdir(), 'mern-blog-dbscripts-'));
   tmpDirs.push(dir);
@@ -20,24 +22,38 @@ afterAll(async () => {
 });
 
 const io = () => {
-  const lines = { out: [], err: [] };
+  const lines: { out: string[]; err: string[] } = { out: [], err: [] };
   return {
     lines,
-    out: (line) => lines.out.push(line),
-    err: (line) => lines.err.push(line),
+    out: (line: string) => lines.out.push(line),
+    err: (line: string) => lines.err.push(line),
     text: () => [...lines.out, ...lines.err].join('\n'),
   };
 };
-const jsonEnv = (dir) => ({ DB_DRIVER: 'json', DATA_DIR: dir });
-const mongoEnv = async (dir) => ({
+const jsonEnv = (dir: string) => ({ DB_DRIVER: 'json', DATA_DIR: dir });
+const mongoEnv = async (dir: string) => ({
   DB_DRIVER: 'mongo',
   MONGO_URI: await freshMongoUri(),
   DATA_DIR: dir,
 });
-const readExport = (file) => JSON.parse(readFileSync(file, 'utf8'));
-const byId = (list) => [...list].sort((a, b) => (a._id < b._id ? -1 : 1));
+// A record of an export file: free-form beyond its id, so a test can corrupt a field.
+interface ExportRecord {
+  _id: string;
+  [key: string]: unknown;
+}
+// The file as these tests read it (the shape is pinned by scripts/lib/export-file.ts).
+interface ExportDoc {
+  format: string;
+  version: number;
+  exportedAt: string;
+  schemaVersion: number;
+  users: ExportRecord[];
+  posts: ExportRecord[];
+}
+const readExport = (file: string) => JSON.parse(readFileSync(file, 'utf8')) as ExportDoc;
+const byId = (list: ExportRecord[]) => [...list].sort((a, b) => (a._id < b._id ? -1 : 1));
 // What an export file says about the data (not when it was written).
-const content = (file) => {
+const content = (file: string) => {
   const { users, posts, schemaVersion } = readExport(file);
   return { schemaVersion, users: byId(users), posts: byId(posts) };
 };
@@ -48,7 +64,7 @@ async function seededJson() {
   return dir;
 }
 
-async function exportTo(env, file) {
+async function exportTo(env: ScriptEnv, file: string) {
   const result = io();
   expect(await exportRun([file], { env, ...result })).toBe(0);
   return result;
@@ -95,10 +111,10 @@ describe('npm run db:export', () => {
     expect(Number.isNaN(Date.parse(data.exportedAt))).toBe(false);
     expect(data.users).toHaveLength(5);
     expect(data.posts).toHaveLength(6);
-    expect(data.users[0].passwordHash).toMatch(/^\$2/);
+    expect(present(data.users[0]).passwordHash).toMatch(/^\$2/);
     expect(result.lines.out.join('\n')).toMatch(/password hashes/);
     // The hashes are in the file, never on the terminal.
-    expect(result.text()).not.toContain(data.users[0].passwordHash);
+    expect(result.text()).not.toContain(present(data.users[0]).passwordHash);
   });
 
   it('defaults to DATA_DIR/exports and never overwrites an earlier file', async () => {
@@ -167,8 +183,8 @@ describe('npm run db:import', () => {
     const good = path.join(tmp(), 'good.json');
     await exportTo(jsonEnv(dir), good);
     const data = readExport(good);
-    data.users[0].role = 'superuser-value-that-must-not-be-echoed';
-    data.posts[0]._id = 'not-an-id';
+    present(data.users[0]).role = 'superuser-value-that-must-not-be-echoed';
+    present(data.posts[0])._id = 'not-an-id';
     const bad = path.join(tmp(), 'bad.json');
     writeFileSync(bad, JSON.stringify(data));
     const target = tmp();
@@ -202,7 +218,7 @@ describe('npm run db:import', () => {
     const good = path.join(tmp(), 'good.json');
     await exportTo(jsonEnv(dir), good);
     const data = readExport(good);
-    data.users[1].email = data.users[0].email.toUpperCase();
+    present(data.users[1]).email = String(present(data.users[0]).email).toUpperCase();
     const bad = path.join(tmp(), 'dup.json');
     writeFileSync(bad, JSON.stringify(data));
 

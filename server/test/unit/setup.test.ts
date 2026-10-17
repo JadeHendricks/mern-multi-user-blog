@@ -7,9 +7,9 @@ import { createEnvFile } from '../../../scripts/setup.mjs';
 
 // Temp folders only: the real .env is never read, written or passed to the script.
 describe('createEnvFile', () => {
-  let dir;
-  let examplePath;
-  let envPath;
+  let dir: string;
+  let examplePath: string;
+  let envPath: string;
 
   beforeEach(() => {
     dir = mkdtempSync(path.join(tmpdir(), 'mern-blog-setup-'));
@@ -17,7 +17,9 @@ describe('createEnvFile', () => {
     envPath = path.join(dir, '.env');
     writeFileSync(examplePath, 'PORT=5000\nJWT_SECRET=change-me\nNODE_ENV=development\n');
   });
-  afterEach(() => rmSync(dir, { recursive: true, force: true }));
+  afterEach(() => {
+    rmSync(dir, { recursive: true, force: true });
+  });
 
   it('creates .env with a 96-character hex JWT_SECRET and keeps the other lines', () => {
     expect(createEnvFile({ examplePath, envPath })).toEqual({ created: true });
@@ -31,12 +33,12 @@ describe('createEnvFile', () => {
 
   it('writes a secret that passes the config rules, and a different one each time', () => {
     createEnvFile({ examplePath, envPath });
-    const first = /^JWT_SECRET=(.+)$/m.exec(readFileSync(envPath, 'utf8'))[1];
+    const first = /^JWT_SECRET=(.+)$/m.exec(readFileSync(envPath, 'utf8'))?.[1];
     expect(() => loadConfig({ JWT_SECRET: first })).not.toThrow();
 
     const otherEnv = path.join(dir, 'other.env');
     createEnvFile({ examplePath, envPath: otherEnv });
-    const second = /^JWT_SECRET=(.+)$/m.exec(readFileSync(otherEnv, 'utf8'))[1];
+    const second = /^JWT_SECRET=(.+)$/m.exec(readFileSync(otherEnv, 'utf8'))?.[1];
     expect(second).not.toBe(first);
   });
 
