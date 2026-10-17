@@ -54,6 +54,8 @@
   },
   "homepage": "https://github.com/JadeHendricks/mern-starterkit#readme",
   "overrides": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "eslint-plugin-react": {
       "eslint": "$eslint"
     },

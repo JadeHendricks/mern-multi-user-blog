@@ -10,9 +10,7 @@ const api = 'http://localhost:5000';
 const proxy = { '/api': api, '/uploads': api };
 
 export default defineConfig({
-  // React 16.13 has no react/jsx-runtime (added in 16.14), so use the classic runtime. Every
-  // component already imports React.
-  plugins: [react({ jsxRuntime: 'classic' })],
+  plugins: [react()],
   resolve: {
     // react-moment 0.9 is a webpack UMD bundle that require()s moment and expects moment itself.
     // Left alone, Vite picks moment's ESM build, so require() returns a namespace object and the
