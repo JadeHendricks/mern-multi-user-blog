@@ -37,17 +37,17 @@ const PostEditForm = ({ id, post }: PostEditFormProps) => {
             </div>
             <div className="form__group">
                 <label className="label" htmlFor="tag">Post Tag</label>
-                <div className="form__radio">
-                    <input type="radio" id="general" value="general" name="tag" onChange={ handleOnChange } checked={tag === 'general'} />
-                    <label htmlFor="general" className="form__radio-label">general</label>
+                <div className="radio">
+                    <input className="radio__input" type="radio" id="general" value="general" name="tag" onChange={ handleOnChange } checked={tag === 'general'} />
+                    <label htmlFor="general" className="radio__label">general</label>
                 </div>
-                <div className="form__radio">
-                    <input type="radio" id="travel" value="travel" name="tag" onChange={ handleOnChange } checked={tag === 'travel'} />
-                    <label htmlFor="travel" className="form__radio-label">travel</label>
+                <div className="radio">
+                    <input className="radio__input" type="radio" id="travel" value="travel" name="tag" onChange={ handleOnChange } checked={tag === 'travel'} />
+                    <label htmlFor="travel" className="radio__label">travel</label>
                 </div>
-                <div className="form__radio">
-                    <input type="radio" id="funny" value="funny" name="tag" onChange={ handleOnChange } checked={tag === 'funny'} />
-                    <label htmlFor="funny" className="form__radio-label">funny</label>
+                <div className="radio">
+                    <input className="radio__input" type="radio" id="funny" value="funny" name="tag" onChange={ handleOnChange } checked={tag === 'funny'} />
+                    <label htmlFor="funny" className="radio__label">funny</label>
                 </div>
             </div>
             <div className="form__group">
