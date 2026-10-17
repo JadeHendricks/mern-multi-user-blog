@@ -29,7 +29,7 @@ const renderCard = (likes: PostWithAuthor['likes'], routes: Record<string, MockH
     auth: { loggedInUser: { _id: 'u2' } },
   });
   // The heart is the interaction icon that is not the comment icon.
-  const heart = utils.container.querySelector('svg.card__interaction-icon:not(.card__interaction-icon-comment)');
+  const heart = utils.container.querySelector('svg.card-interaction__icon:not(.card-interaction__icon--comment)');
   if (!heart) throw new Error('the card has no heart icon');
   return { ...utils, heart, api };
 };

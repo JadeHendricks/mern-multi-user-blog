@@ -30,19 +30,19 @@ const PostCard = ({ post: { _id, title, image, date, tag, description, user, lik
             <div className="card__details">
                 <Link to={`/post/${_id}`} className="card__title">{ title }</Link>
                 <p className="card__description">{ descriptionTrimmer(description) }</p>
-                <div className="card__interaction">
-                    <div className="card__interaction-block">
-                        <svg className="card__interaction-icon card__interaction-icon-comment">
+                <div className="card-interaction">
+                    <div className="card-interaction__item">
+                        <svg className="card-interaction__icon card-interaction__icon--comment">
                             <use xlinkHref={`${svg}#icon-comment-o`}></use>
                         </svg>
                         <span>{ comments.length } { comments.length === 1 ? 'Comment' : 'Comments' }</span>
                     </div>
-                    <div className="card__interaction-block">	
+                    <div className="card-interaction__item">	
                         { postIsLiked(likes, loggedInUser) ? 	
-                            <svg className="card__interaction-icon" onClick={ () => { toggleLike(_id, true); } }>	
+                            <svg className="card-interaction__icon" onClick={ () => { toggleLike(_id, true); } }>	
                                 <use xlinkHref={`${svg}#icon-heart`}></use>	
                             </svg> :
-                            <svg className="card__interaction-icon" onClick={ () => { toggleLike(_id, false); } }>	
+                            <svg className="card-interaction__icon" onClick={ () => { toggleLike(_id, false); } }>	
                                 <use xlinkHref={`${svg}#icon-heart-o`}></use>	
                             </svg>	
                         }
