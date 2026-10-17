@@ -7,8 +7,6 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "noEmit": true,
-    "allowJs": true,
-    "checkJs": false,
     "types": ["node"],
     "tsBuildInfoFile": "../node_modules/.tmp/client-node.tsbuildinfo"
   },

@@ -9,8 +9,6 @@
     "moduleResolution": "Bundler",
     "jsx": "react-jsx",
     "noEmit": true,
-    "allowJs": true,
-    "checkJs": false,
     "types": ["vite/client", "vitest/globals"],
     "tsBuildInfoFile": "../node_modules/.tmp/client-test.tsbuildinfo"
   },

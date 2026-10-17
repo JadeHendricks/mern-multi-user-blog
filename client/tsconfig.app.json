@@ -9,9 +9,6 @@
     "moduleResolution": "Bundler",
     "jsx": "react-jsx",
     "noEmit": true,
-    // Temporary: lets converted and not yet converted files import each other. Removed with the last conversion.
-    "allowJs": true,
-    "checkJs": false,
     "types": ["vite/client"],
     "tsBuildInfoFile": "../node_modules/.tmp/client-app.tsbuildinfo"
   },
