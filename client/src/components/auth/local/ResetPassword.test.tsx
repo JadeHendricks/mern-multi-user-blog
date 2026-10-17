@@ -4,13 +4,14 @@ import { MemoryRouter, Routes, Route } from 'react-router';
 import AuthContext from '../../../context/authContext/AuthContext';
 import ResetPassword from './ResetPassword';
 import { testAuth } from '../../../testing/testAuth';
+import { expectEveryFieldLabelled } from '../../../testing/dom';
 
 afterEach(cleanup);
 
 describe('ResetPassword', () => {
   it('submits the token from the url, also under StrictMode double effects', () => {
     const resetPassword = vi.fn();
-    render(
+    const { container } = render(
       <StrictMode>
         <AuthContext.Provider value={testAuth({ resetPassword })}>
           <MemoryRouter initialEntries={['/auth/password/reset/tok-1']}>
@@ -21,6 +22,7 @@ describe('ResetPassword', () => {
         </AuthContext.Provider>
       </StrictMode>
     );
+    expectEveryFieldLabelled(container);
     fireEvent.change(screen.getByLabelText('New Password'), { target: { name: 'newPassword', value: 'secret12' } });
     fireEvent.click(screen.getByRole('button', { name: 'Reset Password' }));
     expect(resetPassword).toHaveBeenCalledTimes(1);

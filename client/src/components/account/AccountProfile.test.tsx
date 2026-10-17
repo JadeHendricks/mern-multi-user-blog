@@ -9,6 +9,7 @@ import { queryKeys } from '../../lib/queryKeys';
 import { mockApi, asFormData } from '../../testing/mockApi';
 import type { MockHandler } from '../../testing/mockApi';
 import { testAuth } from '../../testing/testAuth';
+import { expectEveryFieldLabelled } from '../../testing/dom';
 
 const ann = { _id: 'u1', name: 'Ann', avatar: 'a.png', socials: { facebook: 'https://fb.test/ann' } };
 const bob = { _id: 'u2', name: 'Bob', avatar: 'b.png', socials: { facebook: 'https://fb.test/bob' } };
@@ -90,6 +91,14 @@ describe('AccountProfile data', () => {
 // B23: the account settings form copied props into state once, so showing a different user kept
 // the previous user's name and socials in the form (and a save would have written them back).
 describe('AccountProfile account settings form', () => {
+  it('gives every settings field a label', async () => {
+    mockApi(baseRoutes());
+    const { container } = render(tree('u1'));
+    fireEvent.click(await screen.findByRole('button', { name: 'Account settings' }));
+    await screen.findByLabelText('Name');
+    expectEveryFieldLabelled(container);
+  });
+
   it('shows the new user values after the user changes', async () => {
     mockApi(baseRoutes());
     const { rerender } = render(tree('u1'));

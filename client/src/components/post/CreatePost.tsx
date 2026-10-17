@@ -39,8 +39,9 @@ const PostForm = () => {
                             <label className="label" htmlFor="title">Post Title</label>
                             <input className="input" id="title" onChange={ handleOnChange } name="title" type="text" placeholder="Title goes here" />
                         </div>
-                        <div className="form-group">
-                            <label className="label" htmlFor="tag">Post Tag</label>
+                        {/* No single input owns this label (the tag is a radio group), so it names the group instead. */}
+                        <div className="form-group" role="radiogroup" aria-labelledby="post-tag-label">
+                            <span className="label" id="post-tag-label">Post Tag</span>
                             <div className="radio">
                                 {/* Always checked: both branches of the old ternary rendered checked=true. */}
                                 <input className="radio__input" type="radio" id="general" value="general" name="tag" onChange={ handleOnChange } checked />

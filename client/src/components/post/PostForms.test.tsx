@@ -1,4 +1,4 @@
-import { screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
+import { screen, fireEvent, waitFor, within, cleanup } from '@testing-library/react';
 import { Routes, Route, Link } from 'react-router';
 import { toast } from 'react-toastify';
 import CreatePost from './CreatePost';
@@ -8,6 +8,7 @@ import { mockApi, asFormData } from '../../testing/mockApi';
 import type { MockHandler } from '../../testing/mockApi';
 import type { TestAuth } from '../../testing/testAuth';
 import { renderWithProviders } from '../../testing/renderWithProviders';
+import { expectEveryFieldLabelled } from '../../testing/dom';
 
 const auth: TestAuth = { loggedInUser: { _id: 'u1' }, isAuthenticated: true, authLoading: false };
 const saved = { _id: 'p1', title: 'Saved title', tag: 'travel', description: 'Saved body', image: 'saved.png' };
@@ -48,6 +49,13 @@ const fillCreate = (image?: File) => {
 };
 
 describe('CreatePost', () => {
+  it('labels every field and names the tag radio group', () => {
+    const { container } = renderCreate();
+    expectEveryFieldLabelled(container);
+    const group = screen.getByRole('radiogroup', { name: 'Post Tag' });
+    expect(within(group).getAllByRole('radio')).toHaveLength(3);
+  });
+
   it('sends the fields as FormData without a Content-Type, then opens the new post', async () => {
     const { api, queryClient } = renderCreate();
     queryClient.setQueryData(queryKeys.posts.list(), { posts: [] });
@@ -97,6 +105,14 @@ const renderEdit = (routes: Record<string, MockHandler> = {}, route = '/edit-pos
 };
 
 describe('EditPost', () => {
+  it('labels every field and names the tag radio group', async () => {
+    const { container } = renderEdit();
+    await waitFor(() => expect(screen.getByLabelText('Post Title')).toHaveValue('Saved title'));
+    expectEveryFieldLabelled(container);
+    const group = screen.getByRole('radiogroup', { name: 'Post Tag' });
+    expect(within(group).getByLabelText('travel')).toBeChecked();
+  });
+
   it('fills the form from the saved post', async () => {
     renderEdit();
     await waitFor(() => expect(screen.getByLabelText('Post Title')).toHaveValue('Saved title'));
