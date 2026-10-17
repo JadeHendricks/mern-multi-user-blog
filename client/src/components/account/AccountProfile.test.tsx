@@ -8,7 +8,6 @@ import { createQueryClient } from '../../lib/queryClient';
 import { queryKeys } from '../../lib/queryKeys';
 import { mockApi, asFormData } from '../../testing/mockApi';
 import type { MockHandler } from '../../testing/mockApi';
-import { mustQuery } from '../../testing/dom';
 import { testAuth } from '../../testing/testAuth';
 
 const ann = { _id: 'u1', name: 'Ann', avatar: 'a.png', socials: { facebook: 'https://fb.test/ann' } };
@@ -153,19 +152,20 @@ describe('AccountProfile account settings form', () => {
 describe('AccountProfile post cards (B21)', () => {
   it('updates the like count on an own post card', async () => {
     mockApi(baseRoutes());
-    const { container } = render(tree());
+    render(tree());
     expect(await screen.findByText('0 Likes')).toBeInTheDocument();
-    fireEvent.click(mustQuery(container, 'svg.card-interaction__icon:not(.card-interaction__icon--comment)'));
+    fireEvent.click(screen.getByRole('button', { name: 'Like Ann post' }));
     expect(await screen.findByText('1 Like')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Like Ann post' })).toHaveAttribute('aria-pressed', 'true');
     await waitFor(() => expect(toast.success).toHaveBeenCalledWith('Post has been liked.'));
   });
 
   it('updates the like count on another user\u2019s post card', async () => {
     mockApi(baseRoutes());
     // Bob looks at Ann's profile.
-    const { container } = render(tree('u2'));
+    render(tree('u2'));
     expect(await screen.findByText('0 Likes')).toBeInTheDocument();
-    fireEvent.click(mustQuery(container, 'svg.card-interaction__icon:not(.card-interaction__icon--comment)'));
+    fireEvent.click(screen.getByRole('button', { name: 'Like Ann post' }));
     expect(await screen.findByText('1 Like')).toBeInTheDocument();
   });
 

@@ -6,7 +6,7 @@ import { useAuth } from '../../context/authContext/AuthContext';
 import type { PostWithAuthor } from '../../lib/types';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
 import { descriptionTrimmer, postIsLiked } from '../../utils/postUtils';
-import { useToggleLike } from '../../hooks/useToggleLike';
+import LikeButton from './LikeButton';
 
 interface PostCardProps {
     post: PostWithAuthor;
@@ -16,8 +16,7 @@ interface PostCardProps {
 
 const PostCard = ({ post: { _id, title, image, date, tag, description, user, likes, comments }, variant }: PostCardProps) => {
 
-    const { loggedInUser } = useAuth();	    
-    const toggleLike = useToggleLike();
+    const { loggedInUser } = useAuth();
 
     return (
         <div className={ variant === 'account' ? 'card card--account' : 'card' }>
@@ -34,20 +33,13 @@ const PostCard = ({ post: { _id, title, image, date, tag, description, user, lik
                 <p className="card__description">{ descriptionTrimmer(description) }</p>
                 <div className="card-interaction">
                     <div className="card-interaction__item">
-                        <svg className="card-interaction__icon card-interaction__icon--comment">
+                        <svg className="card-interaction__icon card-interaction__icon--comment" aria-hidden="true" focusable="false">
                             <use xlinkHref={`${svg}#icon-comment-o`}></use>
                         </svg>
                         <span>{ comments.length } { comments.length === 1 ? 'Comment' : 'Comments' }</span>
                     </div>
-                    <div className="card-interaction__item">	
-                        { postIsLiked(likes, loggedInUser) ? 	
-                            <svg className="card-interaction__icon" onClick={ () => { toggleLike(_id, true); } }>	
-                                <use xlinkHref={`${svg}#icon-heart`}></use>	
-                            </svg> :
-                            <svg className="card-interaction__icon" onClick={ () => { toggleLike(_id, false); } }>	
-                                <use xlinkHref={`${svg}#icon-heart-o`}></use>	
-                            </svg>	
-                        }
+                    <div className="card-interaction__item">
+                        <LikeButton postId={ _id } title={ title } liked={ Boolean(postIsLiked(likes, loggedInUser)) } />
                         <span>{ likes.length } { likes.length === 1 ? 'Like' : 'Likes' }</span>	
                     </div>
                 </div>
