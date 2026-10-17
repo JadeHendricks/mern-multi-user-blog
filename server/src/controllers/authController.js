@@ -76,7 +76,7 @@ export const createAuthController = ({ store }) => {
     // password change. Never throws on a bad token.
     const verifySession = async (token) => {
         try {
-            const decoded = jwt.verify(token, config.JWT_SECRET);
+            const decoded = jwt.verify(token, config.JWT_SECRET, { algorithms: ['HS256'] });
             const withSecrets = await store.users.findById(decoded._id, { secrets: true });
             if (!withSecrets || withSecrets.status !== 'active') return null;
             // iat is in whole seconds, so compare against the change time truncated to seconds
@@ -190,6 +190,7 @@ export const createAuthController = ({ store }) => {
         }
 
         const token = jwt.sign({ _id: user._id }, config.JWT_SECRET, {
+            algorithm: 'HS256',
             expiresIn: sessionDays() * 24 * 60 * 60
         });
 

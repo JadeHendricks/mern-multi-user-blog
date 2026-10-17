@@ -14,7 +14,7 @@ describe('password hashes', () => {
 
   it('hashes new passwords at cost 12 and verifies them', async () => {
     const hash = await hashPassword('a-fresh-password');
-    expect(hash).toMatch(/^\$2[ab]\$12\$/);
+    expect(hash).toMatch(/^\$2b\$12\$/);
     expect(await verifyPassword('a-fresh-password', hash)).toBe(true);
     expect(await verifyPassword('another-password', hash)).toBe(false);
   });
