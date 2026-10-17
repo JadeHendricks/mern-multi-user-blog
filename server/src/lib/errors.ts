@@ -8,7 +8,12 @@ export const errorCode = (err: unknown): string | undefined =>
 export const errorMessage = (err: unknown): string =>
   err instanceof Error ? err.message : String(err);
 
-// Error classes shared across the server. The store adapters raise the first four, so callers
+// Error classes shared across the server.
+//
+// Which module throws what:
+// - the store adapters: DuplicateEmailError, InvalidCursorError, StoreValidationError, StoreError
+// - config.ts: ConfigError
+// - uploads: HttpError (the JSON error handler in app answers it with its status) The store adapters raise the first four, so callers
 // never depend on a driver's own error types; store/errors.ts re-exports them for the store code.
 
 export class DuplicateEmailError extends Error {
@@ -38,5 +43,30 @@ export class StoreError extends Error {
   constructor(message: string) {
     super(message);
     this.name = 'StoreError';
+  }
+}
+
+// The settings are wrong or missing. One problem per line, key names only: a zod issue message
+// describes the rule, never the value, so no secret ends up in the message.
+export class ConfigError extends Error {
+  readonly problems: string[];
+
+  constructor(problems: string[]) {
+    super(`Invalid configuration:\n${problems.map((line) => `  - ${line}`).join('\n')}`);
+    this.name = 'ConfigError';
+    this.problems = problems;
+  }
+}
+
+// An error the JSON error handler (app) answers with `status`. `expose` says the message is safe to
+// show to the client; without it the handler sends a generic "Bad request".
+export class HttpError extends Error {
+  readonly status: number;
+  readonly expose: boolean;
+
+  constructor(status: number, message: string, expose = false) {
+    super(message);
+    this.status = status;
+    this.expose = expose;
   }
 }

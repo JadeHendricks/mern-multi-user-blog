@@ -7,6 +7,7 @@ import path from 'path';
 import rateLimit from 'express-rate-limit';
 import { config } from './config.js';
 import { createMailer } from './lib/mailer.js';
+import { CLIENT_BUILD_DIR } from './lib/paths.js';
 import { ensureUploadDirs, uploadsRoot } from './lib/upload.js';
 import { createAuthController } from './modules/auth/controller.js';
 import { createUserController } from './modules/users/controller.js';
@@ -16,7 +17,7 @@ import createUserRouter from './modules/users/routes.js';
 import createPostRouter from './modules/posts/routes.js';
 import { DuplicateEmailError, InvalidCursorError, StoreValidationError } from './store/errors.js';
 
-// The app only knows the repo interface (see store/types.js), never a database driver,
+// The app only knows the repo interface (see store/types.ts), never a database driver,
 // so any storage adapter can be plugged in. Mail goes through mailer.send the same way.
 export function createApp({ store, mailer = createMailer(config) }) {
     const app = express();
@@ -112,10 +113,9 @@ export function createApp({ store, mailer = createMailer(config) }) {
     });
 
     if (config.NODE_ENV === 'production') {
-        const clientBuild = path.resolve(import.meta.dirname, '../../client/build');
-        app.use(express.static(clientBuild));
+        app.use(express.static(CLIENT_BUILD_DIR));
         app.get('/{*splat}', (req, res) => {
-            res.sendFile(path.join(clientBuild, 'index.html'))
+            res.sendFile(path.join(CLIENT_BUILD_DIR, 'index.html'))
         });
     }
 
