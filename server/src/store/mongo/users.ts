@@ -1,15 +1,22 @@
+import { DEFAULT_AVATAR } from '@mern-blog/shared';
+import type { Types, UpdateQuery } from 'mongoose';
 import { isValidId, newId } from '../../lib/ids.js';
 import { StoreValidationError } from '../errors.js';
-import { cleanEmail, cleanName, requireHash } from '../rules.js';
-import { DEFAULT_AVATAR, toPublicUser, toUser } from '../views.js';
-import { toUserRecord, USER_SECRET_SELECT } from './records.js';
-import { findPage, guard, oid, trust } from './support.js';
+import { cleanEmail, cleanName, orDefault, requireHash } from '../rules.js';
+import type { SecretsOption, User, UserInput, UserRepo, UserStatus } from '../types.js';
+import { toPublicUser, toUser } from '../views.js';
+import { toSocials, toUserRecord, USER_SECRET_SELECT } from './records.js';
+import { guard, oid, pageWindow, trust } from './support.js';
+import type { LeanUser, UserModel, UserSchema } from './user-model.js';
 
-const ROLES = new Set(['user', 'admin']);
-const STATUSES = new Set(['pending', 'active']);
+const ROLES = new Set<string>(['user', 'admin']);
+const STATUSES = new Set<string>(['pending', 'active']);
+
+/** A user document to insert (the secret columns are optional here). */
+type NewUserDoc = Partial<UserSchema> & { _id: Types.ObjectId };
 
 // Builds the document to insert from repo input (used by createPending and create).
-function buildDoc(data, defaultStatus) {
+function buildDoc(data: UserInput, defaultStatus: UserStatus): NewUserDoc {
   const status = data.status ?? defaultStatus;
   const role = data.role ?? 'user';
   if (!STATUSES.has(status))
@@ -19,9 +26,9 @@ function buildDoc(data, defaultStatus) {
     throw new StoreValidationError('Path `_id` is not a valid id.');
   const now = new Date();
   const createdAt = data.createdAt ? new Date(data.createdAt) : now;
-  const doc = {
+  const doc: NewUserDoc = {
     _id: oid(data._id ?? newId()),
-    avatar: data.avatar || DEFAULT_AVATAR,
+    avatar: orDefault(data.avatar, DEFAULT_AVATAR),
     name: cleanName(data.name),
     email: cleanEmail(data.email),
     password: requireHash(data.passwordHash),
@@ -30,7 +37,9 @@ function buildDoc(data, defaultStatus) {
     createdAt,
     updatedAt: data.updatedAt ? new Date(data.updatedAt) : data.createdAt ? createdAt : now,
   };
-  if (data.socials && Object.keys(data.socials).length > 0) doc.socials = { ...data.socials };
+  const socials =
+    data.socials && Object.keys(data.socials).length > 0 ? toSocials(data.socials) : undefined;
+  if (socials) doc.socials = socials;
   if (data.activationHash) doc.activationToken = data.activationHash;
   if (data.activationExpires) doc.activationExpires = new Date(data.activationExpires);
   if (data.resetHash) doc.resetPasswordLink = data.resetHash;
@@ -39,27 +48,28 @@ function buildDoc(data, defaultStatus) {
   return doc;
 }
 
-/**
- * @param {{User: import('mongoose').Model}} models
- * @returns {import('../types.js').UserRepo}
- */
-export function createUserRepo({ User }) {
-  const view = (doc, opts) => (doc ? toUser(toUserRecord(doc), opts) : null);
-  const byId = (id) => (isValidId(id) ? { _id: oid(id) } : null);
+export function createUserRepo({ User }: { User: UserModel }): UserRepo {
+  const view = (doc: LeanUser | null, opts?: SecretsOption): User | null =>
+    doc ? toUser(toUserRecord(doc), opts) : null;
+  const byId = (id: string) => (isValidId(id) ? { _id: oid(id) } : null);
   // Runs an update on one user by id; an invalid or unknown id gives null.
-  async function updateOne(id, update, { secrets = false } = {}) {
+  async function updateOne(id: string, update: UpdateQuery<UserSchema>): Promise<User | null> {
     const filter = byId(id);
     if (!filter) return null;
-    let query = User.findOneAndUpdate(filter, update, { returnDocument: 'after' }).lean();
-    if (secrets) query = query.select(USER_SECRET_SELECT);
-    return view(await guard(query));
+    return view(
+      await guard(
+        User.findOneAndUpdate(filter, update, { returnDocument: 'after' }).lean<LeanUser>(),
+      ),
+    );
   }
 
+  // The methods that look something up by a value from a request take `unknown` here, so a value
+  // of the wrong type is a plain "not found" (the interface itself asks for strings).
   return {
     async findById(id, { secrets = false } = {}) {
       const filter = byId(id);
       if (!filter) return null;
-      let query = User.findOne(filter).lean();
+      let query = User.findOne(filter).lean<LeanUser>();
       if (secrets) query = query.select(USER_SECRET_SELECT);
       return view(await query, { secrets });
     },
@@ -67,48 +77,45 @@ export function createUserRepo({ User }) {
     async findPublicById(id) {
       const filter = byId(id);
       if (!filter) return null;
-      const doc = await User.findOne(filter).lean();
+      const doc = await User.findOne(filter).lean<LeanUser>();
       return doc && doc.status !== 'pending' ? toPublicUser(toUserRecord(doc)) : null;
     },
 
-    async findByEmail(email, { secrets = false } = {}) {
+    async findByEmail(email: unknown, { secrets = false } = {}) {
       if (typeof email !== 'string') return null;
-      let query = User.findOne({ email: email.trim().toLowerCase() }).lean();
+      let query = User.findOne({ email: email.trim().toLowerCase() }).lean<LeanUser>();
       if (secrets) query = query.select(USER_SECRET_SELECT);
       return view(await query, { secrets });
     },
 
-    async findByActivationHash(hash) {
+    async findByActivationHash(hash: unknown) {
       if (typeof hash !== 'string' || !hash) return null;
       const doc = await User.findOne({ activationToken: hash })
         .select('+activationToken +activationExpires')
-        .lean();
+        .lean<LeanUser>();
       if (!doc) return null;
-      const user = view(doc);
+      const user = toUser(toUserRecord(doc));
       if (doc.activationExpires) user.activationExpires = new Date(doc.activationExpires);
       return user;
     },
 
-    async findByResetHash(hash) {
+    async findByResetHash(hash: unknown) {
       if (typeof hash !== 'string' || !hash) return null;
       const doc = await User.findOne({
         resetPasswordLink: hash,
         resetPasswordExpires: trust({ $gt: new Date() }),
-      }).lean();
+      }).lean<LeanUser>();
       return view(doc);
     },
 
     async listPublic({ cursor, limit } = {}) {
-      const { rows, nextCursor } = await findPage(
-        User,
-        { status: trust({ $ne: 'pending' }) },
-        {
-          cursor,
-          limit,
-          field: 'createdAt',
-          direction: 'asc',
-        },
+      const window = pageWindow<UserSchema, 'createdAt'>(
+        { status: trust<{ $ne: UserStatus }>({ $ne: 'pending' }) },
+        { cursor, limit, field: 'createdAt', direction: 'asc' },
       );
+      let query = User.find(window.filter).sort(window.sort).lean<LeanUser[]>();
+      if (window.fetch !== undefined) query = query.limit(window.fetch);
+      const { rows, nextCursor } = window.finish(await query);
       return { items: rows.map((doc) => toPublicUser(toUserRecord(doc))), nextCursor };
     },
 
@@ -118,7 +125,7 @@ export function createUserRepo({ User }) {
         'pending',
       );
       const created = await guard(User.create(doc));
-      return view(created.toObject());
+      return toUser(toUserRecord(created.toObject()));
     },
 
     async refreshPending(id, { name, passwordHash, activationHash, activationExpires }) {
@@ -135,7 +142,7 @@ export function createUserRepo({ User }) {
 
     async create(data) {
       const created = await guard(User.create(buildDoc(data, 'active')));
-      return view(created.toObject());
+      return toUser(toUserRecord(created.toObject()));
     },
 
     // The hash stays on purpose: using the link a second time answers 409, not "expired".
@@ -143,17 +150,18 @@ export function createUserRepo({ User }) {
       updateOne(id, { $set: { status: 'active' }, $unset: { activationExpires: 1 } }),
 
     async updateProfile(id, { name, avatar } = {}) {
-      const set = {};
+      const set: Partial<Pick<UserSchema, 'name' | 'avatar'>> = {};
       if (name !== undefined) set.name = cleanName(name);
-      if (avatar !== undefined) set.avatar = avatar || DEFAULT_AVATAR;
+      if (avatar !== undefined) set.avatar = orDefault(avatar, DEFAULT_AVATAR);
       return updateOne(id, { $set: set });
     },
 
     // Only the networks that were sent change; '' clears one by storing an empty string.
     async updateSocials(id, fields = {}) {
-      const set = {};
-      for (const key of ['facebook', 'linkedin', 'twitter']) {
-        if (fields[key] !== undefined) set[`socials.${key}`] = String(fields[key]);
+      const set: Record<string, string> = {};
+      for (const key of ['facebook', 'linkedin', 'twitter'] as const) {
+        const value = fields[key];
+        if (value !== undefined) set[`socials.${key}`] = value;
       }
       return updateOne(id, { $set: set });
     },
@@ -175,7 +183,7 @@ export function createUserRepo({ User }) {
       const filter = byId(id);
       if (!filter) return false;
       const result = await User.deleteOne(filter);
-      return (result.deletedCount ?? 0) > 0;
+      return result.deletedCount > 0;
     },
   };
 }

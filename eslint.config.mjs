@@ -87,7 +87,17 @@ export default [
         'error',
         { checksVoidReturn: { arguments: false } },
       ],
+      // Numbers in messages ("...(32)", "process 1234") are safe and read better than String(n).
+      // Everything else (objects, unknown, nullable values) stays an error.
+      '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
     },
+  },
+  {
+    // The repo contract (store/types.ts) is async for every adapter. The JSON adapter answers from
+    // memory, but its methods stay `async` on purpose: a throw (for example "store not initialised")
+    // must reach the caller as a rejected promise, never as a synchronous exception.
+    files: ['server/src/store/json/**/*.ts'],
+    rules: { '@typescript-eslint/require-await': 'off' },
   },
   // Keep last so it switches off every formatting rule above.
   prettier,

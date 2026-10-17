@@ -1,10 +1,14 @@
 import { StoreError } from '../errors.js';
-import { createFileDb, emptyState } from './file-db.js';
-import { migrate } from './migrations.js';
-import { createPostRepo } from './posts.js';
-import { assertImportable, cleanEmail } from '../rules.js';
-import { createUserRepo } from './users.js';
+import { assertImportable, cleanEmail, parseDate } from '../rules.js';
+import type { Store, StoreAdmin, StoreConfig } from '../types.js';
 import { toRawUser, userIndex } from '../views.js';
+import { createFileDb, emptyState } from './file-db.js';
+import type { FileDb, JsonStoreDeps } from './file-db.js';
+import { looksLikeDatabase, migrate } from './migrations.js';
+import { createPostRepo } from './posts.js';
+import { createUserRepo } from './users.js';
+
+export type { JsonStoreDeps };
 
 const DATE_FIELDS = new Set([
   'passwordChangedAt',
@@ -14,22 +18,26 @@ const DATE_FIELDS = new Set([
   'updatedAt',
 ]);
 
-/**
- * The JSON-file adapter.
- * @param {{DATA_DIR: string, BACKUP_KEEP?: number}} config
- * @param {object} [deps] test hooks: rename, now, lock, isAlive, pid, log, migrationSteps
- * @returns {import('../types.js').Store}
- */
-export function createJsonStore(config, deps = {}) {
+/** The JSON adapter also exposes its file database, for the durability tests and the scripts. */
+export interface JsonStore extends Store {
+  _db: FileDb;
+}
+
+/** The JSON-file adapter. `deps` are test hooks: rename, now, lock, isAlive, pid, log, migrationSteps. */
+export function createJsonStore(
+  config: Pick<StoreConfig, 'DATA_DIR' | 'BACKUP_KEEP'>,
+  deps: JsonStoreDeps = {},
+): JsonStore {
   const db = createFileDb({ dir: config.DATA_DIR, backupKeep: config.BACKUP_KEEP ?? 10, ...deps });
 
-  const admin = {
+  const admin: StoreAdmin = {
     async exportAll() {
       return structuredClone(db.read());
     },
 
-    async importAll(data, { replace = false } = {}) {
-      if (!data || !Array.isArray(data.users) || !Array.isArray(data.posts)) {
+    // `data` is whatever file the caller read, so it is checked before it is trusted.
+    async importAll(data: unknown, { replace = false } = {}) {
+      if (!looksLikeDatabase(data)) {
         throw new StoreError('Import file must contain "users" and "posts" lists.');
       }
       const next = migrate(structuredClone(data), deps.migrationSteps);
@@ -66,9 +74,11 @@ export function createJsonStore(config, deps = {}) {
           tx.unchanged();
           return false;
         }
+        // Any stored field can be patched on purpose, so the keys are not checked against the type.
         for (const [key, value] of Object.entries(fields)) {
-          if (value === undefined || value === null) delete record[key];
-          else record[key] = DATE_FIELDS.has(key) ? new Date(value).toISOString() : value;
+          if (value === undefined || value === null) Reflect.deleteProperty(record, key);
+          else
+            Reflect.set(record, key, DATE_FIELDS.has(key) ? parseDate(value).toISOString() : value);
         }
         return true;
       }),

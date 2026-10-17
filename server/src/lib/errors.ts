@@ -1,4 +1,15 @@
-// Errors every storage adapter raises, so callers never depend on a driver's own error types.
+/** The `code` of a Node system error ('ENOENT', 'EPERM', ...), or undefined for anything else. */
+export const errorCode = (err: unknown): string | undefined =>
+  typeof err === 'object' && err !== null && 'code' in err && typeof err.code === 'string'
+    ? err.code
+    : undefined;
+
+/** The message of whatever was thrown. */
+export const errorMessage = (err: unknown): string =>
+  err instanceof Error ? err.message : String(err);
+
+// Error classes shared across the server. The store adapters raise the first four, so callers
+// never depend on a driver's own error types; store/errors.ts re-exports them for the store code.
 
 export class DuplicateEmailError extends Error {
   constructor() {
@@ -16,7 +27,7 @@ export class InvalidCursorError extends Error {
 
 // A field broke a length or required rule (the same rules the Mongo schema enforces).
 export class StoreValidationError extends Error {
-  constructor(message) {
+  constructor(message: string) {
     super(message);
     this.name = 'StoreValidationError';
   }
@@ -24,7 +35,7 @@ export class StoreValidationError extends Error {
 
 // The store cannot start or write (corrupt file, newer schema, lock held, closed store).
 export class StoreError extends Error {
-  constructor(message) {
+  constructor(message: string) {
     super(message);
     this.name = 'StoreError';
   }

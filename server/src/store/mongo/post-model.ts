@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import type { InferSchemaType, Mongoose, Types } from 'mongoose';
+import type { UserSchema } from './user-model.js';
 
 export const postSchema = new mongoose.Schema(
   {
@@ -62,4 +64,31 @@ export const postSchema = new mongoose.Schema(
 postSchema.index({ user: 1, date: -1 });
 postSchema.index({ date: -1 });
 
-export const createPostModel = (instance) => instance.model('Post', postSchema);
+export type PostSchema = InferSchemaType<typeof postSchema>;
+
+/** An author as populated onto a post or a comment. */
+export type LeanAuthor = Pick<UserSchema, 'name' | 'avatar' | 'socials'> & { _id: Types.ObjectId };
+
+/** A post as a lean query returns it. Authors are an id, or populated (see POPULATE in posts.ts). */
+export interface LeanPost {
+  _id: Types.ObjectId;
+  user?: Types.ObjectId | LeanAuthor | null | undefined;
+  image: string;
+  title: string;
+  tag: string;
+  description: string;
+  // Lean documents get no schema defaults, so a post written before these arrays existed has none.
+  likes?: { _id: Types.ObjectId; user?: Types.ObjectId | null | undefined }[] | undefined;
+  comments?:
+    | {
+        _id: Types.ObjectId;
+        user: Types.ObjectId | LeanAuthor;
+        comment: string;
+        date: Date;
+      }[]
+    | undefined;
+  date: Date;
+}
+
+export const createPostModel = (instance: Mongoose) => instance.model('Post', postSchema);
+export type PostModel = ReturnType<typeof createPostModel>;

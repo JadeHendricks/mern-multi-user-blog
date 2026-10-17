@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
+import type { InferSchemaType, Mongoose, Types } from 'mongoose';
 
 // Column names are the ones this database has always used (`password`, `activationToken`,
-// `resetPasswordLink`, ...), so an existing database keeps working. users.js maps them to the
+// `resetPasswordLink`, ...), so an existing database keeps working. records.ts maps them to the
 // repo names (passwordHash, activationHash, resetHash).
 export const userSchema = new mongoose.Schema(
   {
@@ -76,5 +77,21 @@ export const userSchema = new mongoose.Schema(
   { timestamps: true, versionKey: false },
 );
 
+export type UserSchema = InferSchemaType<typeof userSchema>;
+
+/** The columns with `select: false`: a query only returns them when it asks for them. */
+export type SecretColumn =
+  | 'password'
+  | 'activationToken'
+  | 'activationExpires'
+  | 'resetPasswordLink'
+  | 'resetPasswordExpires'
+  | 'passwordChangedAt';
+
+/** A user as a lean query returns it. The secret columns are only there when selected. */
+export type LeanUser = Omit<UserSchema, SecretColumn> &
+  Partial<Pick<UserSchema, SecretColumn>> & { _id: Types.ObjectId };
+
 // Models are bound to one Mongoose instance, so every store owns its own connection and models.
-export const createUserModel = (instance) => instance.model('user', userSchema);
+export const createUserModel = (instance: Mongoose) => instance.model('user', userSchema);
+export type UserModel = ReturnType<typeof createUserModel>;

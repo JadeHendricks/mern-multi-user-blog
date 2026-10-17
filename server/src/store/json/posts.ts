@@ -1,26 +1,35 @@
+import { DEFAULT_AVATAR } from '@mern-blog/shared';
 import { isValidId, newId } from '../../lib/ids.js';
 import { paginate } from '../../lib/pagination.js';
 import { StoreValidationError } from '../errors.js';
-import { cleanComment, cleanDescription, cleanTitle } from '../rules.js';
-import { DEFAULT_AVATAR, toCommentView, toLikeView, toPostView, userIndex } from '../views.js';
+import { cleanComment, cleanDescription, cleanTitle, orDefault } from '../rules.js';
+import type { LikeResult, PostInput, PostRepo, UnlikeResult } from '../types.js';
+import { toCommentView, toLikeView, toPostView, userIndex } from '../views.js';
+import type { PostAuthor } from '../views.js';
+import type { FileDb } from './file-db.js';
+import type { JsonState, StoredPost, StoredUser } from './records.js';
 
 const DEFAULT_TAG = 'general';
 const DEFAULT_IMAGE = DEFAULT_AVATAR;
 
-const iso = (value) => new Date(value).toISOString();
+const iso = (value: Date | string): string => new Date(value).toISOString();
 
 // Newest first, with the id as a tie-break so the order is stable.
-const byDateDesc = (a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : a._id < b._id ? 1 : -1);
+const byDateDesc = (a: StoredPost, b: StoredPost): number =>
+  a.date < b.date ? 1 : a.date > b.date ? -1 : a._id < b._id ? 1 : -1;
 
-function buildPost(data) {
+const usersById = (users: readonly StoredUser[]): Map<string, StoredUser> =>
+  new Map(users.map((user) => [user._id, user] as const));
+
+function buildPost(data: PostInput): StoredPost {
   if (data._id !== undefined && !isValidId(data._id))
     throw new StoreValidationError('Path `_id` is not a valid id.');
   return {
     _id: data._id ?? newId(),
     user: data.user,
-    image: data.image || DEFAULT_IMAGE,
+    image: orDefault(data.image, DEFAULT_IMAGE),
     title: cleanTitle(data.title),
-    tag: data.tag || DEFAULT_TAG,
+    tag: orDefault(data.tag, DEFAULT_TAG),
     description: cleanDescription(data.description),
     likes: (data.likes ?? []).map((like) => ({ _id: like._id ?? newId(), user: like.user })),
     comments: (data.comments ?? []).map((comment) => {
@@ -38,11 +47,10 @@ function buildPost(data) {
   };
 }
 
-/** @returns {import('../types.js').PostRepo} */
-export function createPostRepo(db) {
-  const find = (state, id) =>
+export function createPostRepo(db: FileDb): PostRepo {
+  const find = (state: JsonState, id: string) =>
     isValidId(id) ? state.posts.find((post) => post._id === id) : undefined;
-  const authors = () => userIndex(db.read()).byId;
+  const authors = (): ReadonlyMap<string, PostAuthor> => userIndex(db.read()).byId;
 
   return {
     async findById(id) {
@@ -78,7 +86,7 @@ export function createPostRepo(db) {
       db.write((draft) => {
         const record = buildPost({ user, title, tag, description, image });
         draft.posts.push(record);
-        return toPostView(record, new Map(), 'id');
+        return toPostView(record, new Map<string, PostAuthor>(), 'id');
       }),
 
     update: (id, fields = {}) =>
@@ -91,9 +99,9 @@ export function createPostRepo(db) {
         if (fields.title !== undefined) record.title = cleanTitle(fields.title);
         if (fields.description !== undefined)
           record.description = cleanDescription(fields.description);
-        if (fields.tag !== undefined) record.tag = fields.tag || DEFAULT_TAG;
-        if (fields.image !== undefined) record.image = fields.image || DEFAULT_IMAGE;
-        return toPostView(record, new Map(draft.users.map((user) => [user._id, user])), 'id');
+        if (fields.tag !== undefined) record.tag = orDefault(fields.tag, DEFAULT_TAG);
+        if (fields.image !== undefined) record.image = orDefault(fields.image, DEFAULT_IMAGE);
+        return toPostView(record, usersById(draft.users), 'id');
       }),
 
     async getOwnerAndImage(id) {
@@ -103,13 +111,13 @@ export function createPostRepo(db) {
 
     delete: (id) =>
       db.write((draft, tx) => {
-        const index = isValidId(id) ? draft.posts.findIndex((post) => post._id === id) : -1;
-        if (index === -1) {
+        const record = find(draft, id);
+        if (!record) {
           tx.unchanged();
           return null;
         }
-        const [removed] = draft.posts.splice(index, 1);
-        return { image: removed.image };
+        draft.posts.splice(draft.posts.indexOf(record), 1);
+        return { image: record.image };
       }),
 
     async exists(id) {
@@ -118,7 +126,7 @@ export function createPostRepo(db) {
 
     // Runs in the write queue, so two parallel calls by one user can never both add a like.
     like: (id, userId) =>
-      db.write((draft, tx) => {
+      db.write<LikeResult>((draft, tx) => {
         const record = find(draft, id);
         if (!record) {
           tx.unchanged();
@@ -133,7 +141,7 @@ export function createPostRepo(db) {
       }),
 
     unlike: (id, userId) =>
-      db.write((draft, tx) => {
+      db.write<UnlikeResult>((draft, tx) => {
         const record = find(draft, id);
         if (!record) {
           tx.unchanged();
@@ -163,7 +171,7 @@ export function createPostRepo(db) {
           comment: cleanComment(text),
           date: new Date().toISOString(),
         });
-        const byId = new Map(draft.users.map((user) => [user._id, user]));
+        const byId = usersById(draft.users);
         return record.comments.map((comment) => toCommentView(comment, byId));
       }),
 
@@ -172,15 +180,15 @@ export function createPostRepo(db) {
         const record = find(draft, id);
         if (!record) {
           tx.unchanged();
-          return 'post-not-found';
+          return 'post-not-found' as const;
         }
         const index = record.comments.findIndex((comment) => comment._id === commentId);
         if (index === -1) {
           tx.unchanged();
-          return 'comment-not-found';
+          return 'comment-not-found' as const;
         }
         record.comments.splice(index, 1);
-        return 'removed';
+        return 'removed' as const;
       }),
 
     async getComment(id, commentId) {

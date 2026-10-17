@@ -1,37 +1,29 @@
+import { DEFAULT_AVATAR } from '@mern-blog/shared';
 import { isValidId, newId } from '../../lib/ids.js';
 import { paginate } from '../../lib/pagination.js';
 import { DuplicateEmailError, StoreValidationError } from '../errors.js';
-import { cleanEmail, cleanName, requireHash } from '../rules.js';
-import { DEFAULT_AVATAR, toPublicUser, toUser, userIndex } from '../views.js';
+import { cleanEmail, cleanName, orDefault, requireHash } from '../rules.js';
+import type { UserInput, UserRepo, UserStatus } from '../types.js';
+import { toPublicUser, toUser, userIndex } from '../views.js';
+import type { FileDb } from './file-db.js';
+import type { JsonState, StoredUser } from './records.js';
 
-const ROLES = new Set(['user', 'admin']);
-const STATUSES = new Set(['pending', 'active']);
+const ROLES = new Set<string>(['user', 'admin']);
+const STATUSES = new Set<string>(['pending', 'active']);
 
-const iso = (value) => new Date(value).toISOString();
+const iso = (value: Date | string): string => new Date(value).toISOString();
+
+const present = <T>(value: T | null | undefined): value is T =>
+  value !== undefined && value !== null;
 
 // The unique-email rule, checked on the draft so it also holds for writes queued back to back.
-const assertEmailFree = (draft, email, exceptId) => {
+const assertEmailFree = (draft: JsonState, email: string, exceptId?: string): void => {
   if (draft.users.some((user) => user.email === email && user._id !== exceptId))
     throw new DuplicateEmailError();
 };
 
-const SECRET_FIELDS = [
-  'passwordChangedAt',
-  'activationHash',
-  'activationExpires',
-  'resetHash',
-  'resetExpires',
-];
-const DATE_FIELDS = new Set([
-  'passwordChangedAt',
-  'activationExpires',
-  'resetExpires',
-  'createdAt',
-  'updatedAt',
-]);
-
 // Builds a stored record from repo input (used by createPending and create).
-function buildRecord(data, defaults) {
+function buildRecord(data: UserInput, defaults: { status: UserStatus }): StoredUser {
   const stamp = new Date().toISOString();
   const status = data.status ?? defaults.status;
   const role = data.role ?? 'user';
@@ -40,9 +32,9 @@ function buildRecord(data, defaults) {
   if (!ROLES.has(role)) throw new StoreValidationError('Path `role` is not a valid enum value.');
   if (data._id !== undefined && !isValidId(data._id))
     throw new StoreValidationError('Path `_id` is not a valid id.');
-  const record = {
+  const record: StoredUser = {
     _id: data._id ?? newId(),
-    avatar: data.avatar || DEFAULT_AVATAR,
+    avatar: orDefault(data.avatar, DEFAULT_AVATAR),
     name: cleanName(data.name),
     email: cleanEmail(data.email),
     passwordHash: requireHash(data.passwordHash),
@@ -52,22 +44,24 @@ function buildRecord(data, defaults) {
     updatedAt: data.updatedAt ? iso(data.updatedAt) : data.createdAt ? iso(data.createdAt) : stamp,
   };
   if (data.socials && Object.keys(data.socials).length > 0) record.socials = { ...data.socials };
-  for (const key of SECRET_FIELDS) {
-    if (data[key] !== undefined && data[key] !== null)
-      record[key] = DATE_FIELDS.has(key) ? iso(data[key]) : data[key];
-  }
+  if (present(data.passwordChangedAt)) record.passwordChangedAt = iso(data.passwordChangedAt);
+  if (present(data.activationHash)) record.activationHash = data.activationHash;
+  if (present(data.activationExpires)) record.activationExpires = iso(data.activationExpires);
+  if (present(data.resetHash)) record.resetHash = data.resetHash;
+  if (present(data.resetExpires)) record.resetExpires = iso(data.resetExpires);
   return record;
 }
 
-/** @returns {import('../types.js').UserRepo} */
-export function createUserRepo(db) {
-  const find = (id) => (isValidId(id) ? userIndex(db.read()).byId.get(id) : undefined);
-  const findInDraft = (draft, id) =>
+export function createUserRepo(db: FileDb): UserRepo {
+  const find = (id: string) => (isValidId(id) ? userIndex(db.read()).byId.get(id) : undefined);
+  const findInDraft = (draft: JsonState, id: string) =>
     isValidId(id) ? draft.users.find((user) => user._id === id) : undefined;
-  const touch = (record) => {
+  const touch = (record: StoredUser) => {
     record.updatedAt = new Date().toISOString();
   };
 
+  // The methods that look something up by a value from a request take `unknown` here, so a value
+  // of the wrong type is a plain "not found" (the interface itself asks for strings).
   return {
     async findById(id, { secrets = false } = {}) {
       const record = find(id);
@@ -79,13 +73,13 @@ export function createUserRepo(db) {
       return record && record.status !== 'pending' ? toPublicUser(record) : null;
     },
 
-    async findByEmail(email, { secrets = false } = {}) {
+    async findByEmail(email: unknown, { secrets = false } = {}) {
       if (typeof email !== 'string') return null;
       const record = userIndex(db.read()).byEmail.get(email.trim().toLowerCase());
       return record ? toUser(record, { secrets }) : null;
     },
 
-    async findByActivationHash(hash) {
+    async findByActivationHash(hash: unknown) {
       if (typeof hash !== 'string' || !hash) return null;
       const record = db.read().users.find((user) => user.activationHash === hash);
       if (!record) return null;
@@ -94,7 +88,7 @@ export function createUserRepo(db) {
       return user;
     },
 
-    async findByResetHash(hash) {
+    async findByResetHash(hash: unknown) {
       if (typeof hash !== 'string' || !hash) return null;
       const now = Date.now();
       const record = db
@@ -183,7 +177,7 @@ export function createUserRepo(db) {
           return null;
         }
         if (name !== undefined) record.name = cleanName(name);
-        if (avatar !== undefined) record.avatar = avatar || DEFAULT_AVATAR;
+        if (avatar !== undefined) record.avatar = orDefault(avatar, DEFAULT_AVATAR);
         touch(record);
         return toUser(record);
       }),
@@ -196,10 +190,11 @@ export function createUserRepo(db) {
           return null;
         }
         // Only the networks that were sent change; '' clears one by storing an empty string.
-        for (const key of ['facebook', 'linkedin', 'twitter']) {
-          if (fields[key] !== undefined) {
+        for (const key of ['facebook', 'linkedin', 'twitter'] as const) {
+          const value = fields[key];
+          if (value !== undefined) {
             record.socials ??= {};
-            record.socials[key] = String(fields[key]);
+            record.socials[key] = value;
           }
         }
         touch(record);

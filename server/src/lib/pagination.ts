@@ -1,22 +1,50 @@
+import { MAX_LIMIT } from '@mern-blog/shared';
 import { z } from 'zod';
-import { InvalidCursorError } from '../store/errors.js';
+import { InvalidCursorError } from './errors.js';
 
 // Cursor = base64url of `<sort key>|<id>`. Rows are ordered by (key, id), so rows that share a key
 // (for example identical dates) still have a stable position.
 const ID_AT_END = /^(.*)\|([0-9a-f]{24})$/s;
 
-export const encodeCursor = (key, id) => Buffer.from(`${key}|${id}`, 'utf8').toString('base64url');
+export interface DecodedCursor {
+  key: string;
+  id: string;
+}
 
-export function decodeCursor(cursor) {
+export interface Page<T> {
+  items: T[];
+  nextCursor: string | null;
+}
+
+/** `cursor` and `limit` as the repos take them. Without a limit and a cursor everything is returned. */
+export interface PageOptions {
+  cursor?: string | null | undefined;
+  limit?: number | undefined;
+}
+
+export const encodeCursor = (key: string, id: string): string =>
+  Buffer.from(`${key}|${id}`, 'utf8').toString('base64url');
+
+export function decodeCursor(cursor: unknown): DecodedCursor {
   if (typeof cursor !== 'string' || cursor === '') throw new InvalidCursorError();
   const match = ID_AT_END.exec(Buffer.from(cursor, 'base64url').toString('utf8'));
-  if (!match) throw new InvalidCursorError();
-  return { key: match[1], id: match[2] };
+  const [, key, id] = match ?? [];
+  if (key === undefined || id === undefined) throw new InvalidCursorError();
+  return { key, id };
+}
+
+export interface PaginateOptions<T> extends PageOptions {
+  /** The value rows are ordered by (before the id tie-break). */
+  key: (item: T) => string;
+  direction?: 'asc' | 'desc';
 }
 
 // `items` must already be sorted by (key, id) in `direction`. Without limit and cursor everything
 // comes back with nextCursor null. One extra row is looked at to know whether another page exists.
-export function paginate(items, { cursor, limit, key, direction = 'asc' }) {
+export function paginate<T extends { _id: string }>(
+  items: readonly T[],
+  { cursor, limit, key, direction = 'asc' }: PaginateOptions<T>,
+): Page<T> {
   if (limit !== undefined && (!Number.isInteger(limit) || limit < 1)) {
     throw new InvalidCursorError('limit must be a positive integer');
   }
@@ -39,10 +67,13 @@ export function paginate(items, { cursor, limit, key, direction = 'asc' }) {
       return order * sign > 0;
     });
   }
-  if (limit === undefined || rows.length <= limit) return { items: rows, nextCursor: null };
-  const page = rows.slice(0, limit);
-  const last = page[page.length - 1];
-  return { items: page, nextCursor: encodeCursor(key(last), last._id) };
+  // rows[limit - 1] only exists when there are at least `limit` rows; with more than `limit` it is
+  // the last row of the page.
+  const last = limit === undefined ? undefined : rows[limit - 1];
+  if (limit === undefined || last === undefined || rows.length <= limit) {
+    return { items: [...rows], nextCursor: null };
+  }
+  return { items: rows.slice(0, limit), nextCursor: encodeCursor(key(last), last._id) };
 }
 
 // ?cursor=&limit= for the list endpoints. Both are optional; a bad value raises InvalidCursorError,
@@ -53,11 +84,11 @@ const pageQuery = z.object({
     .string()
     .regex(/^\d+$/)
     .transform(Number)
-    .pipe(z.number().int().min(1).max(100))
+    .pipe(z.number().int().min(1).max(MAX_LIMIT))
     .optional(),
 });
 
-export function parsePageQuery(query) {
+export function parsePageQuery(query: { cursor?: unknown; limit?: unknown }): PageOptions {
   const result = pageQuery.safeParse({ cursor: query.cursor, limit: query.limit });
   if (!result.success)
     throw new InvalidCursorError('cursor must be a string and limit a whole number from 1 to 100');
