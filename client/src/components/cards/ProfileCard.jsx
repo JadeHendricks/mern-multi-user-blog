@@ -1,34 +1,22 @@
 import React, { useContext } from 'react';
 import svg from '../../assets/images/icons/sprite.svg';
 import AuthContext from '../../context/authContext/AuthContext';
-import PostContext from '../../context/postContext/PostContext';
+import { Link } from 'react-router';
+import { uploadUrl, onImageError } from '../../utils/imageUrl';
 import { descriptionTrimmer, postIsLiked } from '../../utils/postUtils';
 import { useToggleLike } from '../../hooks/useToggleLike';
-import { useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '../../lib/queryKeys';
-import { Link, useNavigate } from 'react-router';
-import { uploadUrl, onImageError } from '../../utils/imageUrl';
-
+import { useDeletePost } from '../../hooks/useDeletePost';
 const ProfileCard = ({ post: { _id, title, image, tag, description, comments, likes } }) => {
-    const navigate = useNavigate();
-    const { loggedInUser } = useContext(AuthContext);	
-    const { deletePost } = useContext(PostContext);
+    const { loggedInUser } = useContext(AuthContext);
     const toggleLike = useToggleLike();
-    const queryClient = useQueryClient();
-
-    // Only leave the page once the server confirmed the delete.
-    const handleDelete = async () => {
+    const deletePost = useDeletePost();
+    // useDeletePost only leaves the page once the server confirmed the delete.
+    const handleDelete = () => {
         if (!window.confirm('Delete this post? This cannot be undone.')) {
             return;
         }
-        if (await deletePost(_id)) {
-            // The deleted post must leave every cached list (replaced by a mutation in the next commit).
-            queryClient.invalidateQueries({ queryKey: queryKeys.posts.all });
-            queryClient.invalidateQueries({ queryKey: queryKeys.users.postsAll() });
-            navigate('/');
-        }
+        deletePost.mutate(_id);
     };
-
     return (
         <div className="card">
             <Link to={`/post/${_id}`}>
@@ -73,5 +61,4 @@ const ProfileCard = ({ post: { _id, title, image, tag, description, comments, li
         </div>
     )
 }
-
 export default ProfileCard;

@@ -1,8 +1,8 @@
-﻿import React from 'react';
+import React from 'react';
 import { screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import { Routes, Route } from 'react-router';
 import { toast } from 'react-toastify';
-import PostContext from '../../context/postContext/PostContext';
+import { queryKeys } from '../../lib/queryKeys';
 import Post from './Post';
 import { mockApi } from '../../testing/mockApi';
 import { renderWithProviders } from '../../testing/renderWithProviders';
@@ -25,12 +25,11 @@ const auth = { loggedInUser: me, isAuthenticated: true, isUsersData: (a, b) => a
 const renderPost = (routes = {}, options = {}) => {
   const api = mockApi({ 'GET /api/post/p1': { body: { post } }, ...routes });
   const utils = renderWithProviders(
-    <PostContext.Provider value={{ deletePost: vi.fn() }}>
-      <Routes>
-        <Route path="/users" element={<div>users page</div>} />
-        <Route path="/post/:id" element={<Post />} />
-      </Routes>
-    </PostContext.Provider>,
+    <Routes>
+      <Route path="/" element={<div>home page</div>} />
+      <Route path="/users" element={<div>users page</div>} />
+      <Route path="/post/:id" element={<Post />} />
+    </Routes>,
     { route: '/post/p1', auth, ...options },
   );
   return { ...utils, api };
@@ -133,5 +132,43 @@ describe('Post page mutations (B21)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Delete Comment' }));
     expect(document.querySelector('.loader-container')).toBeNull();
     expect(screen.getByText('Hello world')).toBeInTheDocument();
+  });
+});
+
+describe('Post page delete', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it('asks first, deletes, toasts, marks the lists stale and goes home without asking for the post again', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const { api, queryClient } = renderPost({ 'DELETE /api/post/p1': { body: { message: 'Post has been deleted.' } } });
+    queryClient.setQueryData(queryKeys.posts.list(), { posts: [post] });
+    fireEvent.click(await screen.findByRole('button', { name: 'Delete Post' }));
+    expect(await screen.findByText('home page')).toBeInTheDocument();
+    expect(window.confirm).toHaveBeenCalledWith('Delete this post? This cannot be undone.');
+    expect(toast.success).toHaveBeenCalledWith('Post has been deleted.');
+    expect(queryClient.getQueryState(queryKeys.posts.list()).isInvalidated).toBe(true);
+    expect(queryClient.getQueryData(queryKeys.posts.detail('p1'))).toBeUndefined();
+    // Give a wrongly refetching detail query time to show itself.
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(api.callsTo('GET /api/post/p1')).toHaveLength(1);
+    expect(toast.error).not.toHaveBeenCalled();
+  });
+
+  it('does nothing when the confirmation is cancelled', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(false);
+    const { api } = renderPost();
+    fireEvent.click(await screen.findByRole('button', { name: 'Delete Post' }));
+    expect(api.calls.some((call) => call.method === 'DELETE')).toBe(false);
+    expect(screen.getByText('Hello world')).toBeInTheDocument();
+  });
+
+  it('stays on the post and toasts the server message when the delete fails', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    renderPost({ 'DELETE /api/post/p1': { status: 401, body: { message: 'This post does not belong to you.' } } });
+    fireEvent.click(await screen.findByRole('button', { name: 'Delete Post' }));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('This post does not belong to you.'));
+    expect(screen.getByText('Hello world')).toBeInTheDocument();
+    expect(screen.queryByText('home page')).toBeNull();
+    expect(toast.success).not.toHaveBeenCalled();
   });
 });

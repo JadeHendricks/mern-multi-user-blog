@@ -2,7 +2,6 @@ import React, { Fragment, useContext } from 'react';
 import svg from '../../assets/images/icons/sprite.svg'
 import { Link, useNavigate, useParams } from 'react-router';
 import AuthContext from '../../context/authContext/AuthContext';
-import PostContext from '../../context/postContext/PostContext';
 import CommentSubmit from '../comment/CommentSubmit';
 import ContentLoader from '../layouts/ContentLoader';
 import { isHttpsUrl } from '../../utils/safeUrl';
@@ -10,8 +9,7 @@ import { uploadUrl, onImageError } from '../../utils/imageUrl';
 import { postIsLiked } from '../../utils/postUtils';
 import { usePost } from '../../hooks/usePost';
 import { useToggleLike } from '../../hooks/useToggleLike';
-import { useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '../../lib/queryKeys';
+import { useDeletePost } from '../../hooks/useDeletePost';
 
 // A post that has not arrived (or failed to load) renders the empty frame, as before.
 const NO_POST = {};
@@ -20,26 +18,19 @@ const FullPost = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { loggedInUser, isUsersData, authLoading } = useContext(AuthContext);
-    const { deletePost } = useContext(PostContext);
     const { data, isPending: postLoading } = usePost(id);
     const post = data ?? NO_POST;
     const toggleLike = useToggleLike();
-    const queryClient = useQueryClient();
+    const deletePost = useDeletePost();
     const  { title, description, image, _id, user, likes, comments } = post;
 
-    // Only leave the page once the server confirmed the delete.
-    const handleDelete = async () => {
+    // useDeletePost only leaves the page once the server confirmed the delete.
+    const handleDelete = () => {
         if (!window.confirm('Delete this post? This cannot be undone.')) {
             return;
         }
-        if (await deletePost(_id)) {
-            // The deleted post must leave every cached list (replaced by a mutation in the next commit).
-            queryClient.invalidateQueries({ queryKey: queryKeys.posts.all });
-            queryClient.invalidateQueries({ queryKey: queryKeys.users.postsAll() });
-            navigate('/');
-        }
+        deletePost.mutate(_id);
     };
-
     return (
         <Fragment>
             { authLoading && postLoading ? (<ContentLoader />) : (

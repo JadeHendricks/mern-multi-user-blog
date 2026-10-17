@@ -100,4 +100,28 @@ describe('AccountProfile post cards (B21)', () => {
     expect(await screen.findByText('Ann post')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /All posts \(1\)/ })).toBeInTheDocument();
   });
+
+  it('deletes an own post after confirming, and toasts the result', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const api = mockApi({
+      'GET /api/post/user/u1': { body: { posts: [annsPost] } },
+      'DELETE /api/post/p1': { body: { message: 'Post has been deleted.' } },
+    });
+    render(tree(ann));
+    fireEvent.click(await screen.findByRole('button', { name: 'Delete post' }));
+    await waitFor(() => expect(toast.success).toHaveBeenCalledWith('Post has been deleted.'));
+    expect(api.callsTo('DELETE /api/post/p1')).toHaveLength(1);
+  });
+
+  it('keeps the card and toasts the server message when the delete fails', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    mockApi({
+      'GET /api/post/user/u1': { body: { posts: [annsPost] } },
+      'DELETE /api/post/p1': { status: 401, body: { message: 'This post does not belong to you.' } },
+    });
+    render(tree(ann));
+    fireEvent.click(await screen.findByRole('button', { name: 'Delete post' }));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('This post does not belong to you.'));
+    expect(screen.getByText('Ann post')).toBeInTheDocument();
+  });
 });
