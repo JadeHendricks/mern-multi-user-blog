@@ -255,7 +255,7 @@ describe('length limits', () => {
   });
 
   it('rejects a 33-character user name at the schema level', async () => {
-    const User = require('../../models/UserModel');
+    const User = require('../../src/models/UserModel');
 
     const tooLong = new User({ name: 'n'.repeat(33), email: 'long@example.test', password: 'x' });
     const ok = new User({ name: 'n'.repeat(32), email: 'ok@example.test', password: 'x' });

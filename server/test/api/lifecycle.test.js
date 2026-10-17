@@ -4,7 +4,7 @@ import { connectDb, mongoose } from './support/db.js';
 
 const require = createRequire(import.meta.url);
 const express = require('express');
-const { startServer, createShutdown } = require('../../lib/lifecycle');
+const { startServer, createShutdown } = require('../../src/lib/lifecycle');
 
 describe('startServer', () => {
   it('does not listen until connect has resolved', async () => {

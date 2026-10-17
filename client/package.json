@@ -1,5 +1,5 @@
 {
-  "name": "client",
+  "name": "@mern-blog/client",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -18,9 +18,9 @@
     "react-toastify": "6.0.6"
   },
   "scripts": {
-    "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts start",
-    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts build",
-    "test": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts test",
+    "start": "cross-env SKIP_PREFLIGHT_CHECK=true NODE_OPTIONS=--openssl-legacy-provider react-scripts start",
+    "build": "cross-env SKIP_PREFLIGHT_CHECK=true NODE_OPTIONS=--openssl-legacy-provider react-scripts build",
+    "test": "cross-env SKIP_PREFLIGHT_CHECK=true NODE_OPTIONS=--openssl-legacy-provider react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

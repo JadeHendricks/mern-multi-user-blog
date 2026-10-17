@@ -1,6 +1,6 @@
 // Shared constants for the specs: seeded ids, user logins, routes and link tokens.
 const path = require('node:path');
-const { SEED_IDS, SEED_USERS, E2E_PASSWORD, SEED_ACTIVATION_TOKEN } = require('../../scripts/seed');
+const { SEED_IDS, SEED_USERS, E2E_PASSWORD, SEED_ACTIVATION_TOKEN } = require('../../server/scripts/seed');
 
 const ids = {
   alice: SEED_IDS.users.alice,

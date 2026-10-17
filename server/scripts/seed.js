@@ -147,9 +147,9 @@ function isLocalMongoUri(uri) {
 // Inserts the fixed users, posts, comments and likes. Expects empty users and posts collections.
 async function seed(mongoose) {
   // The models are CommonJS and register themselves on the shared mongoose instance.
-  const User = require('../models/UserModel');
-  const Post = require('../models/PostModel');
-  const { hashToken } = require('../lib/tokens');
+  const User = require('../src/models/UserModel');
+  const Post = require('../src/models/PostModel');
+  const { hashToken } = require('../src/lib/tokens');
   const ObjectId = mongoose.Types.ObjectId;
 
   // Each save runs the bcrypt pre-save hook, so the seeded passwords are hashed like real ones.
@@ -223,8 +223,8 @@ async function main() {
     useUnifiedTopology: true,
   });
   try {
-    const User = require('../models/UserModel');
-    const Post = require('../models/PostModel');
+    const User = require('../src/models/UserModel');
+    const Post = require('../src/models/PostModel');
     if (process.argv.includes('--reset')) {
       await Promise.all([User.deleteMany({}), Post.deleteMany({})]);
     } else if ((await User.countDocuments()) > 0 || (await Post.countDocuments()) > 0) {

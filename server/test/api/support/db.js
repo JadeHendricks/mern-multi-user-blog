@@ -17,8 +17,8 @@ export async function connectDb() {
     useUnifiedTopology: true,
   });
   // Build the unique email index up front so duplicate checks behave like production.
-  await require('../../../models/UserModel.js').init();
-  await require('../../../models/PostModel.js').init();
+  await require('../../../src/models/UserModel.js').init();
+  await require('../../../src/models/PostModel.js').init();
 }
 
 export async function clearDb() {

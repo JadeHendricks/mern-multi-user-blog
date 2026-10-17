@@ -1,7 +1,7 @@
 // Child process for tests that expect the server to crash (KNOWN BUG B1 / B2).
 // Plain CommonJS on purpose: it is run with `node`, not through Vitest.
 // Config comes from the parent's NODE_CONFIG env; the port is printed as `PORT=<n>`.
-const app = require('../../../app.js');
+const app = require('../../../src/app.js');
 
 async function main() {
   // Only the editPost case needs a database (the token check fails before any query).

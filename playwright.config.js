@@ -59,7 +59,7 @@ module.exports = defineConfig({
       stderr: 'pipe',
     },
     {
-      command: 'npm run start --prefix client',
+      command: 'npm run start -w client',
       url: 'http://localhost:3000',
       reuseExistingServer: false,
       timeout: 300000,

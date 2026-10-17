@@ -11,11 +11,10 @@ A blog written in the mern stack that handles:
 
 ## Installation
 ```bash
-1 - npm install
-2 - npm run clientinstall
-3 - add a .env file to the root and add in your process.env.NODE_ENV (dev || prod)
-4 - add a config/default.json file to the root and add in your config for the application
-5 - npm run start:dev
+1 - npm install (once, at the repo root: installs the server, client and shared workspaces)
+2 - add a .env file to the root and add in your process.env.NODE_ENV (dev || prod)
+3 - add a server/config/default.json file and add in your config for the application
+4 - npm run dev (API on :5000 and client on :3000 together)
 ```
 
 ## Testing
@@ -28,7 +27,7 @@ npm run check          # lint + API tests + client tests + E2E (what to run befo
 Individual commands:
 ```bash
 npm run lint             # eslint (server, test, e2e, scripts; client/ keeps its own CRA lint)
-npm run test:api         # Vitest + supertest against the Express app (see test/README.md)
+npm run test:api         # Vitest + supertest against the Express app (see server/test/README.md)
 npm run test:client      # react-scripts test; the client has no tests yet, so it passes with none
 npm run test:e2e         # Playwright: screenshots, smoke flows, informational axe report
 npm run test:e2e:update  # re-record the screenshot baselines (only for intended visual changes)

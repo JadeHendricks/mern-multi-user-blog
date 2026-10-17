@@ -12,6 +12,8 @@ export default [
       'playwright-report/**',
       'e2e/__screenshots__/**',
       'coverage/**',
+      'server/data/**',
+      'server/config/**',
     ],
   },
   js.configs.recommended,
@@ -39,8 +41,13 @@ export default [
   },
   {
     // Vitest files are ES modules; crash-server.js is a plain CommonJS child script.
-    files: ['test/**/*.js'],
-    ignores: ['test/api/support/crash-server.js'],
+    files: ['server/test/**/*.js'],
+    ignores: ['server/test/api/support/crash-server.js'],
+    languageOptions: { sourceType: 'module', globals: { ...globals.node } },
+  },
+  {
+    // The shared workspace is plain ES modules.
+    files: ['shared/**/*.js'],
     languageOptions: { sourceType: 'module', globals: { ...globals.node } },
   },
   {

@@ -9,7 +9,7 @@ const EXTENSIONS = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'web
 
 // Same destination logic as before: UPLOAD_DIR/<subdir> when set, otherwise the client assets folder.
 const uploadDir = (subdir) =>
-    process.env.UPLOAD_DIR ? path.join(process.env.UPLOAD_DIR, subdir) : `client/src/assets/images/${subdir}`;
+    process.env.UPLOAD_DIR ? path.join(process.env.UPLOAD_DIR, subdir) : path.resolve(__dirname, '../../../client/src/assets/images', subdir);
 
 // Returns single-file multer middleware for `field`, storing under <subdir> with a random file name.
 exports.makeUpload = ({ subdir, prefix, field }) => {

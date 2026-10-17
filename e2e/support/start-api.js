@@ -42,7 +42,7 @@ const PORT = 5000;
 async function main() {
   const { MongoMemoryServer } = require('mongodb-memory-server');
   const mongoose = require('mongoose');
-  const { seed } = require('../../scripts/seed');
+  const { seed } = require('../../server/scripts/seed');
 
   const mongod = await MongoMemoryServer.create();
   await mongoose.connect(`${mongod.getUri()}e2e`, {
@@ -51,11 +51,11 @@ async function main() {
     useFindAndModify: false,
     useUnifiedTopology: true,
   });
-  await require('../../models/UserModel').init();
-  await require('../../models/PostModel').init();
+  await require('../../server/src/models/UserModel').init();
+  await require('../../server/src/models/PostModel').init();
   const counts = await seed(mongoose);
 
-  const app = require('../../app');
+  const app = require('../../server/src/app');
   const server = app.listen(PORT, () => {
     console.log(
       `E2E API on http://localhost:${PORT} (seeded ${counts.users} users, ${counts.pending} pending, ${counts.posts} posts)`,

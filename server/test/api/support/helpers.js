@@ -7,7 +7,7 @@ import { extractLink, readLatestMail, tokenFromLink } from './outbox.js';
 const require = createRequire(import.meta.url);
 
 export function loadApp() {
-  return require('../../../app.js');
+  return require('../../../src/app.js');
 }
 
 // Public parts of NODE_CONFIG that tests need (e.g. to sign tokens). Never print these.

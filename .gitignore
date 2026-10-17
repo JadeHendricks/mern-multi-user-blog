@@ -5,9 +5,10 @@ node_modules/
 /client/src/assets/node_modules/
 /client/node_modules/
 /client/.env
-/config/*
-!/config/default.json.example
-!/config/custom-environment-variables.json
+/server/config/*
+!/server/config/default.json.example
+!/server/config/custom-environment-variables.json
+/server/data/
 # production
 
 # misc
