@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useEffect } from 'react';
+import React, { Fragment, useContext } from 'react';
 import svg from '../../assets/images/icons/sprite.svg'
 import { Link, useNavigate, useParams } from 'react-router';
 import AuthContext from '../../context/authContext/AuthContext';
@@ -7,18 +7,25 @@ import CommentSubmit from '../comment/CommentSubmit';
 import ContentLoader from '../layouts/ContentLoader';
 import { isHttpsUrl } from '../../utils/safeUrl';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
+import { postIsLiked } from '../../utils/postUtils';
+import { usePost } from '../../hooks/usePost';
+import { useToggleLike } from '../../hooks/useToggleLike';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '../../lib/queryKeys';
+
+// A post that has not arrived (or failed to load) renders the empty frame, as before.
+const NO_POST = {};
 
 const FullPost = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { loggedInUser, isUsersData, authLoading } = useContext(AuthContext);
-    const { deletePost, likePost, unLikePost, postIsLiked, getPost, post, postLoading } = useContext(PostContext);
+    const { deletePost } = useContext(PostContext);
+    const { data, isPending: postLoading } = usePost(id);
+    const post = data ?? NO_POST;
+    const toggleLike = useToggleLike();
+    const queryClient = useQueryClient();
     const  { title, description, image, _id, user, likes, comments } = post;
-
-    useEffect(() => {
-        getPost(id);
-        // eslint-disable-next-line
-    }, [id]);
 
     // Only leave the page once the server confirmed the delete.
     const handleDelete = async () => {
@@ -26,6 +33,9 @@ const FullPost = () => {
             return;
         }
         if (await deletePost(_id)) {
+            // The deleted post must leave every cached list (replaced by a mutation in the next commit).
+            queryClient.invalidateQueries({ queryKey: queryKeys.posts.all });
+            queryClient.invalidateQueries({ queryKey: queryKeys.users.postsAll() });
             navigate('/');
         }
     };
@@ -40,8 +50,8 @@ const FullPost = () => {
                                 <Fragment>
                                     <button className="button button--white" onClick={ () => navigate(-1) }>Go back</button>
                                     { postIsLiked(likes, loggedInUser) ? 	
-                                        <button className="button button--red" onClick={ () => unLikePost(_id) }>Unlike Post</button> :	
-                                        <button className="button" onClick={ () => likePost(_id) }>Like Post</button>	
+                                        <button className="button button--red" onClick={ () => toggleLike(_id, true) }>Unlike Post</button> :	
+                                        <button className="button" onClick={ () => toggleLike(_id, false) }>Like Post</button>	
                                     }
                                     { loggedInUser && isUsersData(loggedInUser._id, user._id) && (
                                         <Fragment>

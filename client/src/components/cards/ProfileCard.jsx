@@ -2,13 +2,19 @@ import React, { useContext } from 'react';
 import svg from '../../assets/images/icons/sprite.svg';
 import AuthContext from '../../context/authContext/AuthContext';
 import PostContext from '../../context/postContext/PostContext';
+import { descriptionTrimmer, postIsLiked } from '../../utils/postUtils';
+import { useToggleLike } from '../../hooks/useToggleLike';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '../../lib/queryKeys';
 import { Link, useNavigate } from 'react-router';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
 
 const ProfileCard = ({ post: { _id, title, image, tag, description, comments, likes } }) => {
     const navigate = useNavigate();
     const { loggedInUser } = useContext(AuthContext);	
-    const { deletePost, likePost, unLikePost, postIsLiked, descriptionTrimmer } = useContext(PostContext);
+    const { deletePost } = useContext(PostContext);
+    const toggleLike = useToggleLike();
+    const queryClient = useQueryClient();
 
     // Only leave the page once the server confirmed the delete.
     const handleDelete = async () => {
@@ -16,6 +22,9 @@ const ProfileCard = ({ post: { _id, title, image, tag, description, comments, li
             return;
         }
         if (await deletePost(_id)) {
+            // The deleted post must leave every cached list (replaced by a mutation in the next commit).
+            queryClient.invalidateQueries({ queryKey: queryKeys.posts.all });
+            queryClient.invalidateQueries({ queryKey: queryKeys.users.postsAll() });
             navigate('/');
         }
     };
@@ -44,10 +53,10 @@ const ProfileCard = ({ post: { _id, title, image, tag, description, comments, li
                     </div>
                     <div className="card__interaction-block">	
                         { postIsLiked(likes, loggedInUser) ? 	
-                            <svg className="card__interaction-icon" onClick={ () => unLikePost(_id) }>	
+                            <svg className="card__interaction-icon" onClick={ () => toggleLike(_id, true) }>	
                                 <use xlinkHref={`${svg}#icon-heart`}></use>	
                             </svg> :
-                            <svg className="card__interaction-icon" onClick={ () => likePost(_id) }>	
+                            <svg className="card__interaction-icon" onClick={ () => toggleLike(_id, false) }>	
                                 <use xlinkHref={`${svg}#icon-heart-o`}></use>	
                             </svg>	
                         } 	

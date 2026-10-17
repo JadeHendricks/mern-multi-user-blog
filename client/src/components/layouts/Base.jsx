@@ -1,19 +1,13 @@
-import React, { useContext, useEffect, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import PostCard from '../cards/PostCard'
-import PostContext from '../../context/postContext/PostContext';
 import ContentLoader from '../layouts/ContentLoader';
-
+import { usePosts } from '../../hooks/usePosts';
 const Base = () => {
-    const { getAllPosts, posts, postLoading } = useContext(PostContext);
-
-    useEffect(() => {
-        getAllPosts();
-        // eslint-disable-next-line
-    }, [])
-
+    // A failed request shows the toast and the empty state, as before.
+    const { data: posts = [], isPending } = usePosts();
     return (
         <Fragment>
-            { postLoading ? (<ContentLoader />): (
+            { isPending ? (<ContentLoader />): (
                 <section className="all-posts">
                     <div className="container">
                         <div className="cards">
@@ -25,5 +19,4 @@ const Base = () => {
         </Fragment>
     )
 }
-
 export default Base;

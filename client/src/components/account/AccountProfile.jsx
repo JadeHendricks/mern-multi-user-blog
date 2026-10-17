@@ -9,18 +9,20 @@ import UserContext from '../../context/userContext/UserContext';
 import ContentLoader from '../layouts/ContentLoader';
 import { isHttpsUrl } from '../../utils/safeUrl';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
+import { useUserPosts } from '../../hooks/useUserPosts';
 
 const Profile = () => {
     const { id } = useParams();
     const { loggedInUser, isUsersData, authLoading } = useContext(AuthContext);
-    const { getAllUsersPosts, getUser, user, userPosts, userLoading } = useContext(UserContext);
+    const { getUser, user, userLoading } = useContext(UserContext);
+    // Posts come from Query so a like on a card here updates the count shown on it.
+    const { data: userPosts = [] } = useUserPosts(id);
 
     const [ navigationState, setNavigationState ] = useState('all-posts');
     const handleNavigationState = e => setNavigationState(e.target.name);
 
     useEffect(() => {
         getUser(id);
-        getAllUsersPosts(id);
         // eslint-disable-next-line
     }, [id, loggedInUser]);
 

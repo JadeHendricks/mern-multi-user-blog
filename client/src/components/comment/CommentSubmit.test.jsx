@@ -1,41 +1,50 @@
 ﻿import React from 'react';
-import { render, fireEvent, waitFor, cleanup } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
-import AuthContext from '../../context/authContext/AuthContext';
-import PostContext from '../../context/postContext/PostContext';
+import { fireEvent, waitFor, cleanup } from '@testing-library/react';
+import { toast } from 'react-toastify';
 import CommentSubmit from './CommentSubmit';
+import { mockApi } from '../../testing/mockApi';
+import { renderWithProviders } from '../../testing/renderWithProviders';
 
-const renderSubmit = (isAuthenticated, createComment = vi.fn()) =>
-  render(
-    <AuthContext.Provider value={{ isAuthenticated }}>
-      <PostContext.Provider value={{ createComment }}>
-        <MemoryRouter>
-          <CommentSubmit postId="p1" postUser="u1" comments={[]} />
-        </MemoryRouter>
-      </PostContext.Provider>
-    </AuthContext.Provider>
-  );
+const renderSubmit = (isAuthenticated, routes = {}) => {
+  const api = mockApi({
+    'POST /api/post/comment/p1': { status: 201, body: { message: 'Comment has been added.', comment: [] } },
+    ...routes,
+  });
+  const utils = renderWithProviders(<CommentSubmit postId="p1" postUser="u1" comments={[]} />, {
+    auth: { isAuthenticated },
+  });
+  return { ...utils, api };
+};
 
 describe('CommentSubmit', () => {
-  afterEach(cleanup);
+  beforeEach(() => {
+    vi.spyOn(toast, 'success').mockImplementation(() => 0);
+    vi.spyOn(toast, 'error').mockImplementation(() => 0);
+  });
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
 
   it('clears the textarea after the comment was saved', async () => {
-    const createComment = vi.fn().mockResolvedValue(true);
-    const { getByPlaceholderText, getByText } = renderSubmit(true, createComment);
+    const { getByPlaceholderText, getByText, api } = renderSubmit(true);
     const box = getByPlaceholderText('Comment...');
     fireEvent.change(box, { target: { value: 'nice post' } });
     fireEvent.click(getByText('Submit comment'));
     await waitFor(() => expect(box).toHaveValue(''));
-    expect(createComment).toHaveBeenCalledWith('p1', { comment: 'nice post' });
+    expect(api.callsTo('POST /api/post/comment/p1')[0].body).toEqual({ comment: 'nice post' });
+    expect(toast.success).toHaveBeenCalledWith('Comment has been added.');
   });
 
   it('keeps the text when saving failed', async () => {
-    const createComment = vi.fn().mockResolvedValue(false);
-    const { getByPlaceholderText, getByText } = renderSubmit(true, createComment);
+    const { getByPlaceholderText, getByText } = renderSubmit(true, {
+      'POST /api/post/comment/p1': { status: 400, body: { message: 'Comment is required' } },
+    });
     const box = getByPlaceholderText('Comment...');
     fireEvent.change(box, { target: { value: 'nice post' } });
     fireEvent.click(getByText('Submit comment'));
-    await waitFor(() => expect(createComment).toHaveBeenCalled());
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Comment is required'));
     expect(box).toHaveValue('nice post');
   });
 
@@ -51,4 +60,3 @@ describe('CommentSubmit', () => {
     expect(queryByPlaceholderText('Comment...')).toBeNull();
   });
 });
-

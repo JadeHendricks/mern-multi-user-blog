@@ -7,16 +7,17 @@ import AuthState from '../context/authContext/AuthState';
 import { createQueryClient } from '../lib/queryClient';
 
 // Renders `ui` the way App does: Query, router and auth around it.
-// - route: the URL to start on. path: the route pattern `ui` is mounted on (for useParams).
+// - route: the URL to start on (or a history array with index as the current entry).
+//   path: the route pattern `ui` is mounted on (for useParams).
 // - auth: a fixed AuthContext value. Leave it out to use the real AuthState (which asks /api/user/me).
 // - queryClient: pass one to inspect or pre-fill the cache. Retries are off, so a failure shows at once.
 /**
  * @param {React.ReactElement} ui
- * @param {{ route?: string, path?: string, auth?: object, queryClient?: import('@tanstack/react-query').QueryClient }} [options]
+ * @param {{ route?: string | string[], index?: number, path?: string, auth?: object, queryClient?: import('@tanstack/react-query').QueryClient }} [options]
  */
 export const renderWithProviders = (
   ui,
-  { route = '/', path, auth, queryClient = createQueryClient({ retry: false }) } = {},
+  { route = '/', index, path, auth, queryClient = createQueryClient({ retry: false }) } = {},
 ) => {
   const page = path ? (
     <Routes>
@@ -28,7 +29,7 @@ export const renderWithProviders = (
   const withAuth = auth ? <AuthContext.Provider value={auth}>{page}</AuthContext.Provider> : <AuthState>{page}</AuthState>;
   const utils = render(
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={[route]}>{withAuth}</MemoryRouter>
+      <MemoryRouter initialEntries={[route].flat()} initialIndex={index}>{withAuth}</MemoryRouter>
     </QueryClientProvider>,
   );
   return { ...utils, queryClient };
