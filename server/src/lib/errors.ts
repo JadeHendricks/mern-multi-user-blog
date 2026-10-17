@@ -70,3 +70,12 @@ export class HttpError extends Error {
     this.expose = expose;
   }
 }
+// A handler that needs the signed-in user ran without `protect` in front of it. The routes always
+// put `protect` first, so this only fires if a route is wired wrong; the message is the one
+// `protect` itself answers with.
+export class UnauthorizedError extends HttpError {
+  constructor() {
+    super(401, 'You are not logged in! Please log in to get access.', true);
+    this.name = 'UnauthorizedError';
+  }
+}
