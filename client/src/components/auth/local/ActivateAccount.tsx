@@ -31,8 +31,8 @@ const ActivateAccount = () => {
                     By clicking activate, your account with be verified and ready to use.
                 </p>
                 <form className="form form--activateaccount">
-                    <div className="form__group">
-                        <button className="button button--green" onClick={ handleActivationClick }>Activate</button>
+                    <div className="form-group">
+                        <button className="button button--green form-group__submit" onClick={ handleActivationClick }>Activate</button>
                     </div>
                 </form>
             </div>

@@ -37,18 +37,18 @@ const AccountSettings = ({ user, email }: AccountSettingsProps) => {
                     e.preventDefault();
                     updateUser.mutate({ name, avatar });
                 } }>
-                    <div className="form__group">
+                    <div className="form-group">
                         <label className="label" htmlFor="name">Name</label>
                         <input className="input" id="name" value={ name || '' } onChange={ e => {
                             const value = e.target.value;
                             setName(value);
                         } } />
                     </div>
-                    <div className="form__group">
+                    <div className="form-group">
                         <label className="label" htmlFor="email">Email</label>
                         <input className="input" id="email" name="email" value={ email ?? '' } placeholder="yourname@example.com" disabled></input>
                     </div>
-                    <div className="form__group form__photo-upload">
+                    <div className="form-group form-group--upload">
                         <img className="avatar form__user-photo" src={ uploadUrl('users', user.avatar) } onError={ onImageError('users') } alt={ user.name } title={ user.name } />
                         <input className="form__upload" type="file" accept="image/*" id="avatar" name="avatar" onChange={ e => {
                             const file = e.target.files?.[0];
@@ -57,8 +57,8 @@ const AccountSettings = ({ user, email }: AccountSettingsProps) => {
                         } } />
                         <label htmlFor="avatar">{ uploadName ? uploadName : 'Choose a new profile picture'}</label>
                     </div>
-                    <div className="form__group">
-                        <button type="submit" className="button button--green">Update Account</button>
+                    <div className="form-group">
+                        <button type="submit" className="button button--green form-group__submit">Update Account</button>
                     </div>
                 </form>
             </section>
@@ -70,20 +70,20 @@ const AccountSettings = ({ user, email }: AccountSettingsProps) => {
                     e.preventDefault();
                     updateUserSocials.mutate({ facebook, linkedin, twitter }) }
                     }>
-                    <div className="form__group">
+                    <div className="form-group">
                         <label className="label" htmlFor="facebook">Facebook URL</label>
                         <input className="input" id="facebook" name="facebook" value={ facebook } onChange={ handleSocialsOnChange } type="text" placeholder="Enter in your Facebook URL" />
                     </div>
-                    <div className="form__group">
+                    <div className="form-group">
                         <label className="label" htmlFor="linkedin">Linkedin URL</label>
                         <input className="input" id="linkedin" name="linkedin" value={ linkedin } onChange={ handleSocialsOnChange } type="text" placeholder="Enter in your Linkedin URL" />
                     </div>
-                    <div className="form__group">
+                    <div className="form-group">
                         <label className="label" htmlFor="twitter">Twitter URL</label>
                         <input className="input" id="twitter" name="twitter" value={ twitter } onChange={ handleSocialsOnChange } type="text" placeholder="Enter in your Twitter URL" />
                     </div>
-                    <div className="form__group">
-                        <button type="submit" className="button button--green">Update Socials</button>
+                    <div className="form-group">
+                        <button type="submit" className="button button--green form-group__submit">Update Socials</button>
                     </div>
                 </form>
             </section>

@@ -22,12 +22,12 @@ const ForgotPassword = () => {
                     Enter in your email and a reset link will be sent for you to change your password.
                 </p>
                 <form className="form form--forgotpassword" onSubmit={ handleOnSubmit }>
-                    <div className="form__group">
+                    <div className="form-group">
                         <label className="label" htmlFor="email">Email address</label>
                         <input className="input" id="email" onChange={ handleOnChange } name="email" type="email" placeholder="you@example.com" />
                     </div>
-                    <div className="form__group">
-                        <button className="button button--green">Send</button>
+                    <div className="form-group">
+                        <button className="button button--green form-group__submit">Send</button>
                     </div>
                 </form>
             </div>

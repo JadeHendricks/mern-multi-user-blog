@@ -31,13 +31,13 @@ const CommentSubmit = ({ postId, comments }: CommentSubmitProps) => {
             </div>
             { isAuthenticated && (
                 <form className="comment-form" onSubmit={ handleSubmit }>
-                    <div className="form__group">
+                    <div className="form-group">
                         <textarea id="comment" name="comment" className="input input--textarea" value={ comment } onChange={ handleOnChange } placeholder="Comment..."></textarea>
                     </div>
-                    <div className="form__group">
-                        <button type="submit" className="button button--green">Submit comment</button>
+                    <div className="form-group">
+                        <button type="submit" className="button button--green form-group__submit">Submit comment</button>
                     </div>
-                    <div className="form__group">
+                    <div className="form-group">
                         <span className="comment__total">{ comments?.length } { comments?.length === 1 ? 'Comment' : 'Comments'}</span>
                     </div>
                 </form>

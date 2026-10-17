@@ -16,16 +16,6 @@
   padding: 5rem;
   border-radius: 5px; }
 
-.form__group {
-  margin-bottom: 2.5rem; }
-
-.form__group:last-child {
-    margin-bottom: 0; }
-
-.form__group .button {
-    margin-left: auto;
-    display: block; }
-
 .form__upload {
   width: 0.01rem;
   height: 0.01rem;
@@ -44,11 +34,6 @@
     -webkit-transition: all 0.2s;
     transition: all 0.2s;
     cursor: pointer; }
-
-.form__photo-upload {
-  display: flex;
-  align-items: center;
-  font-size: 1.6rem; }
 
 .form__user-photo {
   height: 8rem;
@@ -78,13 +63,7 @@
     padding: 3rem; }
   .form--account {
     padding: 3rem; }
-  .form__group {
-    margin-bottom: 2rem; }
-  .form__upload + label {
-    font-size: 1.6rem; }
-  .form__photo-upload {
-    display: flex;
-    align-items: center;
+.form__upload + label {
     font-size: 1.6rem; }
   .form__user-photo {
     height: 6rem;
@@ -97,9 +76,7 @@
       font-weight: 500; } }
 
 @media screen and (max-width: 580px) {
-  .form__group {
-    margin-bottom: 2rem; }
-  .form__upload + label {
+.form__upload + label {
     font-size: 1.2rem; }
   .form__useraccount-block {
     margin-bottom: 2rem;

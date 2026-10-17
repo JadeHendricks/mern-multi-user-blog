@@ -28,12 +28,12 @@ const ResetPassword = () => {
                     Enter in your new password to proceed.
                 </p>
                 <form className="form form--resetPassword" onSubmit={ handleOnSubmit }>
-                    <div className="form__group">
+                    <div className="form-group">
                         <label className="label" htmlFor="newPassword">New Password</label>
                         <input className="input" id="newPassword" onChange={ handleOnChange } name="newPassword" type="password" placeholder="••••••••" />
                     </div>
-                    <div className="form__group">
-                        <button className="button button--green">Reset Password</button>
+                    <div className="form-group">
+                        <button className="button button--green form-group__submit">Reset Password</button>
                     </div>
                 </form>
             </div>

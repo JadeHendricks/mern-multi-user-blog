@@ -35,11 +35,11 @@ const PostForm = () => {
                         </p>
                     </div>
                     <form className="form form--createPost" onSubmit={ handleSubmit }>
-                        <div className="form__group">
+                        <div className="form-group">
                             <label className="label" htmlFor="title">Post Title</label>
                             <input className="input" id="title" onChange={ handleOnChange } name="title" type="text" placeholder="Title goes here" />
                         </div>
-                        <div className="form__group">
+                        <div className="form-group">
                             <label className="label" htmlFor="tag">Post Tag</label>
                             <div className="radio">
                                 {/* Always checked: both branches of the old ternary rendered checked=true. */}
@@ -56,11 +56,11 @@ const PostForm = () => {
                                 <label htmlFor="funny" className="radio__label">funny</label>
                             </div>
                         </div>
-                        <div className="form__group">
+                        <div className="form-group">
                             <label className="label" htmlFor="description">Post Body</label>
                             <textarea className="input input--textarea" onChange={ handleOnChange } id="description" name="description" placeholder="Post goes here"></textarea>
                         </div>
-                        <div className="form__group form__photo-upload">
+                        <div className="form-group form-group--upload">
                             <img className="avatar form__user-photo" src={ noImageFound } alt="Something could be here" title="Something could be here" />
                             <input className="form__upload" type="file" accept="image/*" id="image" name="image" onChange={ e => {
                                 const file = e.target.files?.[0];
@@ -69,8 +69,8 @@ const PostForm = () => {
                             } } />
                             <label htmlFor="image">{ uploadName ? uploadName : 'Choose a blog post image' }</label>
                         </div>
-                        <div className="form__group">
-                            <button className="button button--green">Create Post</button>
+                        <div className="form-group">
+                            <button className="button button--green form-group__submit">Create Post</button>
                         </div>
                     </form>
                 </div>
