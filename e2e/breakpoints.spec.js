@@ -15,7 +15,9 @@ const ownerPages = [
   ['create-post', routes.createPost],
 ];
 
-test.beforeEach((_fixtures, testInfo) => {
+// Playwright requires the destructuring pattern here, even with no fixtures used.
+// eslint-disable-next-line no-empty-pattern
+test.beforeEach(({}, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'desktop only');
 });
 
