@@ -7,10 +7,8 @@ const dateFormat = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-
  * Formats an ISO string, timestamp or Date as DD/MM/YYYY.
  * Why '' for bad input: moment printed the text "Invalid date" on the page; an empty
  * string is quieter and Intl.format would throw a RangeError on an invalid Date.
- * @param {string | number | Date | null | undefined} value
- * @returns {string}
  */
-export function formatDate(value) {
+export function formatDate(value: string | number | Date | null | undefined): string {
     if (value === null || value === undefined || value === '') return '';
     const date = value instanceof Date ? value : new Date(value);
     return Number.isNaN(date.getTime()) ? '' : dateFormat.format(date);
