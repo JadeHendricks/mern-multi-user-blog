@@ -14,16 +14,16 @@ const UserCard = ({ user: { createdAt, name, _id, avatar, socials } }: UserCardP
         <div className="card-user">
             <div className="card-user__header">
                 <Link to={`/profile/${_id}`} className="card-user__image">
-                    <img className="avatar" src={ uploadUrl('users', avatar) } onError={ onImageError('users') } alt={ name } title={ name } />
+                    <img className="avatar card-user__avatar" src={ uploadUrl('users', avatar) } onError={ onImageError('users') } alt={ name } title={ name } />
                 </Link>
-                <div className="card-user__userInfo">
+                <div className="card-user__info">
                     <Link to={`/profile/${_id}`} className="card-user__title">{ name }</Link>
                     <p className="card-user__date">Joined date: { formatDate(createdAt) }</p>
                     <Link to={`/profile/${_id}`} className="button button--yellow">Visit Profile</Link>
                 </div>
             </div>
             <div className="card-user__footer">
-                <div className="card-user__social"> 
+                <div>
                     { isHttpsUrl(socials?.facebook) && (
                         <a href={ socials.facebook } target='_blank' rel='noopener noreferrer'>
                             <svg className="card-user__social-icon">

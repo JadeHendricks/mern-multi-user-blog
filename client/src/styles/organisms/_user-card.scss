@@ -1,86 +1,110 @@
-.card-user {
-  border-radius: 0.3rem;
-  overflow: hidden;
-  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.1);
-  background-color: #ffffff;
-  backface-visibility: hidden;
-  flex: 0 1 48%;
-  margin-top: 5rem; }
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
 
-.card-user__header {
+// Card for one author on the All Users page.
+.card-user {
+  @include card-surface;
+
+  flex: 0 1 48%;
+  margin-top: $space-50;
+
+  @include respond-to('lg') {
+    margin-top: $space-40;
+  }
+
+  @include respond-to('sm') {
+    flex: 0 1 100%;
+    margin-top: $space-30;
+  }
+
+  &__header {
     display: flex;
     align-items: center;
-    padding: 3rem 1.5rem; }
+    padding: $space-30 $space-15;
 
-.card-user__image {
-    margin-right: 1.5rem;
-    flex: 0 0 12rem; }
+    @include respond-to('lg') {
+      align-items: flex-start;
+      padding: $space-20 $space-10;
+    }
+  }
 
-.card-user__image img {
-  width: 12rem;
-  height: 12rem;
-  cursor: pointer; }
+  &__image {
+    margin-right: $space-15;
+    flex: 0 0 12rem;
 
-.card-user__userInfo {
-    flex: 1; }
+    @include respond-to('lg') {
+      flex: 0 0 9rem;
+    }
+  }
 
-.card-user__title {
-    font-size: 2.8rem;
-    text-decoration: none;
-    color: #444444;
+  &__avatar {
+    width: 12rem;
+    height: 12rem;
     cursor: pointer;
-    font-weight: 700; }
 
-.card-user__date {
-    font-size: 1.8rem;
-    margin: 1rem 0 1.5rem 0; }
+    @include respond-to('lg') {
+      width: 9rem;
+      height: 9rem;
+    }
+  }
 
-.card-user__footer {
-    background-color: #f7f7f7;
-    border-top: 0.1rem solid #eaeaea;
+  &__info {
+    flex: 1;
+  }
+
+  &__title {
+    font-size: $font-28;
+    text-decoration: none;
+    color: $color-text;
+    cursor: pointer;
+    font-weight: $weight-bold;
+
+    @include respond-to('lg') {
+      font-size: $font-18;
+    }
+  }
+
+  &__date {
+    font-size: $font-18;
+    margin: $space-10 0 $space-15;
+
+    @include respond-to('lg') {
+      font-size: $font-14;
+      margin: 0 0 $space-15;
+    }
+  }
+
+  &__footer {
+    background-color: $color-background;
+    border-top: 0.1rem solid $color-border;
     cursor: pointer;
     height: 6.5rem;
-    padding: 1.5rem;
+    padding: $space-15;
     display: flex;
-    align-items: center; }
+    align-items: center;
 
-.card-user__social-icon {
+    @include respond-to('lg') {
+      height: 5rem;
+      padding: $space-10;
+    }
+  }
+
+  &__social-icon {
     width: 5rem;
     height: 5rem;
-    fill: #444444; }
+    fill: $color-text;
 
-.card-user__social-icon:not(:last-child) {
-  margin-right: 1.5rem; }
-
-@media screen and (max-width: 991px) {
-  .card-user {
-    margin-top: 4rem; }
-  .card-user__header {
-      display: flex;
-      align-items: flex-start;
-      padding: 2rem 1rem; }
-  .card-user__image {
-      flex: 0 0 9rem; }
-  .card-user__image img {
-        width: 9rem;
-        height: 9rem; }
-  .card-user__title {
-      font-size: 1.8rem; }
-  .card-user__date {
-      font-size: 1.4rem;
-      margin: 0 0 1.5rem 0; }
-  .card-user__footer {
-      height: 5rem;
-      padding: 1rem; }
-  .card-user__social-icon {
+    @include respond-to('lg') {
       width: 4rem;
-      height: 4rem; }
-  .card-user__social-icon:not(:last-child) {
-        margin-right: 0.5rem; } }
+      height: 4rem;
+    }
+  }
 
-@media screen and (max-width: 580px) {
-  .card-user {
-    flex: 0 1 100%;
-    margin-top: 3rem; }
-  __title {
-    font-size: 1.8rem; } }
+  &__social-icon:not(:last-child) {
+    margin-right: $space-15;
+
+    @include respond-to('lg') {
+      margin-right: $space-5;
+    }
+  }
+}
