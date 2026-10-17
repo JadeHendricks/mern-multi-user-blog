@@ -3,13 +3,6 @@
 // are switched off for that path only (an allowlist by path, no disable comments in the source).
 // A partial leaves the list when it is rebuilt; the list must be empty when Phase 7 ends.
 const legacy = {
-  'client/src/styles/atoms/_button.scss': [
-    'alpha-value-notation',
-    'color-function-alias-notation',
-    'color-function-notation',
-    'color-hex-length',
-    'media-feature-range-notation',
-  ],
   'client/src/styles/atoms/_loader.scss': [
     'color-hex-length',
     'comment-whitespace-inside',

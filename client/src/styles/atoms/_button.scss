@@ -1,43 +1,52 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
 .button {
-  font-size: 1.8rem;
-  padding: 1.4rem 3rem;
-  border-radius: 10rem;
+  font-size: $font-18;
+  padding: $space-14 $space-30;
+  border-radius: $radius-pill;
   text-transform: uppercase;
   display: inline-block;
   text-decoration: none;
   position: relative;
-  transition: all 0.4s;
-  font-weight: 400;
+  transition: all $duration-slow;
+  font-weight: $weight-regular;
   border: none;
   text-align: center;
-  cursor: pointer; }
+  cursor: pointer;
 
-.button:hover {
+  &:hover {
     transform: translateY(-3px);
-    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15); }
+    box-shadow: $shadow-sm;
+  }
 
-.button--green {
-    background-color: #55c57a;
-    color: #ffffff; }
+  &--green {
+    background-color: $color-green;
+    color: $color-white;
+  }
 
-.button--white {
-    background-color: #ffffff;
-    color: #444444; }
+  &--white {
+    background-color: $color-white;
+    color: $color-text;
+  }
 
-.button--yellow {
-    background-color: #fcd983;
-    color: #444444; }
+  &--yellow {
+    background-color: $color-yellow;
+    color: $color-text;
+  }
 
-.button--red {
-    background-color: #cd2d2d;
-    color: #ffffff; }
+  &--red {
+    background-color: $color-red;
+    color: $color-white;
+  }
 
-@media screen and (max-width: 991px) {
-  .button {
-    font-size: 1.6rem;
-    padding: 1rem 1.5rem; } }
+  @include respond-to('lg') {
+    font-size: $font-16;
+    padding: $space-10 $space-15;
+  }
 
-@media screen and (max-width: 580px) {
-  .button {
-    font-size: 1.2rem;
-    padding: 1rem 1.2rem; } }
+  @include respond-to('sm') {
+    font-size: $font-12;
+    padding: $space-10 $space-12;
+  }
+}
