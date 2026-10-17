@@ -1,9 +1,9 @@
+import { updateMeRequestSchema, updateSocialsRequestSchema } from '@mern-blog/shared';
 import express from 'express';
-import { runValidation } from '../../lib/validate.js';
+import { validateBody } from '../../lib/validate.js';
 import type { AuthController } from '../auth/controller.js';
 import { uploadUserAvatar } from './controller.js';
 import type { UserController } from './controller.js';
-import { updateMeValidator, updateSocialsValidator } from './schema.js';
 
 export default function createUserRouter({
   auth,
@@ -14,10 +14,11 @@ export default function createUserRouter({
 }): express.Router {
   const router = express.Router();
 
+  // Multipart bodies are only parsed by multer, so the avatar upload runs before the validation.
   router
     .route('/me')
     .get(auth.protect, user.getMe)
-    .put(auth.protect, uploadUserAvatar, updateMeValidator, runValidation, user.updateMe);
+    .put(auth.protect, uploadUserAvatar, validateBody(updateMeRequestSchema), user.updateMe);
 
   router.route('/').get(user.getAllUsers);
 
@@ -25,7 +26,7 @@ export default function createUserRouter({
 
   router
     .route('/:id/socials')
-    .put(auth.protect, updateSocialsValidator, runValidation, user.updateUserSocials);
+    .put(auth.protect, validateBody(updateSocialsRequestSchema), user.updateUserSocials);
 
   //admin only example
   //router.put('/admin', requireSignin, adminOnlyRoutes, updateUser);

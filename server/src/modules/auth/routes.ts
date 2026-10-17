@@ -1,33 +1,31 @@
+import {
+  forgotPasswordRequestSchema,
+  loginRequestSchema,
+  registerRequestSchema,
+  resetPasswordRequestSchema,
+} from '@mern-blog/shared';
 import express from 'express';
 import authLimiter from '../../lib/authLimiter.js';
-import { runValidation } from '../../lib/validate.js';
+import { validateBody } from '../../lib/validate.js';
 import type { AuthController } from './controller.js';
-import {
-  forgotPasswordValidator,
-  resetPasswordValidator,
-  userloginValidator,
-  userRegisterValidator,
-} from './schema.js';
 
 export default function createAuthRouter({ auth }: { auth: AuthController }): express.Router {
   const router = express.Router();
 
-  router.post('/register', authLimiter(), userRegisterValidator, runValidation, auth.register);
+  router.post('/register', authLimiter(), validateBody(registerRequestSchema), auth.register);
   router.post('/account-activation', authLimiter(), auth.accountActivation);
   router.get('/account-activation/:token', auth.activationPreview);
-  router.post('/login', authLimiter(), userloginValidator, runValidation, auth.login);
+  router.post('/login', authLimiter(), validateBody(loginRequestSchema), auth.login);
   router.put(
     '/forgot-password',
     authLimiter(),
-    forgotPasswordValidator,
-    runValidation,
+    validateBody(forgotPasswordRequestSchema),
     auth.forgotPassword,
   );
   router.put(
     '/reset-password',
     authLimiter(),
-    resetPasswordValidator,
-    runValidation,
+    validateBody(resetPasswordRequestSchema),
     auth.resetPassword,
   );
   router.get('/isloggedin', auth.isLoggedIn);

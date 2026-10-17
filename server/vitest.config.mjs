@@ -9,7 +9,8 @@ export default defineConfig({
     },
   },
   test: {
-    include: ['test/api/**/*.test.js', 'test/store/**/*.test.js', 'test/unit/**/*.test.js'],
+    // .ts is new (FEAT-003); the older tests are still .js until they are converted.
+    include: ['test/{api,store,unit}/**/*.test.{js,ts}'],
     // One forked process per test file: each file gets a fresh `config`, mongoose and app instance.
     pool: 'forks',
     fileParallelism: false,
