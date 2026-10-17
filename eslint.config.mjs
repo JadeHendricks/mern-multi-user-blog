@@ -91,7 +91,8 @@ export default [
   {
     files: ['client/*.{js,mjs}'],
     languageOptions: { globals: { ...globals.node } },
-  },  ...typeChecked,
+  },
+  ...typeChecked,
   {
     files: tsFiles,
     languageOptions: {
