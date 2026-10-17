@@ -80,10 +80,10 @@ const Profile = () => {
                     <div className="container">
                         <div className="account">
                             <aside className="account__options">
-                                <nav className="account-nav">
+                                <nav>
                                     <ul className="account-nav__ul">
-                                        <li className="account-nav__el"><button onClick={ handleNavigationState } name='all-posts'>All posts ({ userPosts.length })</button></li>
-                                        { isUsersData(loggedInUser?._id, user._id) && <li className="account-nav__el"><button onClick={ handleNavigationState } name='account-settings'>Account settings</button></li> }
+                                        <li className="account-nav__el"><button className="account-nav__button" onClick={ handleNavigationState } name='all-posts'>All posts ({ userPosts.length })</button></li>
+                                        { isUsersData(loggedInUser?._id, user._id) && <li className="account-nav__el"><button className="account-nav__button" onClick={ handleNavigationState } name='account-settings'>Account settings</button></li> }
                                     </ul>
                                 </nav>
                             </aside>

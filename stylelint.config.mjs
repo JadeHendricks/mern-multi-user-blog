@@ -3,13 +3,6 @@
 // are switched off for that path only (an allowlist by path, no disable comments in the source).
 // A partial leaves the list when it is rebuilt; the list must be empty when Phase 7 ends.
 const legacy = {
-  'client/src/styles/organisms/_account-nav.scss': [
-    'color-hex-length',
-    'media-feature-range-notation',
-    'rule-empty-line-before',
-    'selector-max-combinators',
-    'selector-max-type',
-  ],
   'client/src/styles/organisms/_form.scss': [
     'alpha-value-notation',
     'color-function-alias-notation',
