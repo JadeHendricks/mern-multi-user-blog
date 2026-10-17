@@ -1,10 +1,6 @@
-// Style rules for client/src/styles. The partials are rebuilt one chunk at a time, so the ones that
-// still hold the old rules are listed in `legacy`, each with the rules it breaks today. Those rules
-// are switched off for that path only (an allowlist by path, no disable comments in the source).
-// A partial leaves the list when it is rebuilt; the list must be empty when Phase 7 ends.
-const legacy = {
-};
-
+// Style rules for client/src/styles. Every partial follows them; there is no allowlist and no disable
+// comments in the source. The only path exceptions are below: the generic layer (bare elements) and
+// the vendor layer (a library class name).
 export default {
   extends: ['stylelint-config-standard-scss'],
   rules: {
@@ -44,9 +40,5 @@ export default {
       files: ['client/src/styles/vendor/**/*.scss'],
       rules: { 'selector-class-pattern': null },
     },
-    ...Object.entries(legacy).map(([file, rules]) => ({
-      files: [file],
-      rules: Object.fromEntries(rules.map((rule) => [rule, null])),
-    })),
   ],
 };
