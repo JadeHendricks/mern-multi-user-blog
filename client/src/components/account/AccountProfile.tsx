@@ -37,7 +37,7 @@ const Profile = () => {
                             <div className="container">
                                 <div className="user-header">
                                     <div className="user-header__image">
-                                        <img className="avatar" src={ uploadUrl('users', user.avatar) } onError={ onImageError('users') } alt={ user.name } title={ user.name } />
+                                        <img className="avatar user-header__avatar" src={ uploadUrl('users', user.avatar) } onError={ onImageError('users') } alt={ user.name } title={ user.name } />
                                     </div>
                                     <div className="user-header__info">
                                         <h3 className="user-header__info-name">{ user.name }</h3>

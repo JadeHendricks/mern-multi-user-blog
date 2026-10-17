@@ -37,15 +37,6 @@ const legacy = {
     'rule-empty-line-before',
     'shorthand-property-no-redundant-values',
   ],
-  'client/src/styles/organisms/_user-header.scss': [
-    'color-hex-length',
-    'media-feature-range-notation',
-    'rule-empty-line-before',
-    'selector-max-combinators',
-    'selector-max-type',
-    'shorthand-property-no-redundant-values',
-    'value-keyword-case',
-  ],
   'client/src/styles/pages/_account.scss': [
     'alpha-value-notation',
     'color-function-alias-notation',
