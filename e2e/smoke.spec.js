@@ -66,3 +66,25 @@ test('profile page shows the three https social links', async ({ page }) => {
     await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   }
 });
+// Uploaded images and avatars are served from /uploads and actually decode in the browser.
+test('seeded post images and avatars load from /uploads', async ({ page }) => {
+  await visit(page, routes.home);
+  for (const selector of ['.card__image', '.card__user-image']) {
+    const images = page.locator(selector);
+    expect(await images.count()).toBeGreaterThan(0);
+    for (const image of await images.all()) {
+      await expect(image).toHaveAttribute('src', /^\/uploads\/(posts|users)\//);
+      expect(await image.evaluate((img) => img.naturalWidth)).toBeGreaterThan(0);
+    }
+  }
+});
+
+test('a broken upload falls back to the bundled default image', async ({ page }) => {
+  // Every upload answers 404, as if the files had been deleted.
+  await page.route('**/uploads/**', (route) => route.fulfill({ status: 404, body: 'Not found' }));
+  await page.goto(routes.home);
+  const image = page.locator('.card__image').first();
+  await expect(image).toHaveAttribute('src', /default.*\.jpg$/);
+  await expect.poll(() => image.evaluate((img) => img.naturalWidth)).toBeGreaterThan(0);
+  await expect(page.locator('.card__user-image').first()).toHaveAttribute('src', /default.*\.jpg$/);
+});
