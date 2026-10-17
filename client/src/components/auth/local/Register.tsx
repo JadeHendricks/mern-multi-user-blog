@@ -40,8 +40,8 @@ const Register = () => {
                         <input className="input" id="password" name="password" onChange={ handleOnChange } type="password" placeholder="••••••••" />
                     </div>
                     <div className="form-group">
-                        <div className="form__useraccount-block">
-                            <Link to='/login'>Already have an account?</Link>
+                        <div className="form-links">
+                            <Link className="form-links__link" to='/login'>Already have an account?</Link>
                         </div>
                     </div>
                     <div className="form-group">

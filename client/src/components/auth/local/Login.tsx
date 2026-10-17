@@ -35,9 +35,9 @@ const Login = () => {
                         <input className="input" id="password" name="password" onChange={ handleOnChange } type="password" placeholder="••••••••" />
                     </div>
                     <div className="form-group">
-                        <div className="form__useraccount-block">
-                            <Link to='/register'>Don&apos;t have an account?</Link>
-                            <Link to='/forgot-password'>Forgot password?</Link>
+                        <div className="form-links">
+                            <Link className="form-links__link" to='/register'>Don&apos;t have an account?</Link>
+                            <Link className="form-links__link" to='/forgot-password'>Forgot password?</Link>
                         </div>
                     </div>
                     <div className="form-group">

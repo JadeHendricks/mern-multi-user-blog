@@ -1,0 +1,44 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+// Row of links under a form ("Forgot password?" and friends).
+.form-links {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: $space-40;
+
+  @include respond-to('md') {
+    margin-bottom: $space-30;
+  }
+
+  @include respond-to('sm') {
+    margin-bottom: $space-20;
+    display: block;
+  }
+
+  &__link {
+    color: $color-green;
+    text-decoration: none;
+    font-size: $font-18;
+    transition: all $duration-slow;
+    font-weight: $weight-bold;
+
+    @include respond-to('md') {
+      font-size: $font-14;
+      font-weight: $weight-medium;
+    }
+
+    // Below 580px every link stacks. The old stylesheet spelled this `a:not(last-child)`, which is a
+    // typo that matches every link, so the margin applies to all of them, the last one included.
+    @include respond-to('sm') {
+      font-size: $font-12;
+      font-weight: $weight-bold;
+      display: block;
+      margin-bottom: $space-10;
+    }
+  }
+
+  &__link:hover {
+    transform: translateY(-2px);
+  }
+}
