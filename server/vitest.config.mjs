@@ -2,7 +2,7 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    include: ['test/api/**/*.test.js', 'test/unit/**/*.test.js'],
+    include: ['test/api/**/*.test.js', 'test/store/**/*.test.js', 'test/unit/**/*.test.js'],
     // One forked process per test file: each file gets a fresh `config`, mongoose and app instance.
     pool: 'forks',
     fileParallelism: false,
