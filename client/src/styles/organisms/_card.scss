@@ -1,7 +1,7 @@
 @use '../settings/tokens' as *;
 @use '../tools/mixins' as *;
 
-// Post card shell. The footer and author rules further down are rebuilt in the next chunk.
+// Post card: shell, footer with the author, and the owner's edit and delete actions.
 .card {
   @include card-surface;
 
@@ -98,6 +98,95 @@
     }
   }
 
+  &__footer-link {
+    color: $color-text;
+    text-decoration: none;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    background-color: $color-background;
+    padding: $space-15;
+    border-top: 0.1rem solid $color-border;
+    cursor: pointer;
+
+    @include respond-to('xl') {
+      padding: $space-10;
+    }
+
+    @include respond-to('sm-wide') {
+      padding: $space-20;
+    }
+  }
+
+  &__avatar {
+    width: 6rem;
+    height: 6rem;
+    flex: 0 0 6rem;
+    margin-right: $space-10;
+
+    @include respond-to('xl') {
+      width: 4rem;
+      height: 4rem;
+      flex: 0 0 4rem;
+      margin-right: $space-15;
+    }
+
+    @include respond-to('sm-wide') {
+      width: 6rem;
+      height: 6rem;
+      flex: 0 0 6rem;
+      margin-right: $space-10;
+    }
+  }
+
+  &__author {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    font-size: $font-18;
+
+    @include respond-to('xl') {
+      font-size: $font-16;
+    }
+
+    @include respond-to('sm-wide') {
+      font-size: $font-18;
+    }
+  }
+
+  &__author-name {
+    font-weight: $weight-bold;
+
+    @include respond-to('xl') {
+      font-weight: $weight-medium;
+    }
+
+    @include respond-to('sm-wide') {
+      font-weight: $weight-bold;
+    }
+  }
+
+  &__author-date {
+    font-size: $font-16;
+
+    @include respond-to('xl') {
+      font-size: $font-14;
+    }
+  }
+
+  &__actions {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  // Edit and delete buttons in the owner's card footer.
+  &__action {
+    flex: 0 1 48%;
+  }
+
   // Account page variant. Written after the base and its respond-to blocks so it replaces their
   // flex and margin values, and carries its own narrow-screen values.
   &--account {
@@ -110,82 +199,3 @@
     }
   }
 }
-.card__user-link {
-    color: #444444;
-    text-decoration: none; }
-
-.card__user {
-    display: flex;
-    align-items: center;
-    background-color: #f7f7f7;
-    padding: 1.5rem;
-    border-top: 0.1rem solid #eaeaea;
-    cursor: pointer; }
-
-.card__user-image {
-    width: 6rem;
-    height: 6rem;
-    flex: 0 0 6rem;
-    margin-right: 1rem; }
-
-.card__user-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    font-size: 1.8rem; }
-
-.card__user-info div:first-child {
-  font-weight: 700; }
-
-.card__user-info div:last-child {
-  font-size: 1.6rem; }
-
-.card__user-options {
-    width: 100%;
-    display: flex;
-    justify-content: space-between; }
-
-.card__user-options .button {
-  flex: 0 1 48%; }
-
-@media screen and (max-width: 1200px) {
-  .card__user {
-    padding: 1rem; }
-  .card__user-image {
-    width: 4rem;
-    height: 4rem;
-    flex: 0 0 4rem;
-    margin-right: 1.5rem; }
-  .card__user-info {
-    font-size: 1.6rem; }
-  .card__user-info div:first-child {
-      font-weight: 500; }
-  .card__user-info div:last-child {
-      font-size: 1.4rem; }
-  .card__user-options {
-    width: 100%;
-    display: flex;
-    justify-content: space-between; }
-  .card__user-options .button {
-      flex: 0 1 48%; } }
-
-@media screen and (max-width: 590px) {
-  .card__user {
-      padding: 2rem; }
-  .card__user-image {
-      width: 6rem;
-      height: 6rem;
-      flex: 0 0 6rem;
-      margin-right: 1rem; }
-  .card__user-info {
-      font-size: 1.8rem; }
-  .card__user-info div:first-child {
-        font-weight: 700; }
-  .card__user-info div:last-child {
-        font-size: 1.4rem; }
-  .card__user-options {
-      width: 100%;
-      display: flex;
-      justify-content: space-between; }
-  .card__user-options .button {
-        flex: 0 1 48%; } }

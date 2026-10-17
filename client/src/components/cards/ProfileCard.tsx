@@ -58,10 +58,10 @@ const ProfileCard = ({ post: { _id, title, image, tag, description, comments, li
                     </div>
                 </div>
             </div>
-            <div className="card__user">
-                <div className="card__user-options">
-                    <Link to={`/edit-post/${_id}`} className="button button--yellow">Edit post</Link>
-                    <button type="button" onClick={ handleDelete } className="button button--red">Delete post</button>
+            <div className="card__footer">
+                <div className="card__actions">
+                    <Link to={`/edit-post/${_id}`} className="button button--yellow card__action">Edit post</Link>
+                    <button type="button" onClick={ handleDelete } className="button button--red card__action">Delete post</button>
                 </div>
             </div>
         </div>

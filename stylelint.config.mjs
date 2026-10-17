@@ -10,18 +10,6 @@ const legacy = {
     'selector-max-combinators',
     'selector-max-type',
   ],
-  'client/src/styles/organisms/_card.scss': [
-    'alpha-value-notation',
-    'color-function-alias-notation',
-    'color-function-notation',
-    'color-hex-length',
-    'media-feature-range-notation',
-    'no-descending-specificity',
-    'rule-empty-line-before',
-    'selector-max-class',
-    'selector-max-combinators',
-    'selector-max-type',
-  ],
   'client/src/styles/organisms/_comment.scss': [
     'alpha-value-notation',
     'color-function-alias-notation',
