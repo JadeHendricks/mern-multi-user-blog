@@ -3,9 +3,10 @@ import { stopOwnMongo } from '../support/mongo.js';
 import { runAdminContract } from './contract/admin.contract.js';
 import { runPostContract } from './contract/posts.contract.js';
 import { runUserContract } from './contract/users.contract.js';
+import { present } from './contract/support.js';
 import { makeMongoStore } from './support.js';
 
-// The same suites json.test.js runs, against the Mongo adapter on an in-memory MongoDB.
+// The same suites json.test.ts runs, against the Mongo adapter on an in-memory MongoDB.
 afterAll(stopOwnMongo);
 
 runUserContract('mongo', () => makeMongoStore());
@@ -18,7 +19,7 @@ describe('mongo: indexes', () => {
   it('has the unique email index and the two post indexes, and no others', async () => {
     const { store, cleanup } = await makeMongoStore();
     try {
-      const indexes = await store.admin.indexes();
+      const indexes = present(await store.admin.indexes?.());
 
       expect(indexes.users).toEqual([{ key: { email: 1 }, unique: true }]);
       expect(indexes.posts).toEqual(

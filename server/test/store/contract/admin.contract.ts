@@ -1,12 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { newId } from '../../../src/lib/ids.js';
-import { activeUser, hex, pendingInput, postInput, rejection } from './support.js';
+import type { Store } from '../../../src/store/types.js';
+import { activeUser, hex, pendingInput, postInput, present, rejection } from './support.js';
+import type { MakeStore } from './support.js';
 
 // Runs against any adapter. `makeStore()` resolves to { store, cleanup }.
-export function runAdminContract(label, makeStore) {
+export function runAdminContract(label: string, makeStore: MakeStore): void {
   describe(`${label}: StoreAdmin`, () => {
-    let store;
-    let cleanup;
+    let store: Store;
+    let cleanup: () => Promise<void>;
 
     beforeEach(async () => {
       ({ store, cleanup } = await makeStore());
@@ -46,7 +48,7 @@ export function runAdminContract(label, makeStore) {
 
         expect(counts).toEqual({ users: 3, posts: 1 });
         expect(await second.store.admin.exportAll()).toEqual(exported);
-        const imported = await second.store.posts.findById(post._id);
+        const imported = present(await second.store.posts.findById(post._id));
         expect(imported).toEqual(await store.posts.findById(post._id));
         expect((await second.store.users.listPublic()).items).toHaveLength(2);
       } finally {
@@ -63,6 +65,8 @@ export function runAdminContract(label, makeStore) {
         users: 3,
         posts: 1,
       });
+      // A file that lost its posts list is not a type-valid import, but a real file can be one.
+      // @ts-expect-error posts is missing on purpose
       expect(await rejection(store.admin.importAll({ users: [] }))).toBeInstanceOf(Error);
     });
 
@@ -71,9 +75,9 @@ export function runAdminContract(label, makeStore) {
       const exported = await store.admin.exportAll();
       await store.admin.reset();
       const dupEmail = structuredClone(exported);
-      dupEmail.users[1].email = dupEmail.users[0].email.toUpperCase();
+      present(dupEmail.users[1]).email = present(dupEmail.users[0]).email.toUpperCase();
       const dupId = structuredClone(exported);
-      dupId.users[1]._id = dupId.users[0]._id;
+      present(dupId.users[1])._id = present(dupId.users[0])._id;
 
       expect(await rejection(store.admin.importAll(dupEmail))).toBeInstanceOf(Error);
       expect(await rejection(store.admin.importAll(dupId))).toBeInstanceOf(Error);
@@ -83,7 +87,7 @@ export function runAdminContract(label, makeStore) {
     it('reads the raw user with its secrets and removes absent fields', async () => {
       const user = await store.users.createPending(pendingInput(1));
 
-      const raw = await store.admin.rawUserByEmail(user.email.toUpperCase());
+      const raw = present(await store.admin.rawUserByEmail(user.email.toUpperCase()));
 
       expect(raw.status).toBe('pending');
       expect(raw.passwordHash).toMatch(/^\$2/);
@@ -106,7 +110,7 @@ export function runAdminContract(label, makeStore) {
       ).toBe(true);
 
       expect(await store.users.findByResetHash(hash)).toBeNull();
-      const raw = await store.admin.rawUserByEmail(user.email);
+      const raw = present(await store.admin.rawUserByEmail(user.email));
       expect('activationExpires' in raw).toBe(false);
       expect(await store.admin.patchUser(newId(), { name: 'x' })).toBe(false);
     });

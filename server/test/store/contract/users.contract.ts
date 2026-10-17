@@ -5,13 +5,15 @@ import {
   InvalidCursorError,
   StoreValidationError,
 } from '../../../src/store/errors.js';
-import { activeUser, hex, pendingInput, rejection } from './support.js';
+import type { Store } from '../../../src/store/types.js';
+import { activeUser, hex, pendingInput, present, rejection } from './support.js';
+import type { MakeStore } from './support.js';
 
 // Runs against any adapter. `makeStore()` resolves to { store, cleanup }.
-export function runUserContract(label, makeStore) {
+export function runUserContract(label: string, makeStore: MakeStore): void {
   describe(`${label}: UserRepo`, () => {
-    let store;
-    let cleanup;
+    let store: Store;
+    let cleanup: () => Promise<void>;
 
     beforeEach(async () => {
       ({ store, cleanup } = await makeStore());
@@ -30,13 +32,17 @@ export function runUserContract(label, makeStore) {
       expect(created.role).toBe('user');
       expect(created.avatar).toBe('default.jpg');
       expect(created.createdAt).toBeInstanceOf(Date);
-      expect((await store.users.findById(created._id))._id).toBe(created._id);
-      expect((await store.users.findByEmail('MIXED.case@example.test '))._id).toBe(created._id);
+      expect(present(await store.users.findById(created._id))._id).toBe(created._id);
+      expect(present(await store.users.findByEmail('MIXED.case@example.test '))._id).toBe(
+        created._id,
+      );
     });
 
     it('returns null for unknown and malformed ids and emails', async () => {
       expect(await store.users.findById(newId())).toBeNull();
       expect(await store.users.findById('not-an-id')).toBeNull();
+      // Untyped callers (a route with a missing param) can still hand over undefined.
+      // @ts-expect-error undefined is not a valid id, which is what this checks
       expect(await store.users.findById(undefined)).toBeNull();
       expect(await store.users.findByEmail('nobody@example.test')).toBeNull();
       expect(await store.users.findPublicById('not-an-id')).toBeNull();
@@ -49,9 +55,9 @@ export function runUserContract(label, makeStore) {
     it('returns secrets only when asked', async () => {
       const created = await store.users.createPending(pendingInput(1));
 
-      const plain = await store.users.findById(created._id);
-      const secret = await store.users.findById(created._id, { secrets: true });
-      const byEmail = await store.users.findByEmail(created.email, { secrets: true });
+      const plain = present(await store.users.findById(created._id));
+      const secret = present(await store.users.findById(created._id, { secrets: true }));
+      const byEmail = present(await store.users.findByEmail(created.email, { secrets: true }));
 
       for (const key of [
         'passwordHash',
@@ -81,13 +87,13 @@ export function runUserContract(label, makeStore) {
         store.users.createPending(pendingInput(4, { email: 'RACE@x.test' })),
       ]);
       expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
-      expect(results.find((r) => r.status === 'rejected').reason).toBeInstanceOf(
-        DuplicateEmailError,
-      );
       expect(
-        await store.users
-          .create({ name: 'Other', email: 'a@x.test', passwordHash: hex() })
-          .catch((e) => e),
+        present(results.find((r): r is PromiseRejectedResult => r.status === 'rejected')).reason,
+      ).toBeInstanceOf(DuplicateEmailError);
+      expect(
+        await rejection(
+          store.users.create({ name: 'Other', email: 'a@x.test', passwordHash: hex() }),
+        ),
       ).toBeInstanceOf(DuplicateEmailError);
     });
 
@@ -107,14 +113,14 @@ export function runUserContract(label, makeStore) {
       const input = pendingInput(1);
       const created = await store.users.createPending(input);
 
-      const found = await store.users.findByActivationHash(input.activationHash);
+      const found = present(await store.users.findByActivationHash(input.activationHash));
       expect(found._id).toBe(created._id);
-      expect(found.activationExpires.getTime()).toBe(input.activationExpires.getTime());
+      expect(found.activationExpires?.getTime()).toBe(input.activationExpires.getTime());
       expect(await store.users.findByActivationHash(hex())).toBeNull();
 
-      const activated = await store.users.activate(created._id);
+      const activated = present(await store.users.activate(created._id));
       expect(activated.status).toBe('active');
-      const again = await store.users.findByActivationHash(input.activationHash);
+      const again = present(await store.users.findByActivationHash(input.activationHash));
       expect(again.status).toBe('active');
       expect(again.activationExpires).toBeUndefined();
     });
@@ -129,13 +135,15 @@ export function runUserContract(label, makeStore) {
         activationExpires: new Date(Date.now() + 5000),
       };
 
-      const refreshed = await store.users.refreshPending(created._id, next);
+      const refreshed = present(await store.users.refreshPending(created._id, next));
 
       expect(refreshed.name).toBe('New Name');
       expect(refreshed.status).toBe('pending');
       expect(await store.users.findByActivationHash(first.activationHash)).toBeNull();
-      expect((await store.users.findByActivationHash(next.activationHash))._id).toBe(created._id);
-      expect((await store.users.findById(created._id, { secrets: true })).passwordHash).toBe(
+      expect(present(await store.users.findByActivationHash(next.activationHash))._id).toBe(
+        created._id,
+      );
+      expect(present(await store.users.findById(created._id, { secrets: true })).passwordHash).toBe(
         next.passwordHash,
       );
       expect(await store.users.refreshPending(newId(), next)).toBeNull();
@@ -146,7 +154,7 @@ export function runUserContract(label, makeStore) {
       const active = await activeUser(store, 2);
 
       expect(await store.users.findPublicById(pending._id)).toBeNull();
-      const publicView = await store.users.findPublicById(active._id);
+      const publicView = present(await store.users.findPublicById(active._id));
       expect(Object.keys(publicView).sort()).toEqual(['_id', 'avatar', 'createdAt', 'name']);
       const page = await store.users.listPublic();
       expect(page.items.map((user) => user._id)).toEqual([active._id]);
@@ -158,7 +166,7 @@ export function runUserContract(label, makeStore) {
 
     it('pages the public list by (createdAt, _id), including ties, and rejects bad cursors', async () => {
       const createdAt = new Date('2025-11-20T09:00:00.000Z');
-      const ids = [];
+      const ids: string[] = [];
       for (let n = 1; n <= 5; n += 1) {
         // The last two share a timestamp with the first three on purpose.
         ids.push(
@@ -171,8 +179,8 @@ export function runUserContract(label, makeStore) {
       }
       const expected = [...ids.slice(0, 3).sort(), ...ids.slice(3).sort()];
 
-      const seen = [];
-      let cursor;
+      const seen: string[] = [];
+      let cursor: string | undefined;
       let pages = 0;
       do {
         const page = await store.users.listPublic({ cursor, limit: 2 });
@@ -194,31 +202,33 @@ export function runUserContract(label, makeStore) {
     it('updates the profile without creating anything', async () => {
       const user = await activeUser(store, 1);
 
-      const updated = await store.users.updateProfile(user._id, {
-        name: '  Renamed ',
-        avatar: 'user-1.png',
-      });
+      const updated = present(
+        await store.users.updateProfile(user._id, {
+          name: '  Renamed ',
+          avatar: 'user-1.png',
+        }),
+      );
 
       expect(updated.name).toBe('Renamed');
       expect(updated.avatar).toBe('user-1.png');
       expect(updated.updatedAt.getTime()).toBeGreaterThanOrEqual(user.updatedAt.getTime());
-      expect((await store.users.updateProfile(user._id, {})).name).toBe('Renamed');
+      expect(present(await store.users.updateProfile(user._id, {})).name).toBe('Renamed');
       expect(await store.users.updateProfile(newId(), { name: 'Ghost' })).toBeNull();
       expect((await store.admin.counts()).users).toBe(1);
     });
 
     it('sets only the socials that were sent, and "" clears one', async () => {
       const user = await activeUser(store, 1);
-      expect('socials' in (await store.users.findById(user._id))).toBe(false);
+      expect('socials' in present(await store.users.findById(user._id))).toBe(false);
 
       await store.users.updateSocials(user._id, {
         facebook: 'https://facebook.com/me',
         twitter: 'https://twitter.com/me',
       });
-      const second = await store.users.updateSocials(user._id, { twitter: '' });
+      const second = present(await store.users.updateSocials(user._id, { twitter: '' }));
 
       expect(second.socials).toEqual({ facebook: 'https://facebook.com/me', twitter: '' });
-      expect((await store.users.findPublicById(user._id)).socials).toEqual(second.socials);
+      expect(present(await store.users.findPublicById(user._id)).socials).toEqual(second.socials);
     });
 
     it('resets a password once, ends old sessions and ignores expired links', async () => {
@@ -226,12 +236,12 @@ export function runUserContract(label, makeStore) {
       const hash = hex();
       await store.users.setResetToken(user._id, hash, new Date(Date.now() + 30 * 60 * 1000));
 
-      expect((await store.users.findByResetHash(hash))._id).toBe(user._id);
+      expect(present(await store.users.findByResetHash(hash))._id).toBe(user._id);
       expect(await store.users.findByResetHash(hex())).toBeNull();
 
       const newHash = `$2a$12$${hex(40)}`;
       await store.users.consumeReset(user._id, newHash);
-      const after = await store.users.findById(user._id, { secrets: true });
+      const after = present(await store.users.findById(user._id, { secrets: true }));
       expect(after.passwordHash).toBe(newHash);
       expect(after.passwordChangedAt).toBeInstanceOf(Date);
       expect('resetHash' in after).toBe(false);

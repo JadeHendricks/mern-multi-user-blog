@@ -1,15 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { newId } from '../../../src/lib/ids.js';
 import { InvalidCursorError, StoreValidationError } from '../../../src/store/errors.js';
-import { activeUser, postInput, rejection } from './support.js';
+import type { Store, User } from '../../../src/store/types.js';
+import { activeUser, likesOf, postInput, present, rejection } from './support.js';
+import type { MakeStore } from './support.js';
 
 // Runs against any adapter. `makeStore()` resolves to { store, cleanup }.
-export function runPostContract(label, makeStore) {
+export function runPostContract(label: string, makeStore: MakeStore): void {
   describe(`${label}: PostRepo`, () => {
-    let store;
-    let cleanup;
-    let alice;
-    let bob;
+    let store: Store;
+    let cleanup: () => Promise<void>;
+    let alice: User;
+    let bob: User;
 
     beforeEach(async () => {
       ({ store, cleanup } = await makeStore());
@@ -62,7 +64,7 @@ export function runPostContract(label, makeStore) {
       const post = await store.posts.create(postInput(alice._id));
       await store.users.updateSocials(alice._id, { twitter: 'https://twitter.com/me' });
 
-      const detail = await store.posts.findById(post._id);
+      const detail = present(await store.posts.findById(post._id));
       const list = await store.posts.list();
 
       expect(detail.user).toEqual({
@@ -71,7 +73,7 @@ export function runPostContract(label, makeStore) {
         avatar: 'default.jpg',
         socials: { twitter: 'https://twitter.com/me' },
       });
-      expect(list.items[0].user).toEqual({ _id: alice._id, name: 'Alice', avatar: 'default.jpg' });
+      expect(list.items[0]?.user).toEqual({ _id: alice._id, name: 'Alice', avatar: 'default.jpg' });
     });
 
     it('returns null for unknown and malformed ids', async () => {
@@ -88,16 +90,16 @@ export function runPostContract(label, makeStore) {
       const post = await store.posts.create(postInput(bob._id));
       await store.users.deleteById(bob._id);
 
-      expect((await store.posts.findById(post._id)).user).toBeNull();
+      expect(present(await store.posts.findById(post._id)).user).toBeNull();
     });
 
     it('answers a null author, not a missing key, for an imported post without an author', async () => {
       // An export can carry a post with no `user`; update returns the author as an id, so it must
       // say null here just like find and list do.
       await store.posts.insertMany([postInput(undefined, { title: 'Orphan' })]);
-      const [orphan] = (await store.posts.list()).items;
+      const orphan = present((await store.posts.list()).items[0]);
 
-      const updated = await store.posts.update(orphan._id, { title: 'Orphan, edited' });
+      const updated = present(await store.posts.update(orphan._id, { title: 'Orphan, edited' }));
 
       expect(updated.user).toBeNull();
       expect(orphan.user).toBeNull();
@@ -114,10 +116,10 @@ export function runPostContract(label, makeStore) {
 
       const everything = await store.posts.list();
       expect(everything.nextCursor).toBeNull();
-      expect(everything.items[0]._id).toBe(newest._id);
+      expect(everything.items[0]?._id).toBe(newest._id);
 
-      const seen = [];
-      let cursor;
+      const seen: string[] = [];
+      let cursor: string | undefined;
       let pages = 0;
       do {
         const page = await store.posts.list({ cursor, limit: 2 });
@@ -146,7 +148,7 @@ export function runPostContract(label, makeStore) {
       const page = await store.posts.listByUser(alice._id);
 
       expect(page.items.map((post) => post.title)).toEqual(['Second', 'First']);
-      expect(page.items[0].user).toEqual({ _id: alice._id, name: 'Alice', avatar: 'default.jpg' });
+      expect(page.items[0]?.user).toEqual({ _id: alice._id, name: 'Alice', avatar: 'default.jpg' });
       expect((await store.posts.listByUser(newId())).items).toEqual([]);
       expect((await store.posts.listByUser('nope')).items).toEqual([]);
     });
@@ -154,7 +156,9 @@ export function runPostContract(label, makeStore) {
     it('updates only the fields that were sent', async () => {
       const post = await store.posts.create(postInput(alice._id, { tag: 'travel' }));
 
-      const updated = await store.posts.update(post._id, { title: 'Renamed', image: 'post-1.png' });
+      const updated = present(
+        await store.posts.update(post._id, { title: 'Renamed', image: 'post-1.png' }),
+      );
 
       expect(updated.title).toBe('Renamed');
       expect(updated.image).toBe('post-1.png');
@@ -163,7 +167,7 @@ export function runPostContract(label, makeStore) {
       expect(await rejection(store.posts.update(post._id, { title: '' }))).toBeInstanceOf(
         StoreValidationError,
       );
-      expect((await store.posts.findById(post._id)).title).toBe('Renamed');
+      expect(present(await store.posts.findById(post._id)).title).toBe('Renamed');
     });
 
     it('gives the owner and image, deletes, and reports existence', async () => {
@@ -187,22 +191,22 @@ export function runPostContract(label, makeStore) {
       const again = await store.posts.like(post._id, bob._id);
 
       expect(first.status).toBe('liked');
-      expect(Object.keys(first.likes[0]).sort()).toEqual(['_id', 'user']);
-      expect(second.likes.map((like) => like.user)).toEqual([bob._id, alice._id]);
+      expect(Object.keys(present(likesOf(first)[0])).sort()).toEqual(['_id', 'user']);
+      expect(likesOf(second).map((like) => like.user)).toEqual([bob._id, alice._id]);
       expect(again).toEqual({ status: 'already' });
       expect((await store.posts.like(newId(), alice._id)).status).toBe('not-found');
       expect((await store.posts.like('nope', alice._id)).status).toBe('not-found');
 
       const unliked = await store.posts.unlike(post._id, bob._id);
       expect(unliked.status).toBe('unliked');
-      expect(unliked.likes.map((like) => like.user)).toEqual([alice._id]);
+      expect(likesOf(unliked).map((like) => like.user)).toEqual([alice._id]);
       expect(await store.posts.unlike(post._id, bob._id)).toEqual({ status: 'not-liked' });
       expect((await store.posts.unlike(newId(), bob._id)).status).toBe('not-found');
     });
 
     it('keeps every like when many users like at once, and one like per user', async () => {
       const post = await store.posts.create(postInput(alice._id));
-      const users = [];
+      const users: User[] = [];
       for (let n = 10; n < 30; n += 1) users.push(await activeUser(store, n));
 
       const results = await Promise.all(users.map((user) => store.posts.like(post._id, user._id)));
@@ -213,7 +217,7 @@ export function runPostContract(label, makeStore) {
       expect(results.every((result) => result.status === 'liked')).toBe(true);
       expect(sameUser.filter((result) => result.status === 'liked')).toHaveLength(1);
       expect(sameUser.filter((result) => result.status === 'already')).toHaveLength(4);
-      const stored = await store.posts.findById(post._id);
+      const stored = present(await store.posts.findById(post._id));
       expect(stored.likes).toHaveLength(21);
       expect(new Set(stored.likes.map((like) => like.user)).size).toBe(21);
     });
@@ -222,10 +226,10 @@ export function runPostContract(label, makeStore) {
       const post = await store.posts.create(postInput(alice._id));
 
       await store.posts.addComment(post._id, alice._id, 'one');
-      const comments = await store.posts.addComment(post._id, bob._id, 'two');
+      const comments = present(await store.posts.addComment(post._id, bob._id, 'two'));
 
       expect(comments.map((comment) => comment.comment)).toEqual(['two', 'one']);
-      expect(Object.keys(comments[0]).sort()).toEqual([
+      expect(Object.keys(present(comments[0])).sort()).toEqual([
         '_id',
         'avatar',
         'comment',
@@ -236,7 +240,7 @@ export function runPostContract(label, makeStore) {
       expect(comments[0]).toMatchObject({ userId: bob._id, name: 'Bob', avatar: 'default.jpg' });
 
       await store.users.updateProfile(bob._id, { name: 'Robert', avatar: 'user-2.png' });
-      const renamed = (await store.posts.findById(post._id)).comments[0];
+      const renamed = present(await store.posts.findById(post._id)).comments[0];
       expect(renamed).toMatchObject({ name: 'Robert', avatar: 'user-2.png' });
 
       expect(await store.posts.addComment(newId(), alice._id, 'x')).toBeNull();
@@ -251,7 +255,7 @@ export function runPostContract(label, makeStore) {
       await store.posts.addComment(post._id, bob._id, 'bye');
       await store.users.deleteById(bob._id);
 
-      const [comment] = (await store.posts.findById(post._id)).comments;
+      const [comment] = present(await store.posts.findById(post._id)).comments;
 
       expect(comment).toMatchObject({
         userId: bob._id,
@@ -262,14 +266,14 @@ export function runPostContract(label, makeStore) {
 
     it('finds and removes a comment', async () => {
       const post = await store.posts.create(postInput(alice._id));
-      const [comment] = await store.posts.addComment(post._id, bob._id, 'hi');
+      const comment = present(present(await store.posts.addComment(post._id, bob._id, 'hi'))[0]);
 
       expect(await store.posts.getComment(post._id, comment._id)).toEqual({ userId: bob._id });
       expect(await store.posts.getComment(post._id, newId())).toBeNull();
       expect(await store.posts.removeComment(post._id, newId())).toBe('comment-not-found');
       expect(await store.posts.removeComment(newId(), comment._id)).toBe('post-not-found');
       expect(await store.posts.removeComment(post._id, comment._id)).toBe('removed');
-      expect((await store.posts.findById(post._id)).comments).toEqual([]);
+      expect(present(await store.posts.findById(post._id)).comments).toEqual([]);
     });
 
     it('imports many posts with fixed ids, likes and comments in the given order', async () => {
@@ -291,7 +295,7 @@ export function runPostContract(label, makeStore) {
         }),
       ]);
 
-      const post = await store.posts.findById(id);
+      const post = present(await store.posts.findById(id));
       expect(count).toBe(1);
       expect(post.likes.map((like) => like.user)).toEqual([bob._id, alice._id]);
       expect(post.comments[0]).toMatchObject({ _id: commentId, comment: 'imported', name: 'Bob' });
