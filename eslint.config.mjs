@@ -68,7 +68,7 @@ export default [
       globals: { ...globals.browser },
     },
     // Pinned: 'detect' calls context.getFilename(), which ESLint 10 removed and eslint-plugin-react 7.37 still uses.
-    settings: { react: { version: '18.3' } },
+    settings: { react: { version: '19.3' } },
     rules: {
       ...react.configs.recommended.rules,
       ...jsxA11y.flatConfigs.recommended.rules,
