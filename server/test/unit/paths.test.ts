@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import {
-  CLIENT_BUILD_DIR,
+  CLIENT_DIST_DIR,
   DEFAULT_DATA_DIR,
   SEED_ASSETS_DIR,
   SERVER_ROOT,
@@ -55,6 +55,6 @@ describe('the exported folders', () => {
     expect(SERVER_ROOT).toBe(expectedRoot);
     expect(DEFAULT_DATA_DIR).toBe(path.join(expectedRoot, 'data'));
     expect(SEED_ASSETS_DIR).toBe(path.join(expectedRoot, 'seed-assets'));
-    expect(CLIENT_BUILD_DIR).toBe(path.resolve(expectedRoot, '../client/build'));
+    expect(CLIENT_DIST_DIR).toBe(path.resolve(expectedRoot, '../client/dist'));
   });
 });

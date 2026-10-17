@@ -45,5 +45,5 @@ export const SERVER_ROOT = findServerRoot(import.meta.dirname);
 export const DEFAULT_DATA_DIR = path.join(SERVER_ROOT, 'data');
 /** Sample images the seed script copies into the uploads folders. */
 export const SEED_ASSETS_DIR = path.join(SERVER_ROOT, 'seed-assets');
-/** The built client, served by the API in production. */
-export const CLIENT_BUILD_DIR = path.resolve(SERVER_ROOT, '..', 'client', 'build');
+/** The built client (Vite output), served by the API in production. */
+export const CLIENT_DIST_DIR = path.resolve(SERVER_ROOT, '..', 'client', 'dist');
