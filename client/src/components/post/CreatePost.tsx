@@ -36,11 +36,11 @@ const PostForm = () => {
                     </div>
                     <form className="form form--createPost" onSubmit={ handleSubmit }>
                         <div className="form__group">
-                            <label className="form__label" htmlFor="title">Post Title</label>
+                            <label className="label" htmlFor="title">Post Title</label>
                             <input className="input" id="title" onChange={ handleOnChange } name="title" type="text" placeholder="Title goes here" />
                         </div>
                         <div className="form__group">
-                            <label className="form__label" htmlFor="tag">Post Tag</label>
+                            <label className="label" htmlFor="tag">Post Tag</label>
                             <div className="form__radio">
                                 {/* Always checked: both branches of the old ternary rendered checked=true. */}
                                 <input type="radio" id="general" value="general" name="tag" onChange={ handleOnChange } checked />
@@ -57,7 +57,7 @@ const PostForm = () => {
                             </div>
                         </div>
                         <div className="form__group">
-                            <label className="form__label" htmlFor="description">Post Body</label>
+                            <label className="label" htmlFor="description">Post Body</label>
                             <textarea className="input input--textarea" onChange={ handleOnChange } id="description" name="description" placeholder="Post goes here"></textarea>
                         </div>
                         <div className="form__group form__photo-upload">

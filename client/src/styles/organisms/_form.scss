@@ -26,13 +26,6 @@
     margin-left: auto;
     display: block; }
 
-.form__label {
-  display: block;
-  font-size: 1.8rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  color: #777777; }
-
 .form__radio {
   margin-bottom: 1.5rem; }
 
@@ -134,9 +127,6 @@
     padding: 3rem; }
   .form__group {
     margin-bottom: 2rem; }
-  .form__label {
-    font-size: 1.6rem;
-    font-weight: 500; }
   .form__upload + label {
     font-size: 1.6rem; }
   .form__photo-upload {
@@ -156,8 +146,6 @@
 @media screen and (max-width: 580px) {
   .form__group {
     margin-bottom: 2rem; }
-  .form__label {
-    font-size: 1.4rem; }
   .form__upload + label {
     font-size: 1.2rem; }
   .form__useraccount-block {

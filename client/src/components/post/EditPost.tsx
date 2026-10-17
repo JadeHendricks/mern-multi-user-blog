@@ -32,11 +32,11 @@ const PostEditForm = ({ id, post }: PostEditFormProps) => {
     return (
         <form className="form form--createPost" onSubmit={ handleSubmit }>
             <div className="form__group">
-                <label className="form__label" htmlFor="title">Post Title</label>
+                <label className="label" htmlFor="title">Post Title</label>
                 <input className="input" id="title" onChange={ handleOnChange } value={ title } name="title" type="text" placeholder="Title goes here" />
             </div>
             <div className="form__group">
-                <label className="form__label" htmlFor="tag">Post Tag</label>
+                <label className="label" htmlFor="tag">Post Tag</label>
                 <div className="form__radio">
                     <input type="radio" id="general" value="general" name="tag" onChange={ handleOnChange } checked={tag === 'general'} />
                     <label htmlFor="general" className="form__radio-label">general</label>
@@ -51,7 +51,7 @@ const PostEditForm = ({ id, post }: PostEditFormProps) => {
                 </div>
             </div>
             <div className="form__group">
-                <label className="form__label" htmlFor="description">Post Body</label>
+                <label className="label" htmlFor="description">Post Body</label>
                 <textarea className="input input--textarea" onChange={ handleOnChange } value={ description } id="description" name="description" placeholder="Post goes here"></textarea>
             </div>
             <div className="form__group form__photo-upload">

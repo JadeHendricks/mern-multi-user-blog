@@ -38,14 +38,14 @@ const AccountSettings = ({ user, email }: AccountSettingsProps) => {
                     updateUser.mutate({ name, avatar });
                 } }>
                     <div className="form__group">
-                        <label className="form__label" htmlFor="name">Name</label>
+                        <label className="label" htmlFor="name">Name</label>
                         <input className="input" id="name" value={ name || '' } onChange={ e => {
                             const value = e.target.value;
                             setName(value);
                         } } />
                     </div>
                     <div className="form__group">
-                        <label className="form__label" htmlFor="email">Email</label>
+                        <label className="label" htmlFor="email">Email</label>
                         <input className="input" id="email" name="email" value={ email ?? '' } placeholder="yourname@example.com" disabled></input>
                     </div>
                     <div className="form__group form__photo-upload">
@@ -71,15 +71,15 @@ const AccountSettings = ({ user, email }: AccountSettingsProps) => {
                     updateUserSocials.mutate({ facebook, linkedin, twitter }) }
                     }>
                     <div className="form__group">
-                        <label className="form__label" htmlFor="facebook">Facebook URL</label>
+                        <label className="label" htmlFor="facebook">Facebook URL</label>
                         <input className="input" id="facebook" name="facebook" value={ facebook } onChange={ handleSocialsOnChange } type="text" placeholder="Enter in your Facebook URL" />
                     </div>
                     <div className="form__group">
-                        <label className="form__label" htmlFor="linkedin">Linkedin URL</label>
+                        <label className="label" htmlFor="linkedin">Linkedin URL</label>
                         <input className="input" id="linkedin" name="linkedin" value={ linkedin } onChange={ handleSocialsOnChange } type="text" placeholder="Enter in your Linkedin URL" />
                     </div>
                     <div className="form__group">
-                        <label className="form__label" htmlFor="twitter">Twitter URL</label>
+                        <label className="label" htmlFor="twitter">Twitter URL</label>
                         <input className="input" id="twitter" name="twitter" value={ twitter } onChange={ handleSocialsOnChange } type="text" placeholder="Enter in your Twitter URL" />
                     </div>
                     <div className="form__group">
