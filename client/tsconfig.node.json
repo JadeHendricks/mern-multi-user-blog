@@ -12,6 +12,6 @@
     "types": ["node"],
     "tsBuildInfoFile": "../node_modules/.tmp/client-node.tsbuildinfo"
   },
-  "include": ["vite.config.mjs"]
+  "include": ["vite.config.ts"]
 }
 
