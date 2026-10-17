@@ -1,24 +1,30 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { StrictMode, useEffect, useState } from 'react';
 import { render, screen, fireEvent, waitFor, act, cleanup } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import AuthContext from './AuthContext';
+import { useAuth } from './AuthContext';
+import type { AuthContextValue } from './AuthContext';
 import AuthState from './AuthState';
 import ActivateAccount from '../../components/auth/local/ActivateAccount';
 import { createQueryClient } from '../../lib/queryClient';
 import { queryKeys } from '../../lib/queryKeys';
 import { mockApi } from '../../testing/mockApi';
+import type { MockReply } from '../../testing/mockApi';
 import { renderWithProviders } from '../../testing/renderWithProviders';
 
 const ann = { _id: 'u1', name: 'Ann', email: 'ann@test.dev', avatar: 'a.png' };
 
 // The latest context value, handed to the test body from an effect.
-let auth;
+let latestAuth: AuthContextValue | undefined;
+const session = (): AuthContextValue => {
+  if (!latestAuth) throw new Error('Probe has not rendered yet');
+  return latestAuth;
+};
 const Probe = () => {
-  const ctx = useContext(AuthContext);
+  const ctx = useAuth();
   useEffect(() => {
-    auth = ctx;
+    latestAuth = ctx;
   });
   const { pathname } = useLocation();
   return (
@@ -45,11 +51,11 @@ const state = () => screen.getByTestId('state').textContent;
 
 describe('AuthState with useMe', () => {
   it('is unknown (null, loading) until /api/user/me answers, then signed in', async () => {
-    let answer;
-    mockApi({ 'GET /api/user/me': () => new Promise((resolve) => (answer = resolve)) });
+    const gate = Promise.withResolvers<MockReply>();
+    mockApi({ 'GET /api/user/me': () => gate.promise });
     renderWithProviders(<Probe />);
     expect(state()).toBe('null|true|nobody');
-    await act(async () => answer({ body: { user: ann } }));
+    await act(async () => gate.resolve({ body: { user: ann } }));
     await waitFor(() => expect(state()).toBe('true|false|Ann'));
   });
 
@@ -76,8 +82,8 @@ describe('AuthState actions', () => {
     });
     renderWithProviders(<Probe />, { route: '/login' });
     await waitFor(() => expect(state()).toBe('false|false|nobody'));
-    await act(async () => auth.login('ann@test.dev', 'secret12'));
-    expect(api.callsTo('POST /api/auth/login')[0].body).toEqual({ email: 'ann@test.dev', password: 'secret12' });
+    await act(async () => session().login('ann@test.dev', 'secret12'));
+    expect(api.firstCallTo('POST /api/auth/login').body).toEqual({ email: 'ann@test.dev', password: 'secret12' });
     expect(toast.success).toHaveBeenCalledWith('Login successful, welcome to the Multi User Blog.');
     await waitFor(() => expect(state()).toBe('true|false|Ann'));
     expect(screen.getByTestId('path')).toHaveTextContent('/');
@@ -90,7 +96,7 @@ describe('AuthState actions', () => {
     });
     renderWithProviders(<Probe />, { route: '/login' });
     await waitFor(() => expect(state()).toBe('false|false|nobody'));
-    await act(async () => auth.login('ann@test.dev', 'nope'));
+    await act(async () => session().login('ann@test.dev', 'nope'));
     expect(toast.error).toHaveBeenCalledWith('Incorrect email or password');
     expect(toast.success).not.toHaveBeenCalled();
     expect(state()).toBe('false|false|nobody');
@@ -106,7 +112,7 @@ describe('AuthState actions', () => {
     queryClient.setQueryData(queryKeys.posts.list(), { posts: [{ _id: 'p1' }] });
     renderWithProviders(<Probe />, { queryClient, route: '/profile/u1' });
     await waitFor(() => expect(state()).toBe('true|false|Ann'));
-    await act(async () => auth.logout());
+    await act(async () => session().logout());
     expect(api.callsTo('POST /api/auth/logout')).toHaveLength(1);
     expect(api.calls.some((c) => c.method === 'GET' && c.path === '/api/auth/logout')).toBe(false);
     expect(toast.success).toHaveBeenCalledWith('Logging out');
@@ -126,11 +132,11 @@ describe('AuthState actions', () => {
     });
     renderWithProviders(<Probe />, { route: '/auth/password/reset/tok' });
     await waitFor(() => expect(state()).toBe('false|false|nobody'));
-    await act(async () => auth.register('Ann', 'a@b.co', 'secret12'));
+    await act(async () => session().register('Ann', 'a@b.co', 'secret12'));
     expect(toast.success).toHaveBeenLastCalledWith('Email has been sent to a@b.co.');
-    await act(async () => auth.forgotPassword('a@b.co'));
+    await act(async () => session().forgotPassword('a@b.co'));
     expect(toast.success).toHaveBeenLastCalledWith('Reset mail sent');
-    await act(async () => auth.resetPassword('newsecret', 'tok'));
+    await act(async () => session().resetPassword('newsecret', 'tok'));
     expect(toast.success).toHaveBeenLastCalledWith('Password has been updated, Login!');
     await waitFor(() => expect(screen.getByTestId('path')).toHaveTextContent('/login'));
   });
@@ -142,13 +148,13 @@ describe('AuthState actions', () => {
     });
     renderWithProviders(<Probe />, { route: '/auth/activate/tok' });
     await waitFor(() => expect(state()).toBe('false|false|nobody'));
-    await act(async () => auth.activateAccount('tok'));
-    expect(api.callsTo('POST /api/auth/account-activation')[0].body).toEqual({ token: 'tok' });
+    await act(async () => session().activateAccount('tok'));
+    expect(api.firstCallTo('POST /api/auth/account-activation').body).toEqual({ token: 'tok' });
     expect(toast.success).toHaveBeenCalledWith('Activation successful. Please login.');
     await waitFor(() => expect(screen.getByTestId('path')).toHaveTextContent('/login'));
 
     api.set('POST /api/auth/account-activation', { status: 409, body: { message: 'Account is already activated' } });
-    await act(async () => auth.activateAccount('tok'));
+    await act(async () => session().activateAccount('tok'));
     expect(toast.error).toHaveBeenCalledWith('Account is already activated');
   });
 });
@@ -161,7 +167,7 @@ describe('AuthState value stability (B22)', () => {
     // Counts the commits in which Consumer rendered (an effect without dependencies runs after each).
     let renders = 0;
     const Consumer = () => {
-      const { loggedInUser } = useContext(AuthContext);
+      const { loggedInUser } = useAuth();
       useEffect(() => {
         renders += 1;
       });
@@ -200,9 +206,9 @@ describe('ActivateAccount', () => {
       'GET /api/auth/account-activation/tok-1': { body: { name: 'Ann Lee' } },
     });
     renderWithProviders(
-      <React.StrictMode>
+      <StrictMode>
         <ActivateAccount />
-      </React.StrictMode>,
+      </StrictMode>,
       { route: '/auth/activate/tok-1', path: '/auth/activate/:token' },
     );
     await screen.findByText(/Hello Ann, activate your account now!/);

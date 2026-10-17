@@ -1,14 +1,15 @@
-﻿import React from 'react';
 import { render } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router';
 import AuthContext from '../../context/authContext/AuthContext';
 import RequireAuth from './RequireAuth';
+import { testAuth } from '../../testing/testAuth';
+import type { TestAuth } from '../../testing/testAuth';
 
 const Secret = () => <div>secret page</div>;
 
-const renderAt = auth =>
+const renderAt = (auth: TestAuth) =>
   render(
-    <AuthContext.Provider value={auth}>
+    <AuthContext.Provider value={testAuth(auth)}>
       <MemoryRouter initialEntries={['/secret']}>
         <Routes>
           <Route element={<RequireAuth />}>
