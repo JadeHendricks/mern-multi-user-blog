@@ -9,7 +9,15 @@ import Loader from './Loader';
 const AppShell = () => (
   <>
     <Loader />
-    <ToastContainer autoClose={ 4000 } pauseOnHover={ false } />
+    {/* theme, icon, width and padding keep the toast looking like react-toastify 6 did: red, no
+        icon, same size and text position. Only the close cross is drawn differently by 11. */}
+    <ToastContainer
+      autoClose={ 4000 }
+      pauseOnHover={ false }
+      theme="colored"
+      icon={ false }
+      style={{ '--toastify-toast-width': '312px', '--toastify-toast-padding': '10px' }}
+    />
     <Navigation />
     <main className="main">
       <Outlet />

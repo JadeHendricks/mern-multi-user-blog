@@ -1,6 +1,5 @@
-﻿import React from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router';
-import 'react-toastify/dist/ReactToastify.min.css';
 import './App.css';
 import Register from './components/auth/local/Register';
 import Login from './components/auth/local/Login';
