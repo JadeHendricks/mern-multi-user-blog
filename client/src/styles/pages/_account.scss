@@ -1,64 +1,57 @@
-.account-settings {
-  margin-bottom: 4rem; }
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
 
-.account-settings__title {
-    font-size: 3rem;
-    text-transform: uppercase;
-    font-weight: 700;
-    background-image: linear-gradient(to right, #7dd56f, #28b487);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    letter-spacing: 0.1rem;
-    line-height: 1.3;
-    display: inline-block;
-    margin-bottom: 4rem; }
-
+// Account page: the side menu column next to the view (all posts or settings).
 .account {
   display: flex;
-  padding: 6rem 0; }
+  padding: $space-60 0;
 
-.account--settings {
-    background-color: #ffffff;
-    box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06); }
+  @include respond-to('xl') {
+    flex-direction: column;
+    padding: $space-40 0;
+  }
 
-.account__options {
-    background-image: linear-gradient(to right bottom, #7dd56f, #28b487);
+  @include respond-to('lg') {
+    padding: $space-20 0;
+  }
+
+  &__options {
+    background-image: $gradient-green-diagonal;
     flex: 0 0 23%;
     margin-right: 4%;
-    padding: 2.5rem; }
+    padding: $space-25;
 
-.account__view {
-    flex: 1; }
+    @include respond-to('xl') {
+      margin-right: 0;
+      padding: $space-15;
+    }
 
-.account__view-title {
+    @include respond-to('lg') {
+      padding: $space-10;
+    }
+  }
+
+  &__view {
+    flex: 1;
+
+    @include respond-to('xl') {
+      margin-top: $space-40;
+    }
+  }
+
+  &__view-title {
     text-transform: uppercase;
-    font-weight: 700;
-    background-image: linear-gradient(to right, #7dd56f, #28b487);
-    -webkit-background-clip: text;
+    font-weight: $weight-bold;
+    background-image: $gradient-green-flat;
     background-clip: text;
     color: transparent;
     letter-spacing: 0.1rem;
     line-height: 1.3;
     display: inline-block;
-    margin-bottom: 4rem; }
+    margin-bottom: $space-40;
+  }
+}
 
-@media screen and (max-width: 1200px) {
-  .account {
-    display: flex;
-    flex-direction: column;
-    padding: 4rem 0; }
-  .account__options {
-      background-image: linear-gradient(to right bottom, #7dd56f, #28b487);
-      flex: 0 0 1;
-      margin-right: 0;
-      padding: 1.5rem; }
-  .account__view {
-      margin-top: 4rem;
-      flex: 1; } }
-
-@media screen and (max-width: 991px) {
-  .account {
-    padding: 2rem 0; }
-  .account__options {
-      padding: 1rem; } }
+.account-settings {
+  margin-bottom: $space-40;
+}

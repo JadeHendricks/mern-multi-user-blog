@@ -3,15 +3,6 @@
 // are switched off for that path only (an allowlist by path, no disable comments in the source).
 // A partial leaves the list when it is rebuilt; the list must be empty when Phase 7 ends.
 const legacy = {
-  'client/src/styles/pages/_account.scss': [
-    'alpha-value-notation',
-    'color-function-alias-notation',
-    'color-function-notation',
-    'color-hex-length',
-    'media-feature-range-notation',
-    'property-no-vendor-prefix',
-    'rule-empty-line-before',
-  ],
   'client/src/styles/vendor/_toastify.scss': [
     'comment-whitespace-inside',
   ],
