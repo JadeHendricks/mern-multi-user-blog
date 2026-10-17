@@ -21,7 +21,8 @@ export function createApp({ store, mailer = createMailer(config) }) {
     const app = express();
 
     //Middleware
-    app.use(morgan('dev'));
+    // Request logging is a development aid; tests and production stay quiet.
+    if (config.NODE_ENV === 'development') app.use(morgan('dev'));
     app.use(helmet({
         // Explicit policy so a helmet upgrade cannot change it silently. 'unsafe-inline' is for styles only:
         // CRA and react-toastify inject <style> tags. Google Fonts hosts stay until Lato is self-hosted.
