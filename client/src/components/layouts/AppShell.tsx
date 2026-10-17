@@ -1,4 +1,4 @@
-﻿import React from 'react';
+﻿import type { CSSProperties } from 'react';
 import { Outlet } from 'react-router';
 import { ToastContainer } from 'react-toastify';
 import Navigation from './Navigation';
@@ -16,7 +16,8 @@ const AppShell = () => (
       pauseOnHover={ false }
       theme="colored"
       icon={ false }
-      style={{ '--toastify-toast-width': '312px', '--toastify-toast-padding': '10px' }}
+      // CSSProperties has no index signature for custom properties, so the cast is the usual way to set them.
+      style={{ '--toastify-toast-width': '312px', '--toastify-toast-padding': '10px' } as CSSProperties}
     />
     <Navigation />
     <main className="main">

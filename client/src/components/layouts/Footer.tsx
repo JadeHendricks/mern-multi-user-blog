@@ -1,4 +1,3 @@
-import React from 'react';
 import placeholderFooterImage from '../../assets/images/logo-green.png';
 import { Link } from 'react-router';
 

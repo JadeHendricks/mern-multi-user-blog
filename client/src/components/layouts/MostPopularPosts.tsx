@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import { Fragment } from 'react';
 import PostCard from '../cards/PostCard';
 import ContentLoader from '../layouts/ContentLoader';
 import { usePosts } from '../../hooks/usePosts';

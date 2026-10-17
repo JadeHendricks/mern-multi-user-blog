@@ -1,13 +1,12 @@
-import React, { useContext } from 'react';
 import { Link } from 'react-router';
-import AuthContext from '../../context/authContext/AuthContext';
+import { useAuth } from '../../context/authContext/AuthContext';
 import SiteLogoW from '../../assets/images/logo-white.png';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
 
 const Navigation = () => {
-    const { isAuthenticated, loggedInUser, logout } = useContext(AuthContext);
+    const { isAuthenticated, loggedInUser, logout } = useAuth();
 
-    const onLogout = () => logout();
+    const onLogout = () => void logout();
 
     return (
         <header className="header">
@@ -31,7 +30,7 @@ const Navigation = () => {
                     <Link className="nav__el" to='/users'>All Users</Link>
                     <Link className="nav__el" to='/most-popular-posts'>Popular Posts</Link>
                     <Link className="nav__el" to={`/profile/${loggedInUser._id}`}>
-                        <img className="nav__user-img" src={ uploadUrl('users', loggedInUser?.avatar) } onError={ onImageError('users') } alt={ loggedInUser?.name } title={ loggedInUser?.name } />
+                        <img className="nav__user-img" src={ uploadUrl('users', loggedInUser.avatar) } onError={ onImageError('users') } alt={ loggedInUser.name } title={ loggedInUser.name } />
                         <span>{ loggedInUser.name.split(' ')[0] }</span>
                     </Link>
                     <Link to='/create-post' className="nav__el button button--green">Create Post</Link>

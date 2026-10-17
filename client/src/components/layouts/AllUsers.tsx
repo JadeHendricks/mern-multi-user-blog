@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import { Fragment } from 'react';
 import UserCard from '../cards/UserCard';
 import ContentLoader from '../layouts/ContentLoader';
 import LoadMore from './LoadMore';
@@ -14,7 +14,7 @@ const AllUsers = () => {
                         <div className="all-userCards">
                             { users.length === 0 ? <h3>No Content Found...</h3> : users.map(user => <UserCard key={ user._id } user={ user }/>) }
                         </div>
-                        { hasNextPage && <LoadMore onClick={ () => fetchNextPage() } loading={ isFetchingNextPage } /> }
+                        { hasNextPage && <LoadMore onClick={ () => void fetchNextPage() } loading={ isFetchingNextPage } /> }
                     </div>
                 </section>
             ) }

@@ -1,8 +1,8 @@
-import React, { useContext, Fragment } from 'react';
-import AuthContext from '../../context/authContext/AuthContext';
+import { Fragment } from 'react';
+import { useAuth } from '../../context/authContext/AuthContext';
 
 const Loader = () => {
-    const { isAuthenticated } = useContext(AuthContext);
+    const { isAuthenticated } = useAuth();
 
     return (
         <Fragment>
