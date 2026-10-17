@@ -57,7 +57,7 @@ export default [
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
   {
-    // Client (React 16, Vite). Classic JSX runtime: every component imports React, so
+    // Client (React 19, Vite). Classic JSX runtime: every component imports React, so
     // jsx-uses-react keeps that import from being reported as unused.
     files: ['client/**/*.{js,jsx}'],
     plugins: { react, 'react-hooks': reactHooks, 'jsx-a11y': jsxA11y },

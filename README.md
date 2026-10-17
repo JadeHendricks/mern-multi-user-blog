@@ -214,6 +214,16 @@ npm run check
 | `npm audit` (all and `--omit=dev`) | 196 (11 low, 134 moderate, 46 high, 5 critical) | 3 high |
 | `express` copies in `npm ls` | 5.3.0 and 4.17.1 | 5.3.0 only |
 
+## Tooling notes
+
+- **ESLint peers:** `eslint-plugin-react` 7.37 and `eslint-plugin-jsx-a11y` 6.10 do not list ESLint 10 as a
+  peer yet, though they work with it. The root `package.json` `overrides` point their `eslint` peer at the
+  root version (`$eslint`) so `npm install` needs no `--legacy-peer-deps`. JSON has no comments, so the
+  reason is written here. Remove the overrides once both plugins publish ESLint 10 peers.
+- **React version in ESLint:** `eslint.config.mjs` pins `settings.react.version` instead of `'detect'`.
+  `'detect'` still crashes with ESLint 10 (`context.getFilename is not a function` in `eslint-plugin-react`).
+  Retry `'detect'` after upgrading that plugin.
+
 ## Workspace layout
 
 ```text
