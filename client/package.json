@@ -13,6 +13,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "prebuild": "tsc -p ../shared/tsconfig.json",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run"
