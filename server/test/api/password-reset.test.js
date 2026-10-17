@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import supertest from 'supertest';
-import { clearDb, connectDb, disconnectDb, mongoose } from './support/db.js';
+import { clearDb, connectDb, disconnectDb, getStore } from './support/db.js';
 import { createUserAndLogin, fakeConfig, fakeUser, loadApp, registerAndActivate } from './support/helpers.js';
 import { extractLink, readLatestMail, readMails, tokenFromLink } from './support/outbox.js';
 
@@ -66,27 +66,27 @@ describe('forgot and reset password', () => {
   });
 
   it('stores only a SHA-256 hash of the link and unsets it after a reset', async () => {
-    const User = mongoose.model('user');
-    expect(User.schema.path('resetPasswordLink').instance).toBe('String');
-    expect(User.schema.path('resetPasswordLink').options.select).toBe(false);
-
     const user = fakeUser();
     await registerAndActivate(app, user);
     const { token } = await requestReset(user);
 
-    const raw = await mongoose.connection.db.collection('users').findOne({ email: user.email });
-    expect(raw.resetPasswordLink === token).toBe(false);
-    expect(/^[0-9a-f]{64}$/.test(raw.resetPasswordLink)).toBe(true);
-    const minutes = (raw.resetPasswordExpires.getTime() - Date.now()) / 60000;
+    // Secrets are only returned when asked for, so no ordinary read can leak the hash.
+    const plain = await getStore().users.findByEmail(user.email);
+    for (const key of ['resetHash', 'resetExpires', 'passwordHash']) expect(key in plain).toBe(false);
+
+    const raw = await getStore().admin.rawUserByEmail(user.email);
+    expect(raw.resetHash === token).toBe(false);
+    expect(/^[0-9a-f]{64}$/.test(raw.resetHash)).toBe(true);
+    const minutes = (raw.resetExpires.getTime() - Date.now()) / 60000;
     expect(minutes).toBeGreaterThan(28);
     expect(minutes).toBeLessThanOrEqual(30);
 
     await supertest(app)
       .put('/api/auth/reset-password')
       .send({ resetPasswordLink: token, newPassword: 'another-secret-1' });
-    const after = await mongoose.connection.db.collection('users').findOne({ email: user.email });
-    expect('resetPasswordLink' in after).toBe(false);
-    expect('resetPasswordExpires' in after).toBe(false);
+    const after = await getStore().admin.rawUserByEmail(user.email);
+    expect('resetHash' in after).toBe(false);
+    expect('resetExpires' in after).toBe(false);
     expect(after.passwordChangedAt instanceof Date).toBe(true);
   });
 
@@ -94,9 +94,8 @@ describe('forgot and reset password', () => {
     const user = fakeUser();
     await registerAndActivate(app, user);
     const { token } = await requestReset(user);
-    await mongoose.connection.db
-      .collection('users')
-      .updateOne({ email: user.email }, { $set: { resetPasswordExpires: new Date(Date.now() - 1000) } });
+    const stored = await getStore().admin.rawUserByEmail(user.email);
+    await getStore().admin.patchUser(stored._id, { resetExpires: new Date(Date.now() - 1000) });
 
     const res = await supertest(app)
       .put('/api/auth/reset-password')

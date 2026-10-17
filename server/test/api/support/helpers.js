@@ -1,10 +1,25 @@
 import { randomBytes } from 'node:crypto';
 import supertest from 'supertest';
-import app from '../../../src/app.js';
+import { createApp } from '../../../src/app.js';
+import { getStore } from './db.js';
 import { extractLink, readLatestMail, tokenFromLink } from './outbox.js';
 
+// The store is looked up on every call, so an app created at describe time (before connectDb runs)
+// still talks to the store of the test file that is running.
+const currentStore = {
+  get users() {
+    return getStore().users;
+  },
+  get posts() {
+    return getStore().posts;
+  },
+  get admin() {
+    return getStore().admin;
+  },
+};
+
 export function loadApp() {
-  return app;
+  return createApp({ store: currentStore });
 }
 
 // The settings tests need (e.g. to sign tokens), read from the env that support/env.js set up.

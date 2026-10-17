@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { clearDb, connectDb, disconnectDb, mongoose } from './support/db.js';
+import { clearDb, connectDb, disconnectDb, getStore } from './support/db.js';
 import { createUserAndLogin, LONG_DESCRIPTION, loadApp, TINY_PNG } from './support/helpers.js';
 
 const uploadPath = (sub, name) => path.join(process.env.UPLOAD_DIR, sub, name);
@@ -34,7 +34,7 @@ describe('uploads', () => {
     expect(res.headers['content-type']).toMatch(/json/);
     expect(res.body.message).toBeDefined();
     expect(readdirSync(path.join(process.env.UPLOAD_DIR, 'posts'))).toEqual(before);
-    expect(await mongoose.model('Post').countDocuments()).toBe(0);
+    expect((await getStore().admin.counts()).posts).toBe(0);
   });
 
   it.each([
@@ -96,8 +96,7 @@ describe('uploads', () => {
   it('deletes a post whose file is already gone and one that uses the default image', async () => {
     const { agent } = await createUserAndLogin(app);
     const withFile = await createWithImage(agent);
-    await agent.post('/api/post').send({ title: 'plain', description: LONG_DESCRIPTION });
-    const plain = await mongoose.model('Post').findOne({ title: 'plain' });
+    const plain = (await agent.post('/api/post').send({ title: 'plain', description: LONG_DESCRIPTION })).body.post;
     // The file disappears before the delete: ENOENT must not turn into an error.
     rmSync(uploadPath('posts', withFile.body.post.image));
 

@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import jwt from 'jsonwebtoken';
 import supertest from 'supertest';
-import { clearDb, connectDb, disconnectDb, mongoose } from './support/db.js';
+import { clearDb, connectDb, disconnectDb, getStore } from './support/db.js';
 import {
   createUserAndLogin,
   fakeConfig,
@@ -81,11 +81,11 @@ describe('auth', () => {
       expect(/eyJ/.test(mail.html)).toBe(false);
 
       // Only the hash is stored, and the password is a bcrypt hash.
-      const raw = await mongoose.connection.db.collection('users').findOne({ email: user.email });
+      const raw = await getStore().admin.rawUserByEmail(user.email);
       expect(raw.status).toBe('pending');
-      expect(raw.activationToken === token).toBe(false);
-      expect(/^[0-9a-f]{64}$/.test(raw.activationToken)).toBe(true);
-      expect(raw.password.startsWith('$2')).toBe(true);
+      expect(raw.activationHash === token).toBe(false);
+      expect(/^[0-9a-f]{64}$/.test(raw.activationHash)).toBe(true);
+      expect(raw.passwordHash.startsWith('$2')).toBe(true);
     });
 
     it('registering again while pending refreshes the link and the old link stops working', async () => {
@@ -158,9 +158,8 @@ describe('auth', () => {
       const user = fakeUser();
       await supertest(app).post('/api/auth/register').send(user);
       const token = tokenFromLink(extractLink(readLatestMail(user.email)));
-      await mongoose.connection.db
-        .collection('users')
-        .updateOne({ email: user.email }, { $set: { activationExpires: new Date(Date.now() - 1000) } });
+      const stored = await getStore().admin.rawUserByEmail(user.email);
+      await getStore().admin.patchUser(stored._id, { activationExpires: new Date(Date.now() - 1000) });
 
       const res = await supertest(app).post('/api/auth/account-activation').send({ token });
 

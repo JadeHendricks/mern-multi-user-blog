@@ -2,8 +2,7 @@ import { existsSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import supertest from 'supertest';
-import { User } from '../../src/models/UserModel.js';
-import { clearDb, connectDb, disconnectDb, mongoose } from './support/db.js';
+import { clearDb, connectDb, disconnectDb, getStore, newId } from './support/db.js';
 import {
   createPost,
   createUserAndLogin,
@@ -102,7 +101,7 @@ describe('posts', () => {
 
     expect(res.status).toBe(400);
     expect(res.body.message).toBeDefined();
-    expect(await mongoose.model('Post').countDocuments()).toBe(0);
+    expect((await getStore().admin.counts()).posts).toBe(0);
   });
 
   it('gets one post with the author populated', async () => {
@@ -118,7 +117,7 @@ describe('posts', () => {
   });
 
   it('answers 404 for an unknown or malformed post id', async () => {
-    const unknown = await supertest(app).get(`/api/post/${new mongoose.Types.ObjectId()}`);
+    const unknown = await supertest(app).get(`/api/post/${newId()}`);
     expect(unknown.status).toBe(404);
     expect(unknown.body.message).toBe('Post not found');
 
@@ -222,7 +221,7 @@ describe('posts', () => {
   it('answers 404 when deleting an unknown post', async () => {
     const { agent } = await createUserAndLogin(app);
 
-    const res = await agent.delete(`/api/post/${new mongoose.Types.ObjectId()}`);
+    const res = await agent.delete(`/api/post/${newId()}`);
 
     expect(res.status).toBe(404);
     expect(res.body.message).toBe('Post not found.');
@@ -253,12 +252,10 @@ describe('length limits', () => {
     expect(ok.status).toBe(201);
   });
 
-  it('rejects a 33-character user name at the schema level', async () => {
+  it('rejects a 33-character user name at the storage level', async () => {
+    const user = (name, email) => getStore().users.create({ name, email, passwordHash: 'x' });
 
-    const tooLong = new User({ name: 'n'.repeat(33), email: 'long@example.test', password: 'x' });
-    const ok = new User({ name: 'n'.repeat(32), email: 'ok@example.test', password: 'x' });
-
-    await expect(tooLong.validate()).rejects.toThrow(/maximum allowed length/);
-    await expect(ok.validate()).resolves.toBeUndefined();
+    await expect(user('n'.repeat(33), 'long@example.test')).rejects.toThrow(/maximum allowed length/);
+    await expect(user('n'.repeat(32), 'ok@example.test')).resolves.toMatchObject({ name: 'n'.repeat(32) });
   });
 });

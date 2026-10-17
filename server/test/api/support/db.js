@@ -1,36 +1,27 @@
-import { randomBytes } from 'node:crypto';
-import mongoose from 'mongoose';
-import { inject } from 'vitest';
-import { Post } from '../../../src/models/PostModel.js';
-import { User } from '../../../src/models/UserModel.js';
+import { createTestStore, newId } from './store.js';
 
+// One store per test file: connectDb in beforeAll, clearDb between tests, disconnectDb in afterAll.
+let current;
 
 export async function connectDb() {
-  const base = inject('mongoUri');
-  const uri = `${base}test_${randomBytes(4).toString('hex')}`;
-  // Same options as db.js
-  await mongoose.connect(uri, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true,
-  });
-  // Build the unique email index up front so duplicate checks behave like production.
-  await User.init();
-  await Post.init();
+  current = await createTestStore();
 }
 
 export async function clearDb() {
-  const collections = await mongoose.connection.db.collections();
-  await Promise.all(collections.map((collection) => collection.deleteMany({})));
+  await current.store.admin.reset();
 }
 
 export async function disconnectDb() {
-  await mongoose.connection.dropDatabase();
-  await mongoose.disconnect();
+  await current?.cleanup();
+  current = undefined;
 }
 
-// Random valid id, so tests need no driver-specific id class.
-export const newId = () => new mongoose.Types.ObjectId().toString();
+// The store of the current test file, and the folder it keeps its data in.
+export function getStore() {
+  if (!current) throw new Error('No test store: call connectDb() first.');
+  return current.store;
+}
 
-export { mongoose };
+export const getStoreDir = () => current.dir;
+
+export { newId };

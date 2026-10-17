@@ -1,6 +1,5 @@
 import express from 'express';
 import { describe, expect, it, vi } from 'vitest';
-import { connectDb, mongoose } from './support/db.js';
 
 import { createShutdown, startServer } from '../../src/lib/lifecycle.js';
 
@@ -36,16 +35,15 @@ describe('startServer', () => {
 });
 
 describe('createShutdown', () => {
-  it('closes the server, disconnects mongoose and exits 0', async () => {
-    await connectDb();
-    expect(mongoose.connection.readyState).toBe(1);
+  it('closes the server, closes the store and exits 0', async () => {
+    const store = { close: vi.fn(async () => {}) };
     const server = await startServer({ app: express(), connect: async () => {}, port: 0 });
     const exit = vi.fn();
 
-    await createShutdown({ server, mongoose, exit })();
+    await createShutdown({ server, store, exit })();
 
     expect(server.listening).toBe(false);
-    expect(mongoose.connection.readyState).toBe(0);
+    expect(store.close).toHaveBeenCalledOnce();
     expect(exit).toHaveBeenCalledExactlyOnceWith(0);
   });
 });

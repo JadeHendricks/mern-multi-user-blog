@@ -30,7 +30,7 @@ describe('public user payloads expose only the public fields', () => {
   afterAll(disconnectDb);
 
   const publicKeys = ['_id', 'avatar', 'createdAt', 'name'];
-  const ownerKeys = ['__v', '_id', 'avatar', 'createdAt', 'email', 'name', 'role', 'status', 'updatedAt'];
+  const ownerKeys = ['_id', 'avatar', 'createdAt', 'email', 'name', 'role', 'status', 'updatedAt'];
 
   it('GET /api/user (no login) lists only public keys, even for a user with a pending reset', async () => {
     const res = await supertest(app).get('/api/user');

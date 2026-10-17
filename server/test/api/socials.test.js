@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import supertest from 'supertest';
-import { clearDb, connectDb, disconnectDb, mongoose } from './support/db.js';
+import { clearDb, connectDb, disconnectDb, getStore } from './support/db.js';
 import { createUserAndLogin, loadApp } from './support/helpers.js';
 
 describe('socials and profile updates', () => {
@@ -74,8 +74,8 @@ describe('socials and profile updates', () => {
 
   it('does not create a document when the user no longer exists', async () => {
     const { agent, user } = await createUserAndLogin(app);
-    const before = await mongoose.connection.collection('users').countDocuments();
-    await mongoose.connection.collection('users').deleteOne({ _id: new mongoose.Types.ObjectId(user._id) });
+    const before = (await getStore().admin.counts()).users;
+    await getStore().users.deleteById(user._id);
 
     const social = await putSocials(agent, user, { twitter: 'https://twitter.com/me' });
     const profile = await agent.put('/api/user/me').send({ name: 'Ghost' });
@@ -83,6 +83,6 @@ describe('socials and profile updates', () => {
     // protect rejects a deleted user before the controller runs, and nothing is upserted either way
     expect([social.status, profile.status]).toEqual([401, 401]);
     expect(before).toBe(1);
-    expect(await mongoose.connection.collection('users').countDocuments()).toBe(0);
+    expect((await getStore().admin.counts()).users).toBe(0);
   });
 });

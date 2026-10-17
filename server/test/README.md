@@ -1,7 +1,6 @@
 # API characterisation tests
 
-`npm run test:api` runs Vitest + supertest against the current Express 4 / Mongoose 5 code with an
-in-memory MongoDB (`mongodb-memory-server`). The tests record today's behaviour, including known
+`npm run test:api` runs Vitest + supertest against the Express app on the storage driver named by\n`TEST_DB_DRIVER` (`json` by default: a JSON-file store in a temp folder, no database server needed). The tests record today's behaviour, including known
 bugs (titles start with `KNOWN BUG <id>`). They do not fix anything.
 
 ## How config is injected
@@ -22,11 +21,11 @@ The temp folder is `os.tmpdir()/mern-blog-test-<random>` and is removed after ea
 Child processes (see `crash-server.js`) receive the same env.
 
 Each test file runs in its own forked process (`pool: 'forks'`, files run one after another), so
-every file gets a fresh config, mongoose and app. The app is imported directly (`support/helpers.js`
-exposes it through `loadApp()`).
-## MongoDB binary
+every file gets a fresh config, store and app. `support/db.js` creates the store (`connectDb`),\nempties it between tests (`clearDb`) and removes it (`disconnectDb`); `getStore()` gives tests\nthe repos and `store.admin` (counts, raw user with secrets, `patchUser` to move expiry dates)\ninstead of poking a database driver. `loadApp()` in `support/helpers.js` builds the app with\n`createApp({ store })`.
 
-`global-setup.js` starts one `MongoMemoryServer`. The first run downloads a MongoDB binary (once,
+## MongoDB binary (TEST_DB_DRIVER=mongo only)
+
+`global-setup.js` starts, only for the Mongo driver, one `MongoMemoryServer`. The first run downloads a MongoDB binary (once,
 cached under `node_modules/.cache/mongodb-memory-server`). The default binary (8.2.6 at the time of
 writing) works with Mongoose 5.9. If a future default does not, pin an older one, either with the
 env var or in `global-setup.js`:

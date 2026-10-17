@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import supertest from 'supertest';
-import { clearDb, connectDb, disconnectDb, mongoose } from './support/db.js';
+import { clearDb, connectDb, disconnectDb, newId } from './support/db.js';
 import { createPost, createUserAndLogin, loadApp } from './support/helpers.js';
 
 describe('comments', () => {
@@ -52,7 +52,7 @@ describe('comments', () => {
     const { agent } = await createUserAndLogin(app);
 
     const res = await agent
-      .post(`/api/post/comment/${new mongoose.Types.ObjectId()}`)
+      .post(`/api/post/comment/${newId()}`)
       .send({ comment: 'Hello?' });
 
     expect(res.status).toBe(404);
@@ -78,7 +78,7 @@ describe('comments', () => {
     const post = await createPost(agent);
 
     const res = await agent.delete(
-      `/api/post/comment/${post._id}/${new mongoose.Types.ObjectId()}`,
+      `/api/post/comment/${post._id}/${newId()}`,
     );
 
     expect(res.status).toBe(404);
@@ -89,7 +89,7 @@ describe('comments', () => {
     const { agent } = await createUserAndLogin(app);
 
     const res = await agent.delete(
-      `/api/post/comment/${new mongoose.Types.ObjectId()}/${new mongoose.Types.ObjectId()}`,
+      `/api/post/comment/${newId()}/${newId()}`,
     );
 
     expect(res.status).toBe(404);
@@ -162,8 +162,8 @@ describe('likes', () => {
   it('answers 404 when liking or unliking an unknown post', async () => {
     const { agent } = await createUserAndLogin(app);
 
-    const like = await agent.put(`/api/post/like/${new mongoose.Types.ObjectId()}`);
-    const unlike = await agent.put(`/api/post/unlike/${new mongoose.Types.ObjectId()}`);
+    const like = await agent.put(`/api/post/like/${newId()}`);
+    const unlike = await agent.put(`/api/post/unlike/${newId()}`);
 
     expect(like.status).toBe(404);
     expect(like.body.message).toBe('Post not found');

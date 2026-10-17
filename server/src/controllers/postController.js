@@ -1,278 +1,253 @@
-import { Post } from '../models/PostModel.js';
-import { User } from '../models/UserModel.js';
-
-import mongoose from 'mongoose';
 import { makeUpload, removeStoredFile } from '../lib/upload.js';
 
 export const uploadPostPhoto = makeUpload({ subdir: 'posts', prefix: 'post', field: 'image' });
 
-export const getAllPosts = async (req, res) => { 
-    try {
-        const posts = await Post.find().populate('user', ['name', 'avatar', '_id']).sort({ 'date': '-1' });
-        
-        if (!posts) {
-            return res.status(404).json({
-                message: "No posts available"
-            }); 
-        }
+export const createPostController = ({ store }) => {
+    const getAllPosts = async (req, res) => {
+        try {
+            const { items: posts } = await store.posts.list();
 
-        res.status(200).json({
-            results: posts.length,
-            posts
-        });
-        
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            message: err.message
-        });
-    }
-}
+            res.status(200).json({
+                results: posts.length,
+                posts
+            });
 
-export const getPost = async (req, res) => { 
-    try {
-        const post = await Post.findById(req.params.id).populate('user', ['name', 'avatar', '_id', 'socials']);
-        if (!post) {
-          return res.status(404).json({ 
-            message: 'Post not found' 
-          });
-        }
-    
-        res.status(200).json({
-            post
-        });
-      } catch (err) {
-        console.error(err);
-        if (err.kind === 'ObjectId') {
-          return res.status(404).json({ message: 'Post not found' })
-        }
-        res.status(500).json({
-            message: err.message
-        });
-      }
-}
-
-export const createPost = async (req, res) => { 
-    const { title, tag, description } = req.body;
-    const postFields = {};
-
-    if (title) postFields.title = title;
-    if (tag) postFields.tag = tag;
-    if (description) postFields.description = description;
-    if (req.user._id) postFields.user = req.user._id;
-    if (req.file) postFields.image = req.file.filename;
-
-    try {
-        const post = await Post.create(postFields);
-        
-        res.status(201).json({
-            message: `Post "${title}", has been created`,
-            post
-        });   
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            message: err.message
-        });
-    }
-}
-
-export const deletePost = async (req, res) => { 
-    try {
-        const post = await Post.findById(req.params.id); 
-
-        if (!post) {
-            return res.status(404).json({ message: 'Post not found.' })
-        }
-        // Check user
-        if (post.user.toString() !== req.user.id) {
-            return res.status(401).json({ message: 'This post does not belong to you.' });
-        }
-        await post.deleteOne();
-        await removeStoredFile('posts', post.image);
-        res.status(200).json({ message: 'Post has been deleted.' });
-
-    } catch (err) {
-        console.error(err);
-        if (err.kind === 'ObjectId') {
-            return res.status(404).json({ message: 'Post not found' })
-        }
-
-        return res.status(500).json({
-            message: err.message
-        });
-    }
-}
-
-export const getAllUsersPosts = async (req, res) => { 
-    try {
-        const usersPosts = await Post.find({'user': req.params.id}).populate('user', ['name', 'avatar', '_id']);
-        res.status(200).json({
-            message: 'success',
-            results: usersPosts.length,
-            posts: usersPosts
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            message: err.message
-        });
-    }
-}
-
-export const editPost = async (req, res) => {
-    // The post id comes from the URL only; an id in the body is ignored.
-    const { title, tag, description } = req.body;
-    if (!mongoose.isValidObjectId(req.params.id)) {
-        return res.status(404).json({ message: 'No post found with that ID' });
-    }
-    const postFields = {};
-    if (title) postFields.title = title;
-    if (tag) postFields.tag = tag;
-    if (description) postFields.description = description;
-    if (req.file) postFields.image = req.file.filename;
-    try {
-        const existing = await Post.findById(req.params.id);
-        if (!existing) {
-            return res.status(404).json({
-                message: 'No post found with that ID'
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({
+                message: err.message
             });
         }
-        if (existing.user.toString() !== req.user.id) {
-            return res.status(403).json({ message: 'This post does not belong to you.' });
-        }
-        const post = await Post.findOneAndUpdate(
-            { _id: req.params.id },
-            { $set: postFields },
-            { new: true, runValidators: true }
-          );
-        // The replaced image is no longer referenced, so drop it from disk
-        if (req.file) await removeStoredFile('posts', existing.image);
-        res.status(200).json({
-            message: 'Post has been updated',
-            post
-        });  
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            message: err.message
-        });
     }
-}
 
-// Like and unlike are single atomic updates: the filter makes "already liked" a no-op match, so two
-// parallel requests cannot both push (likes subdocuments have their own _id, so $addToSet cannot dedupe).
-export const likePost = async (req, res) => {
-    if (!mongoose.isValidObjectId(req.params.id)) {
-        return res.status(404).json({ message: 'Post not found' });
+    const getPost = async (req, res) => {
+        try {
+            // An unknown or malformed id both come back as null
+            const post = await store.posts.findById(req.params.id);
+            if (!post) {
+                return res.status(404).json({
+                    message: 'Post not found'
+                });
+            }
+
+            res.status(200).json({
+                post
+            });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({
+                message: err.message
+            });
+        }
     }
-    const post = await Post.findOneAndUpdate(
-        { _id: req.params.id, 'likes.user': { $ne: req.user.id } },
-        { $push: { likes: { $each: [{ user: req.user.id }], $position: 0 } } },
-        { new: true }
-    );
-    if (!post) {
-        if (!(await Post.exists({ _id: req.params.id }))) {
+
+    const createPost = async (req, res) => {
+        const { title, tag, description } = req.body;
+        const postFields = {};
+
+        if (title) postFields.title = title;
+        if (tag) postFields.tag = tag;
+        if (description) postFields.description = description;
+        if (req.user._id) postFields.user = req.user._id;
+        if (req.file) postFields.image = req.file.filename;
+
+        try {
+            const post = await store.posts.create(postFields);
+
+            res.status(201).json({
+                message: `Post "${title}", has been created`,
+                post
+            });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({
+                message: err.message
+            });
+        }
+    }
+
+    const deletePost = async (req, res) => {
+        try {
+            const existing = await store.posts.getOwnerAndImage(req.params.id);
+
+            if (!existing) {
+                return res.status(404).json({ message: 'Post not found.' })
+            }
+            // Check user
+            if (existing.user !== req.user._id) {
+                return res.status(401).json({ message: 'This post does not belong to you.' });
+            }
+            await store.posts.delete(req.params.id);
+            await removeStoredFile('posts', existing.image);
+            res.status(200).json({ message: 'Post has been deleted.' });
+
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({
+                message: err.message
+            });
+        }
+    }
+
+    const getAllUsersPosts = async (req, res) => {
+        try {
+            const { items: posts } = await store.posts.listByUser(req.params.id);
+            res.status(200).json({
+                message: 'success',
+                results: posts.length,
+                posts
+            });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({
+                message: err.message
+            });
+        }
+    }
+
+    const editPost = async (req, res) => {
+        // The post id comes from the URL only; an id in the body is ignored.
+        const { title, tag, description } = req.body;
+        const postFields = {};
+        if (title) postFields.title = title;
+        if (tag) postFields.tag = tag;
+        if (description) postFields.description = description;
+        if (req.file) postFields.image = req.file.filename;
+        try {
+            // A malformed id is simply "not found" in the repo
+            const existing = await store.posts.getOwnerAndImage(req.params.id);
+            if (!existing) {
+                return res.status(404).json({
+                    message: 'No post found with that ID'
+                });
+            }
+            if (existing.user !== req.user._id) {
+                return res.status(403).json({ message: 'This post does not belong to you.' });
+            }
+            const post = await store.posts.update(req.params.id, postFields);
+            if (!post) {
+                return res.status(404).json({
+                    message: 'No post found with that ID'
+                });
+            }
+            // The replaced image is no longer referenced, so drop it from disk
+            if (req.file) await removeStoredFile('posts', existing.image);
+            res.status(200).json({
+                message: 'Post has been updated',
+                post
+            });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({
+                message: err.message
+            });
+        }
+    }
+
+    // Like and unlike are single atomic repo calls, so two parallel requests from one user cannot both add a like.
+    const likePost = async (req, res) => {
+        const { status, likes } = await store.posts.like(req.params.id, req.user._id);
+        if (status === 'not-found') {
             return res.status(404).json({ message: 'Post not found' });
         }
-        return res.status(400).json({
-            message: 'Post has already been liked.'
+        if (status === 'already') {
+            return res.status(400).json({
+                message: 'Post has already been liked.'
+            });
+        }
+        res.status(200).json({
+            message: 'Post has been liked.',
+            likes,
+            results: likes.length
         });
     }
-    res.status(200).json({
-        message: 'Post has been liked.',
-        likes: post.likes,
-        results: post.likes.length
-    });
-}
 
-export const unlikePost = async (req, res) => {
-    if (!mongoose.isValidObjectId(req.params.id)) {
-        return res.status(404).json({ message: 'Post not found' });
-    }
-    const post = await Post.findOneAndUpdate(
-        { _id: req.params.id, 'likes.user': req.user.id },
-        { $pull: { likes: { user: req.user.id } } },
-        { new: true }
-    );
-    if (!post) {
-        if (!(await Post.exists({ _id: req.params.id }))) {
+    const unlikePost = async (req, res) => {
+        const { status, likes } = await store.posts.unlike(req.params.id, req.user._id);
+        if (status === 'not-found') {
             return res.status(404).json({ message: 'Post not found' });
         }
-        return res.status(400).json({
-            message: 'Post has not yet been liked.'
+        if (status === 'not-liked') {
+            return res.status(400).json({
+                message: 'Post has not yet been liked.'
+            });
+        }
+        res.status(200).json({
+            message: 'Post has been disliked.',
+            likes,
+            results: likes.length
         });
     }
-    res.status(200).json({
-        message: 'Post has been disliked.',
-        likes: post.likes,
-        results: post.likes.length
-    });
-}
-export const addComment = async (req, res) => { 
-    try {
-        const post = await Post.findById(req.params.id); 
-        const user = await User.findById(req.user.id);
 
-        if (!user || !post) {
-            return res.status(404).json({
-                message: 'User or Post data not found.'
-            })
+    const addComment = async (req, res) => {
+        try {
+            const comments = await store.posts.addComment(req.params.id, req.user._id, req.body.comment);
+
+            if (!comments) {
+                return res.status(404).json({
+                    message: 'User or Post data not found.'
+                })
+            }
+
+            res.status(201).json({
+                message: 'Comment has been added.',
+                comment: comments,
+                results: comments.length,
+            });
+
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({
+                message: err.message
+            });
         }
+    }
 
-        const newComment = {
-          comment: req.body.comment,
-          name: user.name,
-          userId: req.user.id,
-          avatar: user.avatar
-        };
+    const deleteComment = async (req, res) => {
+        try {
+            if (!(await store.posts.exists(req.params.id))) {
+                return res.status(404).json({ message: 'Post not found' });
+            }
+            const comment = await store.posts.getComment(req.params.id, req.params.comment_id);
 
-        post.comments.unshift(newComment);
-        await post.save();
-    
-        res.status(201).json({
-            message: 'Comment has been added.',
-            comment: post.comments,
-            results: post.comments.length,
-        });
-    
-      } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            message: err.message
-        });
-      }
-}
+            if (!comment) {
+                return res.status(404).json({ msg: 'Comment does not exist' });
+            }
 
-export const deleteComment = async (req, res) => { 
-    try {
-        const post = await Post.findById(req.params.id); 
-        if (!post) {
-          return res.status(404).json({ message: 'Post not found' });
+            if (comment.userId !== req.user._id) {
+                return res.status(401).json({ msg: 'User not authorized' });
+            }
+
+            const outcome = await store.posts.removeComment(req.params.id, req.params.comment_id);
+            if (outcome === 'post-not-found') {
+                return res.status(404).json({ message: 'Post not found' });
+            }
+            if (outcome === 'comment-not-found') {
+                return res.status(404).json({ msg: 'Comment does not exist' });
+            }
+
+            res.status(200).json({
+                message: 'Comment has been deleted.'
+            });
+
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({
+                message: err.message
+            });
         }
-        const comment = post.comments.find(comment => comment._id.toString() === req.params.comment_id);
+    }
 
-        if (!comment) {
-          return res.status(404).json({ msg: 'Comment does not exist' });
-        }
-
-        if (comment.userId.toString() !== req.user.id) {
-          return res.status(401).json({ msg: 'User not authorized' });
-        }
-
-        const removeIndex = post.comments.map(comment => comment._id.toString()).indexOf(req.params.comment_id);
-    
-        post.comments.splice(removeIndex, 1);
-        await post.save();
-    
-        res.status(200).json({
-            message: 'Comment has been deleted.'
-        });
-    
-      } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            message: err.message
-        });
-      }
+    return {
+        getAllPosts,
+        getPost,
+        createPost,
+        deletePost,
+        getAllUsersPosts,
+        editPost,
+        likePost,
+        unlikePost,
+        addComment,
+        deleteComment
+    };
 }

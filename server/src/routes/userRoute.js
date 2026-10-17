@@ -1,29 +1,31 @@
 import express from 'express';
 import asyncHandler from '../lib/asyncHandler.js';
-import * as userController from '../controllers/userController.js';
-import * as authController from '../controllers/authController.js';
+import { uploadUserAvatar } from '../controllers/userController.js';
 import { runValidation } from '../validators/index.js';
 import { updateMeValidator, updateSocialsValidator } from '../validators/user.js';
-const router = express.Router();
 
-router
-    .route('/me')
-    .get(authController.protect, asyncHandler(userController.getMe))
-    .put(authController.protect, userController.uploadUserAvatar, updateMeValidator, runValidation, asyncHandler(userController.updateMe));
+export default function createUserRouter({ auth, user }) {
+    const router = express.Router();
 
-router
-    .route('/')
-    .get(asyncHandler(userController.getAllUsers))
+    router
+        .route('/me')
+        .get(auth.protect, asyncHandler(user.getMe))
+        .put(auth.protect, uploadUserAvatar, updateMeValidator, runValidation, asyncHandler(user.updateMe));
 
-router
-    .route('/:id')
-    .get(asyncHandler(userController.getUser));
+    router
+        .route('/')
+        .get(asyncHandler(user.getAllUsers))
 
-router
-    .route('/:id/socials')
-    .put(authController.protect, updateSocialsValidator, runValidation, asyncHandler(userController.updateUserSocials));
+    router
+        .route('/:id')
+        .get(asyncHandler(user.getUser));
 
-//admin only example
-//router.put('/admin', requireSignin, adminOnlyRoutes, updateUser);
+    router
+        .route('/:id/socials')
+        .put(auth.protect, updateSocialsValidator, runValidation, asyncHandler(user.updateUserSocials));
 
-export default router;
+    //admin only example
+    //router.put('/admin', requireSignin, adminOnlyRoutes, updateUser);
+
+    return router;
+}

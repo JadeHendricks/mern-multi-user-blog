@@ -2,10 +2,10 @@ import { spawn } from 'node:child_process';
 import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { afterAll, afterEach, beforeAll, describe, expect, inject, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import jwt from 'jsonwebtoken';
 import supertest from 'supertest';
-import { connectDb, disconnectDb, mongoose } from './support/db.js';
+import { connectDb, disconnectDb, getStoreDir, newId } from './support/db.js';
 import { createUserAndLogin, fakeConfig, LONG_DESCRIPTION, loadApp } from './support/helpers.js';
 
 const crashServer = path.join(
@@ -78,7 +78,7 @@ describe('protect with an invalid token', () => {
   it('answers 401 for an expired Bearer token and the server stays alive', async () => {
     const port = await startServer();
     const expired = jwt.sign(
-      { _id: new mongoose.Types.ObjectId().toString() },
+      { _id: newId() },
       fakeConfig().JWT_SECRET,
       {
         expiresIn: -60,
@@ -117,7 +117,7 @@ describe('isloggedin with a bad cookie (try/catch path)', () => {
 
   it('answers 401 for an expired cookie', async () => {
     const expired = jwt.sign(
-      { _id: new mongoose.Types.ObjectId().toString() },
+      { _id: newId() },
       fakeConfig().JWT_SECRET,
       {
         expiresIn: -60,
@@ -164,12 +164,12 @@ describe('editPost with an unknown post id', () => {
     const app = loadApp();
     const { user } = await createUserAndLogin(app);
     const token = jwt.sign({ _id: user._id }, fakeConfig().JWT_SECRET, { expiresIn: 600 });
-    // Same database as this worker, so the child finds the user that protect looks up.
+    // Same data folder as this worker, so the child finds the user that protect looks up.
     const port = await startServer({
-      CRASH_SERVER_MONGO_URI: `${inject('mongoUri')}${mongoose.connection.name}`,
+      CRASH_SERVER_DATA_DIR: getStoreDir(),
     });
     const body = JSON.stringify({
-      id: new mongoose.Types.ObjectId().toString(),
+      id: newId(),
       title: 'Ghost',
       description: LONG_DESCRIPTION,
     });
@@ -177,7 +177,7 @@ describe('editPost with an unknown post id', () => {
     const result = await request(
       port,
       'PUT',
-      `/api/post/${new mongoose.Types.ObjectId()}`,
+      `/api/post/${newId()}`,
       {
         Cookie: `authtoken=${token}`,
         'Content-Type': 'application/json',

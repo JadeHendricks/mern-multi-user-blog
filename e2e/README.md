@@ -7,8 +7,7 @@ app looks and behaves today so later phases can prove they changed nothing by ac
 
 Playwright starts two servers itself (`webServer` in `playwright.config.js`), then runs the specs:
 
-- API on `http://localhost:5000`: `e2e/support/start-api.js` starts an in-memory MongoDB
-  (`mongodb-memory-server`), seeds it with `scripts/seed.js` and serves the real Express app.
+- API on `http://localhost:5000`: `e2e/support/start-api.js` creates a JSON-file store in a temp\n  folder, seeds it through the repositories and serves the real Express app.
   Mail goes to a temp folder and uploads to a temp folder, so nothing leaves the machine.
 - Client on exactly `http://localhost:3000`: the CRA dev server. The port is fixed because
   `AuthState.js` hard-codes that origin in its public-route list (known bug B14). The CRA proxy
