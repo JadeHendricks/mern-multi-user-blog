@@ -1,0 +1,20 @@
+// All queries are max-width. 590 and 580 are different on purpose: the old stylesheet used both.
+// Inside one block, write respond-to calls in descending width order so the later (narrower)
+// query wins, exactly as the old source order did.
+$bp-xxl: 1400px;
+$bp-xl: 1200px;
+$bp-lg: 991px;
+$bp-md: 767px;
+$bp-sm-wide: 590px;
+$bp-sm: 580px;
+$bp-xs: 500px;
+
+$breakpoints: (
+  'xxl': $bp-xxl,
+  'xl': $bp-xl,
+  'lg': $bp-lg,
+  'md': $bp-md,
+  'sm-wide': $bp-sm-wide,
+  'sm': $bp-sm,
+  'xs': $bp-xs,
+);

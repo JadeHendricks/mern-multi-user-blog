@@ -1,4 +1,6 @@
-// Layer order matters: generic, objects, atoms, molecules, organisms, pages, vendor.
+// Layer order matters: settings, tools, generic, objects, atoms, molecules, organisms, pages, vendor.
+@use 'settings/tokens';
+@use 'tools/mixins';
 @use 'generic/reset';
 @use 'generic/base';
 @use 'objects/container';
@@ -24,3 +26,7 @@
 @use 'pages/create-post';
 @use 'pages/account';
 @use 'vendor/toastify';
+
+:root {
+  @include tokens.tokens-to-root;
+}
