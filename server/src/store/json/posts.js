@@ -23,12 +23,17 @@ function buildPost(data) {
     tag: data.tag || DEFAULT_TAG,
     description: cleanDescription(data.description),
     likes: (data.likes ?? []).map((like) => ({ _id: like._id ?? newId(), user: like.user })),
-    comments: (data.comments ?? []).map((comment) => ({
-      _id: comment._id ?? newId(),
-      user: comment.user ?? comment.userId,
-      comment: cleanComment(comment.comment),
-      date: comment.date ? iso(comment.date) : new Date().toISOString(),
-    })),
+    comments: (data.comments ?? []).map((comment) => {
+      // Like the Mongo adapter: a comment always names its author.
+      const author = comment.user ?? comment.userId;
+      if (author === undefined) throw new StoreValidationError('Path `user` is not a valid id.');
+      return {
+        _id: comment._id ?? newId(),
+        user: author,
+        comment: cleanComment(comment.comment),
+        date: comment.date ? iso(comment.date) : new Date().toISOString(),
+      };
+    }),
     date: data.date ? iso(data.date) : new Date().toISOString(),
   };
 }

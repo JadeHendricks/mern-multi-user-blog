@@ -297,5 +297,12 @@ export function runPostContract(label, makeStore) {
       expect(post.comments[0]).toMatchObject({ _id: commentId, comment: 'imported', name: 'Bob' });
       expect(post.date.toISOString()).toBe('2025-12-01T09:00:00.000Z');
     });
+
+    it('rejects an imported comment that names no author, and imports nothing', async () => {
+      const bad = postInput(alice._id, { comments: [{ comment: 'who wrote this?' }] });
+
+      expect(await rejection(store.posts.insertMany([bad]))).toBeInstanceOf(StoreValidationError);
+      expect((await store.admin.counts()).posts).toBe(0);
+    });
   });
 }
