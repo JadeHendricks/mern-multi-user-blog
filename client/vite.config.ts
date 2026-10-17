@@ -25,6 +25,6 @@ export default defineConfig(({ command }) => ({
     environment: 'jsdom',
     // Globals keep the ported Jest-style tests (describe/it/expect) unchanged.
     globals: true,
-    setupFiles: ['./src/setupTests.js'],
+    setupFiles: ['./src/setupTests.ts'],
   },
 }));
