@@ -26,7 +26,7 @@ const ProfileCard = ({ post: { _id, title, image, tag, description, comments, li
             <Link to={`/post/${_id}`}>
             <div className="card__header">
                 <img className='card__image' src={ uploadUrl('posts', image) } onError={ onImageError('posts') } alt={ loggedInUser?.name } title={ loggedInUser?.name } />
-                <h5 className={ tag === 'travel' ? 'card__tag card__tag--orange': tag === 'funny' ? 'card__tag card__tag--yellow': 'card__tag'}>
+                <h5 className={ tag === 'travel' ? 'tag tag--orange card__tag': tag === 'funny' ? 'tag tag--yellow card__tag': 'tag card__tag'}>
                     { tag }
                 </h5>
             </div>
