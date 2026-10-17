@@ -62,7 +62,7 @@ const PostForm = () => {
                             <textarea className="input input--textarea" onChange={ handleOnChange } id="description" name="description" placeholder="Post goes here"></textarea>
                         </div>
                         <div className="form-group form-group--upload">
-                            <img className="avatar file-upload__photo" src={ noImageFound } alt="Something could be here" title="Something could be here" />
+                            <img className="avatar file-upload__photo" src={ noImageFound } alt="" />
                             <input className="file-upload__input" type="file" accept="image/*" id="image" name="image" onChange={ e => {
                                 const file = e.target.files?.[0];
                                 setImage(file);

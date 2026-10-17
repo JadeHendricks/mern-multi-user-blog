@@ -2,6 +2,7 @@ import { Fragment, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import type { PublicUserDto } from '@mern-blog/shared';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
+import { avatarAlt } from '../../utils/a11y';
 import { useUpdateProfile } from '../../hooks/useUpdateProfile';
 import { useUpdateSocials } from '../../hooks/useUpdateSocials';
 
@@ -49,7 +50,7 @@ const AccountSettings = ({ user, email }: AccountSettingsProps) => {
                         <input className="input" id="email" name="email" value={ email ?? '' } placeholder="yourname@example.com" disabled></input>
                     </div>
                     <div className="form-group form-group--upload">
-                        <img className="avatar file-upload__photo" src={ uploadUrl('users', user.avatar) } onError={ onImageError('users') } alt={ user.name } title={ user.name } />
+                        <img className="avatar file-upload__photo" src={ uploadUrl('users', user.avatar) } onError={ onImageError('users') } alt={ avatarAlt(user.name) } title={ user.name } />
                         <input className="file-upload__input" type="file" accept="image/*" id="avatar" name="avatar" onChange={ e => {
                             const file = e.target.files?.[0];
                             setAvatar(file);

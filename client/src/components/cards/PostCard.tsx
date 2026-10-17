@@ -22,7 +22,7 @@ const PostCard = ({ post: { _id, title, image, date, tag, description, user, lik
         <div className={ variant === 'account' ? 'card card--account' : 'card' }>
             <Link to={`/post/${_id}`}>
                 <div className="card__header">
-                    <img className="card__image" src={ uploadUrl('posts', image) } onError={ onImageError('posts') } alt={ user?.name } title={ user?.name } />
+                    <img className="card__image" src={ uploadUrl('posts', image) } onError={ onImageError('posts') } alt={ title } title={ title } />
                     <h5 className={ tag === 'travel' ? 'tag tag--orange card__tag': tag === 'funny' ? 'tag tag--yellow card__tag': 'tag card__tag'}>
                         { tag }
                     </h5>
@@ -47,7 +47,7 @@ const PostCard = ({ post: { _id, title, image, date, tag, description, user, lik
             {/* String(): a post whose author is gone has user null and has always linked to /profile/undefined. Kept as is. */}
             <Link to={`/profile/${String(user?._id)}`} className="card__footer-link">
                 <div className="card__footer">
-                    <img className="avatar card__avatar" src={ uploadUrl('users', user?.avatar) } onError={ onImageError('users') } alt={ user?.name } title={ user?.name } />
+                    <img className="avatar card__avatar" src={ uploadUrl('users', user?.avatar) } onError={ onImageError('users') } alt="" />
                     <div className="card__author">
                         <div className="card__author-name">{ user?.name }</div>
                         <div className="card__author-date">Posted on: { formatDate(date) }</div>

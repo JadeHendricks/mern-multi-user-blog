@@ -82,6 +82,15 @@ describe('PostCard like toggle', () => {
     expect(toast.success).not.toHaveBeenCalled();
   });
 
+  it('describes the post image with the post title and leaves the author avatar decorative', () => {
+    const { container } = renderCard([]);
+    // The post image is a meaningful image named after the post, not after its author.
+    expect(screen.getByRole('img', { name: 'Hello' })).toHaveClass('card__image');
+    // The author name sits right beside the avatar, so the avatar adds nothing for a screen reader.
+    expect(container.querySelector('img.card__avatar')).toHaveAttribute('alt', '');
+    expect(screen.queryByRole('img', { name: 'Ann' })).toBeNull();
+  });
+
   it('exposes the heart as a focusable toggle button', () => {
     const { heart } = renderCard([]);
     expect(heart).toHaveAttribute('type', 'button');

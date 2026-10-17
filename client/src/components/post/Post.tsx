@@ -67,28 +67,28 @@ const FullPost = () => {
                                 </div>
                                 <div className="post__user">
                                     <div className="post__user-block">
-                                        <img className="avatar post__user-avatar" src={ uploadUrl('users', user?.avatar) } onError={ onImageError('users') } alt={ user?.name } title={ user?.name } />
+                                        <img className="avatar post__user-avatar" src={ uploadUrl('users', user?.avatar) } onError={ onImageError('users') } alt="" />
                                         <span className="post__user-name">{ user?.name }</span>
                                     </div>
                                     { user?.socials && (
                                         <div className="post__user-social">
                                             { isHttpsUrl(user.socials.facebook) && (
-                                                <a href={user.socials.facebook} target='_blank' rel='noopener noreferrer'>
-                                                    <svg className="post__user-social-icon">
+                                                <a href={user.socials.facebook} aria-label="Facebook profile" target='_blank' rel='noopener noreferrer'>
+                                                    <svg className="post__user-social-icon" aria-hidden="true" focusable="false">
                                                         <use xlinkHref={`${svg}#icon-facebook-square`}></use>
                                                     </svg>  
                                                 </a>
                                             ) }
                                             { isHttpsUrl(user.socials.linkedin) && (
-                                                <a href={user.socials.linkedin} target='_blank' rel='noopener noreferrer'>
-                                                    <svg className="post__user-social-icon">
+                                                <a href={user.socials.linkedin} aria-label="LinkedIn profile" target='_blank' rel='noopener noreferrer'>
+                                                    <svg className="post__user-social-icon" aria-hidden="true" focusable="false">
                                                         <use xlinkHref={`${svg}#icon-linkedin-square`}></use>
                                                     </svg>  
                                                 </a>
                                             ) }
                                             { isHttpsUrl(user.socials.twitter) && (
-                                                <a href={user.socials.twitter} target='_blank' rel='noopener noreferrer'>
-                                                    <svg className="post__user-social-icon">
+                                                <a href={user.socials.twitter} aria-label="Twitter profile" target='_blank' rel='noopener noreferrer'>
+                                                    <svg className="post__user-social-icon" aria-hidden="true" focusable="false">
                                                         <use xlinkHref={`${svg}#icon-twitter-square`}></use>
                                                     </svg>  
                                                 </a>

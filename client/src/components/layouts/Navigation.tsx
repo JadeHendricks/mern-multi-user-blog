@@ -12,7 +12,7 @@ const Navigation = () => {
         <header className="header">
             <nav className="nav nav--posts">
                 <div className="header__logo">
-                    <Link to='/'><img className="header__logo-img" src={ SiteLogoW } alt="Multi User Blog" title="Multi User Blog"/></Link>
+                    <Link to='/'><img className="header__logo-img" src={ SiteLogoW } alt="Multi User Blog home" title="Multi User Blog"/></Link>
                 </div>
                 <Link to='/' className="nav__el">All Posts</Link>
             </nav>
@@ -30,7 +30,7 @@ const Navigation = () => {
                     <Link className="nav__el" to='/users'>All Users</Link>
                     <Link className="nav__el" to='/most-popular-posts'>Popular Posts</Link>
                     <Link className="nav__el" to={`/profile/${loggedInUser._id}`}>
-                        <img className="avatar nav__avatar" src={ uploadUrl('users', loggedInUser.avatar) } onError={ onImageError('users') } alt={ loggedInUser.name } title={ loggedInUser.name } />
+                        <img className="avatar nav__avatar" src={ uploadUrl('users', loggedInUser.avatar) } onError={ onImageError('users') } alt="" />
                         <span>{ loggedInUser.name.split(' ')[0] }</span>
                     </Link>
                     <Link to='/create-post' className="nav__el nav__el--create">Create Post</Link>
