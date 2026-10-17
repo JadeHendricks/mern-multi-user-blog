@@ -1,4 +1,4 @@
-import { makeUpload, removeStoredFile } from '../lib/upload.js';
+import { makeUpload, removeStoredFile } from '../../lib/upload.js';
 
 export const uploadPostPhoto = makeUpload({ subdir: 'posts', prefix: 'post', field: 'image' });
 

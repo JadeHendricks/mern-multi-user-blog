@@ -1,7 +1,7 @@
 import express from 'express';
-import { uploadPostPhoto } from '../controllers/postController.js';
-import { runValidation } from '../validators/index.js';
-import { addCommentValidator, updatePostValidator, createPostValidator } from '../validators/post.js';
+import { uploadPostPhoto } from './controller.js';
+import { runValidation } from '../../lib/validate.js';
+import { addCommentValidator, updatePostValidator, createPostValidator } from './schema.js';
 
 export default function createPostRouter({ auth, post }) {
     const router = express.Router();

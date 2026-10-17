@@ -1,7 +1,7 @@
 import express from 'express';
-import { uploadUserAvatar } from '../controllers/userController.js';
-import { runValidation } from '../validators/index.js';
-import { updateMeValidator, updateSocialsValidator } from '../validators/user.js';
+import { uploadUserAvatar } from './controller.js';
+import { runValidation } from '../../lib/validate.js';
+import { updateMeValidator, updateSocialsValidator } from './schema.js';
 
 export default function createUserRouter({ auth, user }) {
     const router = express.Router();

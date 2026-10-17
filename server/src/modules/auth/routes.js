@@ -1,7 +1,7 @@
 import express from 'express';
-import authLimiter from '../lib/authLimiter.js';
-import { runValidation } from '../validators/index.js';
-import { userRegisterValidator, userloginValidator, forgotPasswordValidator, resetPasswordValidator } from '../validators/auth.js';
+import authLimiter from '../../lib/authLimiter.js';
+import { runValidation } from '../../lib/validate.js';
+import { userRegisterValidator, userloginValidator, forgotPasswordValidator, resetPasswordValidator } from './schema.js';
 
 export default function createAuthRouter({ auth }) {
     const router = express.Router();

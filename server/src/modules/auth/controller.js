@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
-import { config } from '../config.js';
-import { newToken, hashToken } from '../lib/tokens.js';
-import { hashPassword, verifyPassword } from '../lib/password.js';
+import { config } from '../../config.js';
+import { newToken, hashToken } from '../../lib/tokens.js';
+import { hashPassword, verifyPassword } from '../../lib/password.js';
 
 const ACTIVATION_TTL_MS = 24 * 60 * 60 * 1000;
 const RESET_TTL_MS = 30 * 60 * 1000;

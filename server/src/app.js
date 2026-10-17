@@ -7,12 +7,12 @@ import path from 'path';
 import rateLimit from 'express-rate-limit';
 import { config } from './config.js';
 import { createMailer } from './lib/mailer.js';
-import { createAuthController } from './controllers/authController.js';
-import { createUserController } from './controllers/userController.js';
-import { createPostController } from './controllers/postController.js';
-import createAuthRouter from './routes/authRoute.js';
-import createUserRouter from './routes/userRoute.js';
-import createPostRouter from './routes/postRoute.js';
+import { createAuthController } from './modules/auth/controller.js';
+import { createUserController } from './modules/users/controller.js';
+import { createPostController } from './modules/posts/controller.js';
+import createAuthRouter from './modules/auth/routes.js';
+import createUserRouter from './modules/users/routes.js';
+import createPostRouter from './modules/posts/routes.js';
 import { DuplicateEmailError, InvalidCursorError, StoreValidationError } from './store/errors.js';
 
 // The app only knows the repo interface (see store/types.js), never a database driver,
