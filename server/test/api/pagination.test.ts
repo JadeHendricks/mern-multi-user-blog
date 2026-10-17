@@ -25,13 +25,15 @@ describe('opt-in pagination', () => {
     // Five posts by alice; two share a date so a cursor has to cope with ties.
     const dates = ['2025-12-01', '2025-12-02', '2025-12-03', '2025-12-03', '2025-12-04'];
     for (const [i, date] of dates.entries()) {
-      const fields = {
-        user: alice._id,
-        title: `Post ${i + 1}`,
-        description: LONG_DESCRIPTION,
-        date: new Date(`${date}T09:00:00.000Z`),
-      };
-      await getStore().posts.create(fields);
+      // insertMany takes the date; create() ignores it, so the dates were never applied before.
+      await getStore().posts.insertMany([
+        {
+          user: alice._id,
+          title: `Post ${i + 1}`,
+          description: LONG_DESCRIPTION,
+          date: new Date(`${date}T09:00:00.000Z`),
+        },
+      ]);
     }
     // Two more activated users, plus one that stays pending.
     for (let i = 0; i < 2; i++) await registerAndActivate(app, fakeUser());
