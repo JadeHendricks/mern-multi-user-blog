@@ -3,7 +3,8 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    // ES2024.Promise: Promise.withResolvers, which the tests use to hold a request open.
+    "lib": ["ES2023", "ES2024.Promise", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "jsx": "react-jsx",

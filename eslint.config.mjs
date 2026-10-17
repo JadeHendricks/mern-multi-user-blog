@@ -183,6 +183,19 @@ export default [
     },
   },
   {
+    // Client tests. Two idioms of the existing tests would fire on nearly every file:
+    // - `waitFor(() => expect(...))` and `afterEach(() => vi.unstubAllGlobals())` return a void call
+    //   from an arrow shorthand. Allowed for arrow shorthands only; elsewhere the rule stays on.
+    // - fetch stubs are `async` on purpose so they return a promise like fetch does, but have nothing
+    //   to await.
+    // Everything else, including the no-unsafe-* rules and no-explicit-any, stays on.
+    files: ['client/**/*.test.{ts,tsx}', 'client/src/testing/**/*.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/no-confusing-void-expression': ['error', { ignoreArrowShorthand: true }],
+      '@typescript-eslint/require-await': 'off',
+    },
+  },
+  {
     // The repo contract (store/types.ts) is async for every adapter. The JSON adapter answers from
     // memory, but its methods stay `async` on purpose: a throw (for example "store not initialised")
     // must reach the caller as a rejected promise, never as a synchronous exception.

@@ -1,3 +1,4 @@
+import type { SyntheticEvent } from 'react';
 import { onImageError, uploadUrl } from './imageUrl';
 
 describe('uploadUrl', () => {
@@ -19,7 +20,9 @@ describe('uploadUrl', () => {
 });
 
 describe('onImageError', () => {
-  const makeImg = (src) => {
+  // The handler only reads currentTarget, so the tests hand it just that.
+  const errorEvent = (img: HTMLImageElement) => ({ currentTarget: img }) as SyntheticEvent<HTMLImageElement>;
+  const makeImg = (src: string) => {
     const img = document.createElement('img');
     img.setAttribute('src', src);
     return img;
@@ -27,14 +30,14 @@ describe('onImageError', () => {
 
   it('swaps a broken upload for the default image', () => {
     const img = makeImg('/uploads/users/gone.png');
-    onImageError('users')({ currentTarget: img });
+    onImageError('users')(errorEvent(img));
     expect(img.getAttribute('src')).toBe(uploadUrl('users', 'default.jpg'));
   });
 
   it('leaves the default image alone', () => {
     const fallback = uploadUrl('posts', '');
     const img = makeImg(fallback);
-    onImageError('posts')({ currentTarget: img });
+    onImageError('posts')(errorEvent(img));
     expect(img.getAttribute('src')).toBe(fallback);
   });
 });

@@ -3,8 +3,8 @@ import { createQueryClient, shouldRetry } from './queryClient';
 describe('queryClient defaults', () => {
   it('uses a 30s stale time and does not refetch on window focus', () => {
     const { queries } = createQueryClient().getDefaultOptions();
-    expect(queries.staleTime).toBe(30_000);
-    expect(queries.refetchOnWindowFocus).toBe(false);
+    expect(queries?.staleTime).toBe(30_000);
+    expect(queries?.refetchOnWindowFocus).toBe(false);
   });
 
   it('retries once, and only for network and server errors', () => {
@@ -17,6 +17,6 @@ describe('queryClient defaults', () => {
   });
 
   it('lets tests turn retries off', () => {
-    expect(createQueryClient({ retry: false }).getDefaultOptions().queries.retry).toBe(false);
+    expect(createQueryClient({ retry: false }).getDefaultOptions().queries?.retry).toBe(false);
   });
 });
