@@ -5,6 +5,8 @@
 
 export const queryKeys = {
   me: ['me'],
+  /** @param {string} token */
+  activation: (token) => ['activation', token],
   posts: {
     all: ['posts'],
     lists: () => ['posts', 'list'],

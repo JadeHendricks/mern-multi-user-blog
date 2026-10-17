@@ -13,6 +13,7 @@ describe('queryKeys', () => {
     expect(queryKeys.posts.detail('p1')).toEqual(['posts', 'detail', 'p1']);
     expect(queryKeys.users.posts('u1')).toEqual(['users', 'posts', 'u1']);
     expect(queryKeys.me).toEqual(['me']);
+    expect(queryKeys.activation('t1')).toEqual(['activation', 't1']);
   });
 
   it('keeps the user detail key apart from the user post list', () => {
