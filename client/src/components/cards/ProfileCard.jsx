@@ -2,11 +2,11 @@ import React, { useContext } from 'react';
 import svg from '../../assets/images/icons/sprite.svg';
 import AuthContext from '../../context/authContext/AuthContext';
 import PostContext from '../../context/postContext/PostContext';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
 
 const ProfileCard = ({ post: { _id, title, image, tag, description, comments, likes } }) => {
-    const history = useHistory();
+    const navigate = useNavigate();
     const { loggedInUser } = useContext(AuthContext);	
     const { deletePost, likePost, unLikePost, postIsLiked, descriptionTrimmer } = useContext(PostContext);
 
@@ -16,7 +16,7 @@ const ProfileCard = ({ post: { _id, title, image, tag, description, comments, li
             return;
         }
         if (await deletePost(_id)) {
-            history.push('/');
+            navigate('/');
         }
     };
 

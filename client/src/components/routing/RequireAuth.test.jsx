@@ -1,8 +1,8 @@
-import React from 'react';
+﻿import React from 'react';
 import { render } from '@testing-library/react';
-import { MemoryRouter, Route } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router';
 import AuthContext from '../../context/authContext/AuthContext';
-import PrivateRoute from './PrivateRoute';
+import RequireAuth from './RequireAuth';
 
 const Secret = () => <div>secret page</div>;
 
@@ -10,13 +10,17 @@ const renderAt = auth =>
   render(
     <AuthContext.Provider value={auth}>
       <MemoryRouter initialEntries={['/secret']}>
-        <PrivateRoute path="/secret" component={Secret} />
-        <Route path="/login" render={() => <div>login page</div>} />
+        <Routes>
+          <Route element={<RequireAuth />}>
+            <Route path="/secret" element={<Secret />} />
+          </Route>
+          <Route path="/login" element={<div>login page</div>} />
+        </Routes>
       </MemoryRouter>
     </AuthContext.Provider>
   );
 
-describe('PrivateRoute', () => {
+describe('RequireAuth', () => {
   it('shows the loader while the session is being checked', () => {
     const { container, queryByText } = renderAt({ isAuthenticated: null, authLoading: true });
     expect(container.querySelector('.loader')).not.toBeNull();

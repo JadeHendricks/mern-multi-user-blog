@@ -1,5 +1,6 @@
 import React, { Fragment, useEffect, useState, useContext } from 'react';
 import svg from '../../assets/images/icons/sprite.svg'
+import { useParams } from 'react-router';
 import ProfileCard from '../cards/ProfileCard';
 import PostCard from '../cards/PostCard';
 import AccountSettings from './AccountSettings';
@@ -9,7 +10,8 @@ import ContentLoader from '../layouts/ContentLoader';
 import { isHttpsUrl } from '../../utils/safeUrl';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
 
-const Profile = ({ match }) => {
+const Profile = () => {
+    const { id } = useParams();
     const { loggedInUser, isUsersData, authLoading } = useContext(AuthContext);
     const { getAllUsersPosts, getUser, user, userPosts, userLoading } = useContext(UserContext);
 
@@ -17,10 +19,10 @@ const Profile = ({ match }) => {
     const handleNavigationState = e => setNavigationState(e.target.name);
 
     useEffect(() => {
-        getUser(match.params.id);
-        getAllUsersPosts(match.params.id);
+        getUser(id);
+        getAllUsersPosts(id);
         // eslint-disable-next-line
-    }, [match.params.id, loggedInUser]);
+    }, [id, loggedInUser]);
 
     return (
         <Fragment>

@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import AuthContext from '../../context/authContext/AuthContext';
-import { withRouter } from 'react-router-dom';
 import SiteLogoW from '../../assets/images/logo-white.png';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
 
@@ -43,4 +42,4 @@ const Navigation = () => {
     )
 }
 
-export default withRouter(Navigation);
+export default Navigation;

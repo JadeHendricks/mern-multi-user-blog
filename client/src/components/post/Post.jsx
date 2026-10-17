@@ -1,6 +1,6 @@
 import React, { Fragment, useContext, useEffect } from 'react';
 import svg from '../../assets/images/icons/sprite.svg'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router';
 import AuthContext from '../../context/authContext/AuthContext';
 import PostContext from '../../context/postContext/PostContext';
 import CommentSubmit from '../comment/CommentSubmit';
@@ -8,15 +8,17 @@ import ContentLoader from '../layouts/ContentLoader';
 import { isHttpsUrl } from '../../utils/safeUrl';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
 
-const FullPost = ({ match, history }) => {
+const FullPost = () => {
+    const { id } = useParams();
+    const navigate = useNavigate();
     const { loggedInUser, isUsersData, authLoading } = useContext(AuthContext);
     const { deletePost, likePost, unLikePost, postIsLiked, getPost, post, postLoading } = useContext(PostContext);
     const  { title, description, image, _id, user, likes, comments } = post;
 
     useEffect(() => {
-        getPost(match.params.id);
+        getPost(id);
         // eslint-disable-next-line
-    }, [match.params.id]);
+    }, [id]);
 
     // Only leave the page once the server confirmed the delete.
     const handleDelete = async () => {
@@ -24,7 +26,7 @@ const FullPost = ({ match, history }) => {
             return;
         }
         if (await deletePost(_id)) {
-            history.push('/');
+            navigate('/');
         }
     };
 
@@ -36,7 +38,7 @@ const FullPost = ({ match, history }) => {
                         <div className="author-options">
                             { post._id && (
                                 <Fragment>
-                                    <button className="button button--white" onClick={ () => history.goBack() }>Go back</button>
+                                    <button className="button button--white" onClick={ () => navigate(-1) }>Go back</button>
                                     { postIsLiked(likes, loggedInUser) ? 	
                                         <button className="button button--red" onClick={ () => unLikePost(_id) }>Unlike Post</button> :	
                                         <button className="button" onClick={ () => likePost(_id) }>Like Post</button>	

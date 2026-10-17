@@ -1,7 +1,7 @@
 import React from 'react';
 import Moment from 'react-moment';
 import svg from '../../assets/images/icons/sprite.svg'
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { isHttpsUrl } from '../../utils/safeUrl';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
 

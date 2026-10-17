@@ -1,6 +1,6 @@
-import React from 'react';
+﻿import React from 'react';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router';
 import AuthContext from '../../context/authContext/AuthContext';
 import UserContext from '../../context/userContext/UserContext';
 import Profile from './AccountProfile';
@@ -29,8 +29,10 @@ const tree = user => (
         userLoading: false,
       }}
     >
-      <MemoryRouter>
-        <Profile match={{ params: { id: user._id } }} />
+      <MemoryRouter initialEntries={['/profile/u1']}>
+        <Routes>
+          <Route path="/profile/:id" element={<Profile />} />
+        </Routes>
       </MemoryRouter>
     </UserContext.Provider>
   </AuthContext.Provider>
@@ -51,3 +53,4 @@ describe('AccountProfile account settings form', () => {
     expect(screen.getByLabelText('Facebook URL')).toHaveValue('https://fb.test/bob');
   });
 });
+

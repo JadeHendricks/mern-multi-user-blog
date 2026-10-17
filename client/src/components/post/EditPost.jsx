@@ -1,10 +1,12 @@
 import React, { Fragment, useContext, useEffect, useState } from 'react';
+import { useParams } from 'react-router';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import PostContext from '../../context/postContext/PostContext';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
 
-const PostForm = ({ match }) => {
+const PostForm = () => {
+    const { id } = useParams();
     const { editPost } = useContext(PostContext);
     const [ values, setValues ] = useState({ image: '', title: '', tag: '', description: ''});
     const { image, title, tag, description } = values;
@@ -29,14 +31,14 @@ const PostForm = ({ match }) => {
 
     useEffect(() => {
         setValues({ title: '', tag: '', description: '', user: ''});
-        getPost(match.params.id);
-    }, [match.params.id]);
+        getPost(id);
+    }, [id]);
 
     const handleOnChange = e => setValues({ ...values, [e.target.name]: e.target.value });
 
     const handleSubmit = e => {
         e.preventDefault();
-        editPost(match.params.id, title, tag, description, blogimage);
+        editPost(id, title, tag, description, blogimage);
     }
 
     return (

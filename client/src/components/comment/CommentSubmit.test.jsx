@@ -1,6 +1,6 @@
-import React from 'react';
+﻿import React from 'react';
 import { render, fireEvent, waitFor, cleanup } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 import AuthContext from '../../context/authContext/AuthContext';
 import PostContext from '../../context/postContext/PostContext';
 import CommentSubmit from './CommentSubmit';
@@ -51,3 +51,4 @@ describe('CommentSubmit', () => {
     expect(queryByPlaceholderText('Comment...')).toBeNull();
   });
 });
+

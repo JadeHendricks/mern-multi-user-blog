@@ -2,7 +2,6 @@ import React, { useReducer } from "react";
 import UserContext from './UserContext';
 import UserReducer from './UserReducer';
 import { toast } from 'react-toastify';
-import { withRouter } from 'react-router-dom';
 import axios from 'axios';
 import { GET_ALL_USERS, GET_ALL_USERS_POSTS, GET_USER, UPDATE_USER, USER_ERROR } from "../types";
 
@@ -108,4 +107,4 @@ const PostState = props => {
   )
 }
 
-export default withRouter(PostState);
+export default PostState;

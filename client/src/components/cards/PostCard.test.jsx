@@ -1,6 +1,6 @@
-import React from 'react';
+﻿import React from 'react';
 import { render, fireEvent, cleanup } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 import AuthContext from '../../context/authContext/AuthContext';
 import PostContext from '../../context/postContext/PostContext';
 import PostCard from './PostCard';
@@ -55,3 +55,4 @@ describe('PostCard like toggle', () => {
     expect(post_ctx.likePost).not.toHaveBeenCalled();
   });
 });
+

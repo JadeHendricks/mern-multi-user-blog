@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useParams } from 'react-router';
 import axios from 'axios';
 import AuthContext from '../../../context/authContext/AuthContext';
 
-const ActivateAccount = ({ match }) => {
+const ActivateAccount = () => {
+    const params = useParams();
     const { activateAccount } = useContext(AuthContext);
     const [values, setValues] = useState({ name: '', token: '' });
     const { name, token } = values;
 
     useEffect(() => {
-        const token = match.params.token;
+        const token = params.token;
         if (token) {
             // The token is opaque now, so the server tells us who it belongs to.
             let cancelled = false;
@@ -24,7 +26,7 @@ const ActivateAccount = ({ match }) => {
             return () => { cancelled = true; };
         }
     // eslint-disable-next-line
-    }, [match.params.token]);
+    }, [params.token]);
 
     const handleActivationClick = async (e) => {
         e.preventDefault();

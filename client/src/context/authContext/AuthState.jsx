@@ -1,12 +1,13 @@
-import React, { useReducer, useEffect } from "react";
+﻿import React, { useReducer, useEffect } from "react";
 import AuthContext from './AuthContext';
 import AuthReducer from './AuthReducer';
 import { toast } from 'react-toastify';
-import { withRouter } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import axios from 'axios';
 import { LOGIN_SUCCESS, USER_LOADED, AUTH_ERROR, LOGOUT  } from '../types';
 
 const AuthState = props => {
+  const navigate = useNavigate();
 
   useEffect(() => {
     isLoggedin();
@@ -26,7 +27,7 @@ const AuthState = props => {
         loadUser();
       }
     } catch (err) { 
-      // Public pages stay put; PrivateRoute redirects guarded ones.
+      // Public pages stay put; RequireAuth redirects guarded ones.
       dispatch({ type: AUTH_ERROR });
     }
   }
@@ -49,7 +50,7 @@ const AuthState = props => {
         dispatch({ type: LOGIN_SUCCESS });
         toast.success('Login successful, welcome to the Multi User Blog.');
         loadUser();
-        props.history.push('/');
+        navigate('/');
     } catch (err) {
       toast.error(err.response.data.message);
       dispatch({ type: AUTH_ERROR });
@@ -75,7 +76,7 @@ const AuthState = props => {
       toast.success('Logging out');
       dispatch({ type: LOGOUT });
       if (res.data.message === 'success') {
-          props.history.push('/login')
+          navigate('/login')
       }
     } catch (err) {
       dispatch({ type: AUTH_ERROR });
@@ -104,7 +105,7 @@ const AuthState = props => {
         toast.success(res.data.message);
         if (res.status === 200) {
           // The toast lives in App.js, so it survives the navigation.
-          props.history.push('/login');
+          navigate('/login');
         }
     } catch (err) {
       console.log(err);
@@ -121,7 +122,7 @@ const AuthState = props => {
         const res = await axios.post('/api/auth/account-activation', body, config);
         toast.success(res.data.message);
         if (res.status === 201) {
-          props.history.push('/login');
+          navigate('/login');
         }
     } catch (err) {
         console.error(err.message);
@@ -156,4 +157,4 @@ const AuthState = props => {
   )
 }
 
-export default withRouter(AuthState);
+export default AuthState;

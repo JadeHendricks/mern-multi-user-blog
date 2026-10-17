@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import svg from '../../assets/images/icons/sprite.svg'
 import Moment from 'react-moment';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import PostContext from '../../context/postContext/PostContext';
 import AuthContext from '../../context/authContext/AuthContext';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';

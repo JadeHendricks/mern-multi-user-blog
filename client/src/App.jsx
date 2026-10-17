@@ -1,6 +1,5 @@
-import React, { Fragment } from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
+﻿import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router';
 import 'react-toastify/dist/ReactToastify.min.css';
 import './App.css';
 import Register from './components/auth/local/Register';
@@ -9,54 +8,48 @@ import ActivateAccount from './components/auth/local/ActivateAccount';
 import ForgotPassword from './components/auth/local/ForgotPassword';
 import ResetPassword from './components/auth/local/ResetPassword';
 import Base from './components/layouts/Base';
-import Navigation from './components/layouts/Navigation';
-import Footer from './components/layouts/Footer';
-import Loader from './components/layouts/Loader';
-import PrivateRoute from './components/routing/PrivateRoute';
+import AppShell from './components/layouts/AppShell';
+import RequireAuth from './components/routing/RequireAuth';
 import CreatePost from './components/post/CreatePost';
 import EditPost from './components/post/EditPost';
 import Post from './components/post/Post';
 import AccountProfile from './components/account/AccountProfile';
 import AllUsers from './components/layouts/AllUsers';
 import MostPopularPosts from './components/layouts/MostPopularPosts';
-
 import AuthState from "./context/authContext/AuthState";
 import PostState from "./context/postContext/PostState";
 import UserState from "./context/userContext/UserState";
 
-function App (props) {
+function App () {
   return (
-    <Router>
+    <BrowserRouter>
       <AuthState>
       <PostState>
       <UserState>
-        <Fragment>
-          <Loader />
-          <ToastContainer autoClose={ 4000 } pauseOnHover={ false } />
-          <Navigation />
-          <main className="main">
-            <Switch>
-              <Route path='/' exact component={ Base } />
-              <Route path='/register' exact component={ Register } />
-              <Route path='/login' exact component={ Login } />
-              <Route path='/forgot-password' exact component={ ForgotPassword } />
-              <Route path='/auth/password/reset/:token' exact component={ ResetPassword } />
-              <Route path='/auth/activate/:token' history={props.history} exact component={ ActivateAccount } />
-              <PrivateRoute path='/create-post' history={props.history} exact component={ CreatePost } />
-              <PrivateRoute path='/edit-post/:id' history={props.history} exact component={ EditPost } />
-              <Route path='/post/:id' history={props.history} exact component={ Post } />
-              <Route path='/profile/:id' history={props.history} exact component={ AccountProfile } />
-              <Route path='/users' exact component={ AllUsers } />
-              <Route path='/most-popular-posts' exact component={ MostPopularPosts } />
-            </Switch>
-          </main>
-          <Footer />
-        </Fragment>
+        <Routes>
+          <Route element={ <AppShell /> }>
+            <Route path='/' element={ <Base /> } />
+            <Route path='/register' element={ <Register /> } />
+            <Route path='/login' element={ <Login /> } />
+            <Route path='/forgot-password' element={ <ForgotPassword /> } />
+            <Route path='/auth/password/reset/:token' element={ <ResetPassword /> } />
+            <Route path='/auth/activate/:token' element={ <ActivateAccount /> } />
+            <Route element={ <RequireAuth /> }>
+              <Route path='/create-post' element={ <CreatePost /> } />
+              <Route path='/edit-post/:id' element={ <EditPost /> } />
+            </Route>
+            <Route path='/post/:id' element={ <Post /> } />
+            <Route path='/profile/:id' element={ <AccountProfile /> } />
+            <Route path='/users' element={ <AllUsers /> } />
+            <Route path='/most-popular-posts' element={ <MostPopularPosts /> } />
+            {/* Unknown URLs keep the shell with an empty main, as the old Switch without a catch-all did. */}
+            <Route path='*' element={ null } />
+          </Route>
+        </Routes>
       </UserState>
       </PostState>
       </AuthState>
-    </Router>
-
+    </BrowserRouter>
   );
 }
 

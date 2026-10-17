@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import CommentPost from './CommentPost';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import AuthContext from '../../context/authContext/AuthContext';
 import PostContext from '../../context/postContext/PostContext';
 

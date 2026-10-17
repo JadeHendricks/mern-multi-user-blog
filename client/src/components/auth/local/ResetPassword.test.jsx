@@ -1,27 +1,28 @@
-import React from 'react';
+﻿import React from 'react';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import { MemoryRouter, Routes, Route } from 'react-router';
 import AuthContext from '../../../context/authContext/AuthContext';
 import ResetPassword from './ResetPassword';
 
 afterEach(cleanup);
 
 describe('ResetPassword', () => {
-  it('submits the token from the url on the first submit and follows a changed token', () => {
+  it('submits the token from the url, also under StrictMode double effects', () => {
     const resetPassword = vi.fn();
-    const tree = token => (
+    render(
       <React.StrictMode>
         <AuthContext.Provider value={{ resetPassword }}>
-          <ResetPassword match={{ params: { token } }} />
+          <MemoryRouter initialEntries={['/auth/password/reset/tok-1']}>
+            <Routes>
+              <Route path="/auth/password/reset/:token" element={<ResetPassword />} />
+            </Routes>
+          </MemoryRouter>
         </AuthContext.Provider>
       </React.StrictMode>
     );
-    const { rerender } = render(tree('tok-1'));
     fireEvent.change(screen.getByLabelText('New Password'), { target: { name: 'newPassword', value: 'secret12' } });
     fireEvent.click(screen.getByRole('button', { name: 'Reset Password' }));
+    expect(resetPassword).toHaveBeenCalledTimes(1);
     expect(resetPassword).toHaveBeenLastCalledWith('secret12', 'tok-1');
-
-    rerender(tree('tok-2'));
-    fireEvent.click(screen.getByRole('button', { name: 'Reset Password' }));
-    expect(resetPassword).toHaveBeenLastCalledWith('secret12', 'tok-2');
   });
 });

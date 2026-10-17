@@ -2,11 +2,12 @@ import React, { useReducer } from "react";
 import PostContext from './PostContext';
 import PostReducer from './PostReducer';
 import { toast } from 'react-toastify';
-import { withRouter } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import axios from 'axios';
 import { GET_ALL_POSTS, CREATE_COMMENT, GET_POST, DELETE_COMMENT, UPDATE_LIKES, POST_ERROR } from "../types";
 
 const PostState = props => {
+  const navigate = useNavigate();
 
   const initialState = {
     posts: [],
@@ -52,7 +53,7 @@ const PostState = props => {
     try {
         const res = await axios.post('/api/post', body, config);
         toast.success(res.data.message);
-        props.history.push(`/post/${res.data.post._id}`);
+        navigate(`/post/${res.data.post._id}`);
     } catch (err) {
         dispatch({ type: POST_ERROR });
         toast.error(err.response.data.message);
@@ -70,7 +71,7 @@ const PostState = props => {
     try {
         const res = await axios.put(`/api/post/${id}`, body, config);        
         toast.success(res.data.message);
-        props.history.push(`/post/${id}`);
+        navigate(`/post/${id}`);
     } catch (err) {
         dispatch({ type: POST_ERROR });
         toast.error(err.response.data.message);
@@ -185,4 +186,4 @@ const PostState = props => {
   )
 }
 
-export default withRouter(PostState);
+export default PostState;
