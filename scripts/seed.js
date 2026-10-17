@@ -161,6 +161,8 @@ async function seed(mongoose) {
       email: spec.email,
       password: E2E_PASSWORD,
       status: 'active',
+      // Fixed so the "Joined date" on the users page does not change with the day the tests run.
+      createdAt: new Date('2025-11-20T09:00:00.000Z'),
       ...(spec.socials && { socials: spec.socials }),
     });
   }
@@ -169,6 +171,7 @@ async function seed(mongoose) {
     ...PENDING_USER,
     password: E2E_PASSWORD,
     status: 'pending',
+    createdAt: new Date('2025-11-20T09:00:00.000Z'),
     activationToken: hashToken(SEED_ACTIVATION_TOKEN),
     activationExpires: new Date('2099-01-01T00:00:00.000Z'),
   });
