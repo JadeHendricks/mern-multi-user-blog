@@ -10,15 +10,17 @@ import { useToggleLike } from '../../hooks/useToggleLike';
 
 interface PostCardProps {
     post: PostWithAuthor;
+    // 'account' is the two-column card on the account page.
+    variant?: 'account';
 }
 
-const PostCard = ({ post: { _id, title, image, date, tag, description, user, likes, comments } }: PostCardProps) => {
+const PostCard = ({ post: { _id, title, image, date, tag, description, user, likes, comments }, variant }: PostCardProps) => {
 
     const { loggedInUser } = useAuth();	    
     const toggleLike = useToggleLike();
 
     return (
-        <div className="card">
+        <div className={ variant === 'account' ? 'card card--account' : 'card' }>
             <Link to={`/post/${_id}`}>
                 <div className="card__header">
                     <img className="card__image" src={ uploadUrl('posts', image) } onError={ onImageError('posts') } alt={ user?.name } title={ user?.name } />

@@ -1,46 +1,115 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+// Post card shell. The footer and author rules further down are rebuilt in the next chunk.
 .card {
-  border-radius: 0.3rem;
-  overflow: hidden;
-  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.1);
-  background-color: #ffffff;
-  backface-visibility: hidden; }
+  @include card-surface;
 
-.card__header {
-    position: relative; }
+  flex: 0 1 30%;
+  margin-bottom: $space-60;
 
-.card__image {
+  @include respond-to('lg') {
+    flex: 0 1 48%;
+    margin-bottom: $space-40;
+  }
+
+  @include respond-to('sm-wide') {
+    flex: 0 1 100%;
+    margin-bottom: $space-20;
+  }
+
+  &__header {
+    position: relative;
+  }
+
+  &__image {
     width: 100%;
     height: 30rem;
     object-fit: cover;
-    cursor: pointer; }
+    cursor: pointer;
 
-.card__tag {
+    @include respond-to('xl') {
+      height: 22rem;
+    }
+
+    @include respond-to('sm-wide') {
+      height: 25rem;
+    }
+  }
+
+  &__tag {
     position: absolute;
-    bottom: 2rem;
-    right: 2rem; }
+    bottom: $space-20;
+    right: $space-20;
+  }
 
-.card__details {
-    padding: 3rem 2rem; }
+  &__details {
+    padding: $space-30 $space-20;
 
-.card__title {
-    margin-bottom: 1rem;
+    @include respond-to('xl') {
+      padding: $space-20 $space-15;
+    }
+
+    @include respond-to('sm-wide') {
+      padding: $space-30 $space-20;
+    }
+  }
+
+  &__title {
+    margin-bottom: $space-10;
     display: block;
-    color: #444444;
-    font-size: 2.2rem;
-    font-weight: 700;
+    color: $color-text;
+    font-size: $font-22;
+    font-weight: $weight-bold;
     text-decoration: none;
     cursor: pointer;
     width: 95%;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; }
+    text-overflow: ellipsis;
 
-.card__description {
+    @include respond-to('xl') {
+      margin-bottom: $space-5;
+      font-size: $font-18;
+    }
+
+    @include respond-to('sm-wide') {
+      margin-bottom: $space-5;
+      font-size: $font-20;
+    }
+  }
+
+  &__description {
     line-height: 1.4;
     display: block;
     height: 9rem;
-    overflow: hidden; }
+    overflow: hidden;
 
+    @include respond-to('xl') {
+      line-height: 1.2;
+      font-size: $font-14;
+      height: 7rem;
+    }
+
+    @include respond-to('sm-wide') {
+      line-height: 1.4;
+      font-size: $font-16;
+      height: 7rem;
+    }
+  }
+
+  // Account page variant. Written after the base and its respond-to blocks so it replaces their
+  // flex and margin values, and carries its own narrow-screen values.
+  &--account {
+    flex: 0 1 48%;
+    margin-bottom: $space-60;
+
+    @include respond-to('sm-wide') {
+      flex: 0 1 100%;
+      margin-bottom: $space-40;
+    }
+  }
+}
 .card__user-link {
     color: #444444;
     text-decoration: none; }
@@ -79,26 +148,7 @@
 .card__user-options .button {
   flex: 0 1 48%; }
 
-.card {
-  flex: 0 1 30%;
-  margin-bottom: 6rem; }
-
-.cards--account .card {
-  flex: 0 1 48%;
-  margin-bottom: 6rem; }
-
 @media screen and (max-width: 1200px) {
-  .card__image {
-    height: 22rem; }
-  .card__details {
-    padding: 2rem 1.5rem; }
-  .card__title {
-    margin-bottom: 0.5rem;
-    font-size: 1.8rem; }
-  .card__description {
-    line-height: 1.2;
-    font-size: 1.4rem;
-    height: 7rem; }
   .card__user {
     padding: 1rem; }
   .card__user-image {
@@ -119,29 +169,7 @@
   .card__user-options .button {
       flex: 0 1 48%; } }
 
-@media screen and (max-width: 991px) {
-  .card {
-    flex: 0 1 48%;
-    margin-bottom: 4rem; } }
-
 @media screen and (max-width: 590px) {
-  .cards--account .card {
-    flex: 0 1 100%;
-    margin-bottom: 4rem; }
-  .card {
-    flex: 0 1 100%;
-    margin-bottom: 2rem; }
-  .card__image {
-      height: 25rem; }
-  .card__details {
-      padding: 3rem 2rem; }
-  .card__title {
-      margin-bottom: 0.5rem;
-      font-size: 2rem; }
-  .card__description {
-      line-height: 1.4;
-      font-size: 1.6rem;
-      height: 7rem; }
   .card__user {
       padding: 2rem; }
   .card__user-image {

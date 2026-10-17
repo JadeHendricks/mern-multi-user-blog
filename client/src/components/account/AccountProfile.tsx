@@ -93,9 +93,9 @@ const Profile = () => {
                                 </h2>
                                 { navigationState === 'all-posts' ? (
                                     <section className="account-posts">
-                                        <div className="cards cards--account">
-                                            { isUsersData(loggedInUser?._id, user._id) && userPosts.map(post => <ProfileCard key={post._id} post={ post } />) }
-                                            { !isUsersData(loggedInUser?._id, user._id) && userPosts.map(post => <PostCard key={post._id} post={ post } />) }
+                                        <div className="cards">
+                                            { isUsersData(loggedInUser?._id, user._id) && userPosts.map(post => <ProfileCard key={post._id} post={ post } variant="account" />) }
+                                            { !isUsersData(loggedInUser?._id, user._id) && userPosts.map(post => <PostCard key={post._id} post={ post } variant="account" />) }
                                         </div>
                                     </section>
                                 ) : <AccountSettings key={ user._id } user={ user } email={ loggedInUser?.email }/> }

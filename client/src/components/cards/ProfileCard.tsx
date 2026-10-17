@@ -8,9 +8,11 @@ import { useToggleLike } from '../../hooks/useToggleLike';
 import { useDeletePost } from '../../hooks/useDeletePost';
 interface ProfileCardProps {
     post: PostWithAuthor;
+    // 'account' is the two-column card on the account page.
+    variant?: 'account';
 }
 
-const ProfileCard = ({ post: { _id, title, image, tag, description, comments, likes } }: ProfileCardProps) => {
+const ProfileCard = ({ post: { _id, title, image, tag, description, comments, likes }, variant }: ProfileCardProps) => {
     const { loggedInUser } = useAuth();
     const toggleLike = useToggleLike();
     const deletePost = useDeletePost();
@@ -22,7 +24,7 @@ const ProfileCard = ({ post: { _id, title, image, tag, description, comments, li
         deletePost.mutate(_id);
     };
     return (
-        <div className="card">
+        <div className={ variant === 'account' ? 'card card--account' : 'card' }>
             <Link to={`/post/${_id}`}>
             <div className="card__header">
                 <img className='card__image' src={ uploadUrl('posts', image) } onError={ onImageError('posts') } alt={ loggedInUser?.name } title={ loggedInUser?.name } />
