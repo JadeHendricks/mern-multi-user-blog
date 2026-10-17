@@ -27,7 +27,7 @@ const ResetPassword = () => {
                 <p className="reset-password-form__description">
                     Enter in your new password to proceed.
                 </p>
-                <form className="form form--resetPassword" onSubmit={ handleOnSubmit }>
+                <form onSubmit={ handleOnSubmit }>
                     <div className="form-group">
                         <label className="label" htmlFor="newPassword">New Password</label>
                         <input className="input" id="newPassword" onChange={ handleOnChange } name="newPassword" type="password" placeholder="••••••••" />

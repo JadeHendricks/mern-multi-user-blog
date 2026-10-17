@@ -30,7 +30,7 @@ const ActivateAccount = () => {
                 <p className="forgot-password-form__description">
                     By clicking activate, your account with be verified and ready to use.
                 </p>
-                <form className="form form--activateaccount">
+                <form>
                     <div className="form-group">
                         <button className="button button--green form-group__submit" onClick={ handleActivationClick }>Activate</button>
                     </div>

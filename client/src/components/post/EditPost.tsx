@@ -30,7 +30,7 @@ const PostEditForm = ({ id, post }: PostEditFormProps) => {
         editPost.mutate({ title, tag, description, image: blogimage });
     }
     return (
-        <form className="form form--createPost" onSubmit={ handleSubmit }>
+        <form className="form form--post" onSubmit={ handleSubmit }>
             <div className="form-group">
                 <label className="label" htmlFor="title">Post Title</label>
                 <input className="input" id="title" onChange={ handleOnChange } value={ title } name="title" type="text" placeholder="Title goes here" />

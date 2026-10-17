@@ -26,7 +26,7 @@ const Register = () => {
         <div className="container">
             <div className="login-form">
                 <h2 className="login-form__title">Create your account!</h2>
-                <form className="form form--signup" onSubmit={ handleOnSubmit }>
+                <form onSubmit={ handleOnSubmit }>
                     <div className="form-group">
                         <label className="label" htmlFor="name">Name</label>
                         <input className="input" id="name" name="name" onChange={ handleOnChange } type="text" placeholder="John Doe" />

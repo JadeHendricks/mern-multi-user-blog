@@ -34,7 +34,7 @@ const PostForm = () => {
                             nemo quisquam ea eos saepe quidem ipsum assumenda omnis.
                         </p>
                     </div>
-                    <form className="form form--createPost" onSubmit={ handleSubmit }>
+                    <form className="form form--post" onSubmit={ handleSubmit }>
                         <div className="form-group">
                             <label className="label" htmlFor="title">Post Title</label>
                             <input className="input" id="title" onChange={ handleOnChange } name="title" type="text" placeholder="Title goes here" />

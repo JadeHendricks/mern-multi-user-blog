@@ -1,28 +1,23 @@
-.form--createPost {
-  background-color: #ffffff;
-  box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
-  padding: 5rem;
-  border-radius: 5px;
-  margin-bottom: 6rem; }
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
 
-.form--changePassword {
-  background-color: #ffffff;
-  padding: 5rem;
-  border-radius: 5px;
-  margin-bottom: 6rem; }
+// White panel around a form. The create and edit post forms add a shadow and a bottom margin.
+.form {
+  background-color: $color-white;
+  padding: $space-50;
+  border-radius: $radius-5px;
 
-.form--account {
-  background-color: #ffffff;
-  padding: 5rem;
-  border-radius: 5px; }
+  @include respond-to('md') {
+    padding: $space-30;
+  }
 
-@media screen and (max-width: 767px) {
-  .form--createPost {
-    padding: 3rem;
-    margin-bottom: 0; }
-  .form--changePassword {
-    padding: 3rem; }
-  .form--account {
-    padding: 3rem; }
+  // Written after the base and its respond-to block so its margin wins on narrow screens too.
+  &--post {
+    box-shadow: $shadow-lg;
+    margin-bottom: $space-60;
+
+    @include respond-to('md') {
+      margin-bottom: 0;
+    }
+  }
 }
-
