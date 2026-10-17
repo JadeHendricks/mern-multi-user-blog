@@ -14,7 +14,7 @@ const CommentPost = ({ comment: { userId, avatar, comment, name, date, _id }, po
     return (
         <div className="comment-post">
             <div className="comment-post__icon">
-                <img src={ uploadUrl('users', avatar) } onError={ onImageError('users') } alt={ name } title={ name } />
+                <img className="avatar" src={ uploadUrl('users', avatar) } onError={ onImageError('users') } alt={ name } title={ name } />
             </div>
             <div className="comment-post__information">
                 <h5 className="comment-post__user-name">{ name } <span>{ formatDate(date) }</span></h5>

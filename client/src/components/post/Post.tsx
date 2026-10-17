@@ -67,7 +67,7 @@ const FullPost = () => {
                                 </div>
                                 <div className="post__user">
                                     <div className="post__user-block">
-                                        <img className="form__user-photo" src={ uploadUrl('users', user?.avatar) } onError={ onImageError('users') } alt={ user?.name } title={ user?.name } />
+                                        <img className="avatar form__user-photo" src={ uploadUrl('users', user?.avatar) } onError={ onImageError('users') } alt={ user?.name } title={ user?.name } />
                                         <span className="post__user-name">{ user?.name }</span>
                                     </div>
                                     { user?.socials && (

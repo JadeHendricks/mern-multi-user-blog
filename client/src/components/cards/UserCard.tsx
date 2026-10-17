@@ -14,7 +14,7 @@ const UserCard = ({ user: { createdAt, name, _id, avatar, socials } }: UserCardP
         <div className="card-user">
             <div className="card-user__header">
                 <Link to={`/profile/${_id}`} className="card-user__image">
-                    <img src={ uploadUrl('users', avatar) } onError={ onImageError('users') } alt={ name } title={ name } />
+                    <img className="avatar" src={ uploadUrl('users', avatar) } onError={ onImageError('users') } alt={ name } title={ name } />
                 </Link>
                 <div className="card-user__userInfo">
                     <Link to={`/profile/${_id}`} className="card-user__title">{ name }</Link>

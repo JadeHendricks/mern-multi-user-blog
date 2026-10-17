@@ -55,7 +55,7 @@ const PostEditForm = ({ id, post }: PostEditFormProps) => {
                 <textarea className="input input--textarea" onChange={ handleOnChange } value={ description } id="description" name="description" placeholder="Post goes here"></textarea>
             </div>
             <div className="form__group form__photo-upload">
-                <img className="form__user-photo" src={ uploadUrl('posts', image) } onError={ onImageError('posts') } alt={ title } title={ title } />
+                <img className="avatar form__user-photo" src={ uploadUrl('posts', image) } onError={ onImageError('posts') } alt={ title } title={ title } />
                 <input className="form__upload" type="file" accept="image/*" id="blogimage" name="blogimage" onChange={ e => {
                     const file = e.target.files?.[0];
                     setBlogImage(file);

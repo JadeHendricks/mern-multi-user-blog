@@ -30,7 +30,7 @@ const Navigation = () => {
                     <Link className="nav__el" to='/users'>All Users</Link>
                     <Link className="nav__el" to='/most-popular-posts'>Popular Posts</Link>
                     <Link className="nav__el" to={`/profile/${loggedInUser._id}`}>
-                        <img className="nav__user-img" src={ uploadUrl('users', loggedInUser.avatar) } onError={ onImageError('users') } alt={ loggedInUser.name } title={ loggedInUser.name } />
+                        <img className="avatar nav__user-img" src={ uploadUrl('users', loggedInUser.avatar) } onError={ onImageError('users') } alt={ loggedInUser.name } title={ loggedInUser.name } />
                         <span>{ loggedInUser.name.split(' ')[0] }</span>
                     </Link>
                     <Link to='/create-post' className="nav__el button button--green">Create Post</Link>

@@ -53,7 +53,7 @@ const PostCard = ({ post: { _id, title, image, date, tag, description, user, lik
             {/* String(): a post whose author is gone has user null and has always linked to /profile/undefined. Kept as is. */}
             <Link to={`/profile/${String(user?._id)}`} className="card__user-link">
                 <div className="card__user">
-                    <img className="card__user-image" src={ uploadUrl('users', user?.avatar) } onError={ onImageError('users') } alt={ user?.name } title={ user?.name } />
+                    <img className="avatar card__user-image" src={ uploadUrl('users', user?.avatar) } onError={ onImageError('users') } alt={ user?.name } title={ user?.name } />
                     <div className="card__user-info">
                         <div>{ user?.name }</div>
                         <div>Posted on: { formatDate(date) }</div>
