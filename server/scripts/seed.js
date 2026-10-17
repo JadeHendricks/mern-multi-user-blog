@@ -15,9 +15,8 @@ import seedData from './seed-data.cjs';
 const { E2E_PASSWORD, SEED_ACTIVATION_TOKEN, PENDING_USER, SEED_IDS, SEED_USERS, SEED_POSTS } = seedData;
 
 // Sample images (server/seed-assets) are copied into DATA_DIR/uploads and used as avatars and
-// post images. Off until the uploads folder is served and the client shows it (FEAT-005 C22), so
-// the seeded screens keep the default images and the screenshots do not change.
-export const SEED_IMAGES = false;
+// post images, so a seeded store shows real pictures. Pass { images: false } to keep default.jpg.
+export const SEED_IMAGES = true;
 
 const CREATED_AT = new Date('2025-11-20T09:00:00.000Z');
 const ASSETS = path.resolve(import.meta.dirname, '../seed-assets');

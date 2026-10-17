@@ -3,13 +3,14 @@ import Moment from 'react-moment';
 import svg from '../../assets/images/icons/sprite.svg'
 import { Link } from 'react-router-dom';
 import { isHttpsUrl } from '../../utils/safeUrl';
+import { uploadUrl, onImageError } from '../../utils/imageUrl';
 
 const UserCard = ({ user: { createdAt, name, _id, avatar, socials } }) => {
     return (
         <div className="card-user">
             <div className="card-user__header">
                 <Link to={`/profile/${_id}`} className="card-user__image">
-                    <img src={require(`../../assets/images/users/default.jpg`)} alt={ name } title={ name } />
+                    <img src={ uploadUrl('users', avatar) } onError={ onImageError('users') } alt={ name } title={ name } />
                 </Link>
                 <div className="card-user__userInfo">
                     <Link to={`/profile/${_id}`} className="card-user__title">{ name }</Link>

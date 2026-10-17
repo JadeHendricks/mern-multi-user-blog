@@ -37,7 +37,7 @@ describe.each([
   it('writes the fixed users, pending user, posts, likes and comments', async () => {
     const { store, cleanup } = await make();
     try {
-      const counts = await seed(store);
+      const counts = await seed(store, { images: false });
 
       expect(counts).toEqual({ users: 4, posts: 6, pending: 1 });
       expect(await store.admin.counts()).toEqual({ users: 5, posts: 6 });
@@ -47,8 +47,8 @@ describe.each([
       expect(first.comments).toHaveLength(2);
       expect(first.date.toISOString()).toBe('2025-12-01T09:00:00.000Z');
       expect((await store.users.findPublicById(SEED_IDS.users.alice)).createdAt.toISOString()).toBe('2025-11-20T09:00:00.000Z');
-      // Everything keeps the default images until the uploads folder is served.
-      expect(SEED_IMAGES).toBe(false);
+      // Images are on by default (the CLI and the E2E run); this test opted out of copying them.
+      expect(SEED_IMAGES).toBe(true);
       expect(first.image).toBe('default.jpg');
     } finally {
       await cleanup();
@@ -58,7 +58,7 @@ describe.each([
   it('seeds the shared throwaway password, and a pending user with a hashed activation link', async () => {
     const { store, cleanup } = await make();
     try {
-      await seed(store);
+      await seed(store, { images: false });
 
       const alice = await store.users.findByEmail('alice@example.test', { secrets: true });
       expect(await verifyPassword(E2E_PASSWORD, alice.passwordHash)).toBe(true);
@@ -76,8 +76,8 @@ describe.each([
     const first = await make();
     const second = await make();
     try {
-      await seed(first.store);
-      await seed(second.store);
+      await seed(first.store, { images: false });
+      await seed(second.store, { images: false });
 
       expect(stable(await first.store.admin.exportAll())).toEqual(stable(await second.store.admin.exportAll()));
     } finally {

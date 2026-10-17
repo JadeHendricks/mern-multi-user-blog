@@ -7,6 +7,7 @@ import AuthContext from '../../context/authContext/AuthContext';
 import UserContext from '../../context/userContext/UserContext';
 import ContentLoader from '../layouts/ContentLoader';
 import { isHttpsUrl } from '../../utils/safeUrl';
+import { uploadUrl, onImageError } from '../../utils/imageUrl';
 
 const Profile = ({ match }) => {
     const { loggedInUser, isUsersData, authLoading } = useContext(AuthContext);
@@ -30,7 +31,7 @@ const Profile = ({ match }) => {
                             <div className="container">
                                 <div className="user-header">
                                     <div className="user-header__image">
-                                        <img src={require(`../../assets/images/users/default.jpg`)} alt={ user?.name } title={ user?.name } />
+                                        <img src={ uploadUrl('users', user?.avatar) } onError={ onImageError('users') } alt={ user?.name } title={ user?.name } />
                                     </div>
                                     <div className="user-header__info">
                                         <h3 className="user-header__info-name">{ user?.name }</h3>

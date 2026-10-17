@@ -6,6 +6,7 @@ import PostContext from '../../context/postContext/PostContext';
 import CommentSubmit from '../comment/CommentSubmit';
 import ContentLoader from '../layouts/ContentLoader';
 import { isHttpsUrl } from '../../utils/safeUrl';
+import { uploadUrl, onImageError } from '../../utils/imageUrl';
 
 const FullPost = ({ match, history }) => {
     const { loggedInUser, isUsersData, authLoading } = useContext(AuthContext);
@@ -55,13 +56,13 @@ const FullPost = ({ match, history }) => {
                             <div className="post__header">
                                 <div className="post__top">
                                     <div className="post__image-block">
-                                        <img src={require(`../../assets/images/posts/default.jpg`)} alt={ title } title={ title } />
+                                        <img src={ uploadUrl('posts', image) } onError={ onImageError('posts') } alt={ title } title={ title } />
                                     </div>
                                     <h1 className="post__title">{ title }</h1>
                                 </div>
                                 <div className="post__user">
                                     <div className="post__user-block">
-                                        <img className="form__user-photo" src={require(`../../assets/images/users/default.jpg`)} alt={ user?.name } title={ user?.name } />
+                                        <img className="form__user-photo" src={ uploadUrl('users', user?.avatar) } onError={ onImageError('users') } alt={ user?.name } title={ user?.name } />
                                         <span className="post__user-name">{ user?.name }</span>
                                     </div>
                                     { user?.socials && (

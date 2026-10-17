@@ -3,6 +3,7 @@ import svg from '../../assets/images/icons/sprite.svg';
 import AuthContext from '../../context/authContext/AuthContext';
 import PostContext from '../../context/postContext/PostContext';
 import { Link, useHistory } from 'react-router-dom';
+import { uploadUrl, onImageError } from '../../utils/imageUrl';
 
 const ProfileCard = ({ post: { _id, title, image, tag, description, comments, likes } }) => {
     const history = useHistory();
@@ -23,7 +24,7 @@ const ProfileCard = ({ post: { _id, title, image, tag, description, comments, li
         <div className="card">
             <Link to={`/post/${_id}`}>
             <div className="card__header">
-                <img className='card__image' src={require(`../../assets/images/posts/default.jpg`)} alt={ loggedInUser?.name } title={ loggedInUser?.name } />
+                <img className='card__image' src={ uploadUrl('posts', image) } onError={ onImageError('posts') } alt={ loggedInUser?.name } title={ loggedInUser?.name } />
                 <h5 className={ tag === 'travel' ? 'card__tag card__tag--orange': tag === 'funny' ? 'card__tag card__tag--yellow': 'card__tag'}>
                     { tag }
                 </h5>
