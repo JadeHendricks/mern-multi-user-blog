@@ -1,6 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { queryKeys } from '../lib/queryKeys';
+import type { PostListPayload, PostWithAuthor } from '../lib/types';
 import { useErrorToast } from './useErrorToast';
 
 export const FEED_PAGE_SIZE = 12;
@@ -9,13 +10,20 @@ export const FEED_PAGE_SIZE = 12;
 // (the cache patcher knows that shape); `posts` is every loaded page flattened. Most popular
 // posts keep their own unpaginated usePosts query because they sort the whole set.
 export const usePostsInfinite = () => {
-  const query = useInfiniteQuery({
+  // The page param is the cursor; undefined asks for the first page.
+  const query = useInfiniteQuery<
+    PostListPayload,
+    Error,
+    PostWithAuthor[],
+    ReturnType<typeof queryKeys.posts.list>,
+    string | undefined
+  >({
     queryKey: queryKeys.posts.list({ limit: FEED_PAGE_SIZE }),
-    initialPageParam: /** @type {string | undefined} */ (undefined),
+    initialPageParam: undefined,
     queryFn: ({ pageParam, signal }) => {
       const params = new URLSearchParams({ limit: String(FEED_PAGE_SIZE) });
       if (pageParam) params.set('cursor', pageParam);
-      return api.get(`/api/post?${params}`, { signal });
+      return api.get<PostListPayload>(`/api/post?${params.toString()}`, { signal });
     },
     // undefined (not null) is what tells Query there is no next page.
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,

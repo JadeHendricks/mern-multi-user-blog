@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import type { MeResponse, OwnUserDto } from '@mern-blog/shared';
 import { api, ApiError } from '../lib/api';
 import { queryKeys } from '../lib/queryKeys';
 
@@ -8,9 +9,9 @@ import { queryKeys } from '../lib/queryKeys';
 export const useMe = () =>
   useQuery({
     queryKey: queryKeys.me,
-    queryFn: async ({ signal }) => {
+    queryFn: async ({ signal }): Promise<OwnUserDto | null> => {
       try {
-        const res = await api.get('/api/user/me', { signal });
+        const res = await api.get<MeResponse>('/api/user/me', { signal });
         return res.user;
       } catch (error) {
         if (error instanceof ApiError && error.status === 401) return null;
