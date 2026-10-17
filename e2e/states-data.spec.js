@@ -41,10 +41,10 @@ test.describe('loading overlay', () => {
     const authAnswered = page.waitForResponse('**/api/user/me');
     await page.goto(routes.home);
     await authAnswered;
-    await expect(page.locator('.loader-container')).toHaveCount(1);
+    await expect(page.locator('.loader')).toHaveCount(1);
     await expect(page).toHaveScreenshot('home-loading.png');
     release();
-    await expect(page.locator('.loader-container')).toHaveCount(0);
+    await expect(page.locator('.loader')).toHaveCount(0);
   });
 });
 
