@@ -68,7 +68,14 @@ export const createUserController = ({ store }) => {
         const { facebook, linkedin, twitter } = req.body;
 
         // Only the networks that were sent change; an empty string clears that one field.
-        const user = await store.users.updateSocials(req.user._id, { facebook, linkedin, twitter });
+        // A value that is not text (null, 0, false pass the validator as "left out") is not a link and
+        // must not be stored; only text counts as sent.
+        const text = (value) => (typeof value === 'string' ? value : undefined);
+        const user = await store.users.updateSocials(req.user._id, {
+            facebook: text(facebook),
+            linkedin: text(linkedin),
+            twitter: text(twitter)
+        });
         if (!user) {
             return res.status(404).json({ message: 'User not found!' });
         }

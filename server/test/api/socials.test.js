@@ -33,6 +33,23 @@ describe('socials and profile updates', () => {
     });
   });
 
+  // null, 0 and false pass validation as "left out"; they used to be stored as they came in.
+  it.each([null, 0, false])(
+    'does not store %j as a link and keeps the existing one',
+    async (value) => {
+      const { agent, user } = await createUserAndLogin(app);
+      await putSocials(agent, user, { facebook: 'https://facebook.com/me' });
+      const res = await putSocials(agent, user, {
+        facebook: value,
+        twitter: 'https://twitter.com/me',
+      });
+      expect(res.status).toBe(200);
+      expect(res.body.user.socials).toEqual({
+        facebook: 'https://facebook.com/me',
+        twitter: 'https://twitter.com/me',
+      });
+    },
+  );
   it('clears one network with an empty string', async () => {
     const { agent, user } = await createUserAndLogin(app);
     await putSocials(agent, user, {
