@@ -16,10 +16,10 @@ Playwright starts three servers itself (a second API instance is described under
   (`npm run build:api`); if you run `npx playwright test` directly, run `npm run build:api`
   yourself after a server change.
 - Client on exactly `http://localhost:3000`: the Vite dev server (`npm run dev -w client`). The port is fixed
-  (`strictPort`) because `AuthState.jsx` hard-codes that origin in its public-route list (known bug B14).
+  (`strictPort`) because the screenshot baselines and the specs use that origin.
   The Vite proxy forwards `/api` and `/uploads` to port 5000.
 
-Ports 3000, 5000 and 5001 (the production-build instance, see `prod-smoke.spec.js`) must be free. The servers are never reused (`reuseExistingServer: false`), so
+Ports 3000, 5000 and 5001 (the production-build instance, see `prod-smoke.spec.js`) must be free. `npm run test:e2e` checks that first (`e2e/support/check-ports.js`) and stops with the port and how to find its owner; it never kills anything. The servers are never reused (`reuseExistingServer: false`), so
 every run starts from the same seed and a fresh rate limiter.
 
 `e2e/global-setup.js` logs the seeded owner (Alice) and visitor (Bob) in over the API and saves
