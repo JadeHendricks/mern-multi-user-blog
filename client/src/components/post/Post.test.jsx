@@ -67,6 +67,13 @@ describe('Post page data', () => {
     expect(screen.queryByText('Hello world')).toBeNull();
     expect(document.querySelector('.post__banner')).not.toBeNull();
   });
+
+  it('still shows a post whose author account is gone (user is null) to a signed-in reader', async () => {
+    renderPost({ 'GET /api/post/p1': { body: { post: { ...post, user: null } } } });
+    expect(await screen.findByText('Hello world')).toBeInTheDocument();
+    // Only the author may edit or delete, and nobody is the author of a deleted account.
+    expect(screen.queryByRole('button', { name: 'Delete Post' })).toBeNull();
+  });
 });
 
 // B21: every failed mutation used to dispatch POST_ERROR, which replaced the post (and the list)

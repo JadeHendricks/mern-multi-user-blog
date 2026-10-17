@@ -44,7 +44,7 @@ const FullPost = () => {
                                         <button className="button button--red" onClick={ () => toggleLike(_id, true) }>Unlike Post</button> :	
                                         <button className="button" onClick={ () => toggleLike(_id, false) }>Like Post</button>	
                                     }
-                                    { loggedInUser && isUsersData(loggedInUser._id, user._id) && (
+                                    { loggedInUser && isUsersData(loggedInUser._id, user?._id) && (
                                         <Fragment>
                                             <Link to={`/edit-post/${_id}`} className="button button--yellow">Edit Post</Link>
                                             <button className="button button--red" onClick={ handleDelete }>Delete Post</button>
