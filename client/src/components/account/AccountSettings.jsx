@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useContext, useState } from 'react';
+import React, { Fragment, useContext, useState } from 'react';
 import UserContext from '../../context/userContext/UserContext';
 import ContentLoader from '../layouts/ContentLoader';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
@@ -6,25 +6,20 @@ import { uploadUrl, onImageError } from '../../utils/imageUrl';
 const AccountSettings = ({ user, email }) => {
     const { updateUserSocials, updateUser, userLoading } = useContext(UserContext);
 
-    const [ userSocials, setUserSocials] = useState({ facebook: '', linkedin: '', twitter: '' });
+    // Initial values come from props via lazy state. AccountProfile keys this component by user id,
+    // so a different user remounts it instead of leaving the previous user's values in the form.
+    const [ userSocials, setUserSocials] = useState(() => ({
+        facebook: user.socials?.facebook || '',
+        twitter: user.socials?.twitter || '',
+        linkedin: user.socials?.linkedin || ''
+    }));
     const handleSocialsOnChange = e => setUserSocials({ ...userSocials, [e.target.name]: e.target.value });
     const {facebook, linkedin, twitter} = userSocials;
 
-    const [ name, setName] = useState();
+    const [ name, setName] = useState(() => user.name);
     const [ avatar, setAvatar] = useState();
     const [ uploadName, setUploadName] = useState();
 
-    useEffect(() => {
-        if (user.socials) {
-            setUserSocials({
-                facebook: user.socials.facebook || '',
-                twitter: user.socials.twitter || '',
-                linkedin: user.socials.linkedin || ''
-            });
-        }
-        setName(user.name);
-        // eslint-disable-next-line
-    }, []);
     
     return (
         <Fragment>

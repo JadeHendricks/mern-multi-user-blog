@@ -92,7 +92,7 @@ const Profile = ({ match }) => {
                                             { !isUsersData(loggedInUser?._id, user._id) && userPosts?.map(post => <PostCard key={post._id} post={ post } />) }
                                         </div>
                                     </section>
-                                ) : <AccountSettings user={ user } email={ loggedInUser?.email }/> }
+                                ) : <AccountSettings key={ user._id } user={ user } email={ loggedInUser?.email }/> }
                             </main>
                         </div>
                     </div>
