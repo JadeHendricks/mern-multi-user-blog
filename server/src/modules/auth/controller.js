@@ -165,6 +165,14 @@ export const createAuthController = ({ store, mailer }) => {
             });
         }
 
+        // The account can be deleted between the credential check and this read; answer it like any
+        // other failed login instead of setting a cookie and returning { user: null }.
+        const profile = await store.users.findById(user._id);
+        if (!profile) {
+            return res.status(401).json({
+                message: 'Incorrect email or password'
+            });
+        }
         const token = jwt.sign({ _id: user._id }, config.JWT_SECRET, {
             algorithm: 'HS256',
             expiresIn: sessionDays() * 24 * 60 * 60
@@ -177,7 +185,7 @@ export const createAuthController = ({ store, mailer }) => {
 
         // The token only travels in the httpOnly cookie, never in the body.
         res.status(200).json({
-            user: await store.users.findById(user._id)
+            user: profile
         });
     }
 
