@@ -1,12 +1,12 @@
-const Post = require('../models/PostModel');
-const User = require('../models/UserModel');
+import { Post } from '../models/PostModel.js';
+import { User } from '../models/UserModel.js';
 
-const mongoose = require('mongoose');
-const { makeUpload, removeStoredFile } = require('../lib/upload');
+import mongoose from 'mongoose';
+import { makeUpload, removeStoredFile } from '../lib/upload.js';
 
-exports.uploadPostPhoto = makeUpload({ subdir: 'posts', prefix: 'post', field: 'image' });
+export const uploadPostPhoto = makeUpload({ subdir: 'posts', prefix: 'post', field: 'image' });
 
-exports.getAllPosts = async (req, res) => { 
+export const getAllPosts = async (req, res) => { 
     try {
         const posts = await Post.find().populate('user', ['name', 'avatar', '_id']).sort({ 'date': '-1' });
         
@@ -29,7 +29,7 @@ exports.getAllPosts = async (req, res) => {
     }
 }
 
-exports.getPost = async (req, res) => { 
+export const getPost = async (req, res) => { 
     try {
         const post = await Post.findById(req.params.id).populate('user', ['name', 'avatar', '_id', 'socials']);
         if (!post) {
@@ -52,7 +52,7 @@ exports.getPost = async (req, res) => {
       }
 }
 
-exports.createPost = async (req, res) => { 
+export const createPost = async (req, res) => { 
     const { title, tag, description } = req.body;
     const postFields = {};
 
@@ -77,7 +77,7 @@ exports.createPost = async (req, res) => {
     }
 }
 
-exports.deletePost = async (req, res) => { 
+export const deletePost = async (req, res) => { 
     try {
         const post = await Post.findById(req.params.id); 
 
@@ -104,7 +104,7 @@ exports.deletePost = async (req, res) => {
     }
 }
 
-exports.getAllUsersPosts = async (req, res) => { 
+export const getAllUsersPosts = async (req, res) => { 
     try {
         const usersPosts = await Post.find({'user': req.params.id}).populate('user', ['name', 'avatar', '_id']);
         res.status(200).json({
@@ -120,7 +120,7 @@ exports.getAllUsersPosts = async (req, res) => {
     }
 }
 
-exports.editPost = async (req, res) => {
+export const editPost = async (req, res) => {
     // The post id comes from the URL only; an id in the body is ignored.
     const { title, tag, description } = req.body;
     if (!mongoose.isValidObjectId(req.params.id)) {
@@ -162,7 +162,7 @@ exports.editPost = async (req, res) => {
 
 // Like and unlike are single atomic updates: the filter makes "already liked" a no-op match, so two
 // parallel requests cannot both push (likes subdocuments have their own _id, so $addToSet cannot dedupe).
-exports.likePost = async (req, res) => {
+export const likePost = async (req, res) => {
     if (!mongoose.isValidObjectId(req.params.id)) {
         return res.status(404).json({ message: 'Post not found' });
     }
@@ -186,7 +186,7 @@ exports.likePost = async (req, res) => {
     });
 }
 
-exports.unlikePost = async (req, res) => {
+export const unlikePost = async (req, res) => {
     if (!mongoose.isValidObjectId(req.params.id)) {
         return res.status(404).json({ message: 'Post not found' });
     }
@@ -209,7 +209,7 @@ exports.unlikePost = async (req, res) => {
         results: post.likes.length
     });
 }
-exports.addComment = async (req, res) => { 
+export const addComment = async (req, res) => { 
     try {
         const post = await Post.findById(req.params.id); 
         const user = await User.findById(req.user.id);
@@ -244,7 +244,7 @@ exports.addComment = async (req, res) => {
       }
 }
 
-exports.deleteComment = async (req, res) => { 
+export const deleteComment = async (req, res) => { 
     try {
         const post = await Post.findById(req.params.id); 
         if (!post) {

@@ -1,11 +1,11 @@
-const User = require('../models/UserModel');
-const { makeUpload, removeStoredFile } = require('../lib/upload');
+import { User } from '../models/UserModel.js';
+import { makeUpload, removeStoredFile } from '../lib/upload.js';
 
 const PUBLIC_FIELDS = '_id name avatar socials createdAt';
 
-exports.uploadUserAvatar = makeUpload({ subdir: 'users', prefix: 'user', field: 'avatar' });
+export const uploadUserAvatar = makeUpload({ subdir: 'users', prefix: 'user', field: 'avatar' });
 
-exports.getMe = async (req, res) => {
+export const getMe = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
         if (!user) {
@@ -27,7 +27,7 @@ exports.getMe = async (req, res) => {
     }
 }
 
-exports.getUser = async (req, res) => {
+export const getUser = async (req, res) => {
     try {
         // Public view: no email, role or timestamps beyond createdAt
         const user = await User.findById(req.params.id).select(PUBLIC_FIELDS);
@@ -50,7 +50,7 @@ exports.getUser = async (req, res) => {
     }
 }
 
-exports.getAllUsers = async (req, res) => {
+export const getAllUsers = async (req, res) => {
     try {
         // Pending (not yet activated) accounts must never be listed
         const users = await User.find({ status: { $ne: 'pending' } }).select(PUBLIC_FIELDS);
@@ -73,7 +73,7 @@ exports.getAllUsers = async (req, res) => {
     }
 }
 
-exports.updateMe = async (req, res) => {
+export const updateMe = async (req, res) => {
     try {
         const { name } = req.body;
 
@@ -106,7 +106,7 @@ exports.updateMe = async (req, res) => {
 }
 
 
-exports.updateUserSocials = async (req, res) => {
+export const updateUserSocials = async (req, res) => {
     try {
         const { facebook, linkedin, twitter } = req.body;
 

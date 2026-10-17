@@ -1,8 +1,8 @@
 import { existsSync, readdirSync } from 'node:fs';
-import { createRequire } from 'node:module';
 import path from 'node:path';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import supertest from 'supertest';
+import { User } from '../../src/models/UserModel.js';
 import { clearDb, connectDb, disconnectDb, mongoose } from './support/db.js';
 import {
   createPost,
@@ -12,8 +12,7 @@ import {
   TINY_PNG,
 } from './support/helpers.js';
 
-const require = createRequire(import.meta.url);
-const clientPostImages = path.resolve('client/src/assets/images/posts');
+const clientPostImages = path.resolve(import.meta.dirname, '../../../client/src/assets/images/posts');
 const list = (dir) => (existsSync(dir) ? readdirSync(dir).sort() : []);
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -255,7 +254,6 @@ describe('length limits', () => {
   });
 
   it('rejects a 33-character user name at the schema level', async () => {
-    const User = require('../../src/models/UserModel');
 
     const tooLong = new User({ name: 'n'.repeat(33), email: 'long@example.test', password: 'x' });
     const ok = new User({ name: 'n'.repeat(32), email: 'ok@example.test', password: 'x' });

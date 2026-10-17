@@ -1,12 +1,10 @@
 import { existsSync, readdirSync } from 'node:fs';
-import { createRequire } from 'node:module';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import sendGridMail from '@sendgrid/mail';
 import supertest from 'supertest';
 import { clearDb, connectDb, disconnectDb } from './support/db.js';
 import { fakeConfig, fakeUser, loadApp } from './support/helpers.js';
 
-// Same module instance that authController.js requires.
-const require = createRequire(import.meta.url);
 
 describe('mail transport', () => {
   let app;
@@ -18,7 +16,7 @@ describe('mail transport', () => {
   });
   beforeEach(async () => {
     await clearDb();
-    send = vi.spyOn(require('@sendgrid/mail'), 'send').mockResolvedValue([{ statusCode: 202 }]);
+    send = vi.spyOn(sendGridMail, 'send').mockResolvedValue([{ statusCode: 202 }]);
   });
   afterEach(() => {
     vi.restoreAllMocks();

@@ -1,15 +1,13 @@
 import { spawn } from 'node:child_process';
 import http from 'node:http';
-import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, afterEach, beforeAll, describe, expect, inject, it } from 'vitest';
+import jwt from 'jsonwebtoken';
 import supertest from 'supertest';
 import { connectDb, disconnectDb, mongoose } from './support/db.js';
 import { createUserAndLogin, fakeConfig, LONG_DESCRIPTION, loadApp } from './support/helpers.js';
 
-const require = createRequire(import.meta.url);
-const jwt = require('jsonwebtoken');
 const crashServer = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
   'support',

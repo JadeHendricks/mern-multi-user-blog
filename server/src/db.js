@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const config = require('config');
+import mongoose from 'mongoose';
+import config from 'config';
 
 const connectDB = async () => {
 	const DB = config.get('MONGO_URI2').replace('<PASSWORD>', config.get('MONGO_PASSWORD'));
@@ -13,4 +13,4 @@ const connectDB = async () => {
 	console.log('MongoDB Connected...');
 };
 
-module.exports = connectDB;
+export default connectDB;

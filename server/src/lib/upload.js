@@ -1,7 +1,7 @@
-const crypto = require('crypto');
-const fs = require('fs');
-const path = require('path');
-const multer = require('multer');
+import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
+import multer from 'multer';
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024;
 // A fixed allowlist: the extension comes from here, never from the client's mimetype or filename.
@@ -9,10 +9,10 @@ const EXTENSIONS = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'web
 
 // Same destination logic as before: UPLOAD_DIR/<subdir> when set, otherwise the client assets folder.
 const uploadDir = (subdir) =>
-    process.env.UPLOAD_DIR ? path.join(process.env.UPLOAD_DIR, subdir) : path.resolve(__dirname, '../../../client/src/assets/images', subdir);
+    process.env.UPLOAD_DIR ? path.join(process.env.UPLOAD_DIR, subdir) : path.resolve(import.meta.dirname, '../../../client/src/assets/images', subdir);
 
 // Returns single-file multer middleware for `field`, storing under <subdir> with a random file name.
-exports.makeUpload = ({ subdir, prefix, field }) => {
+export const makeUpload = ({ subdir, prefix, field }) => {
     const storage = multer.diskStorage({
         destination: (req, file, cb) => cb(null, uploadDir(subdir)),
         filename: (req, file, cb) => {
@@ -33,7 +33,7 @@ exports.makeUpload = ({ subdir, prefix, field }) => {
 
 // Deletes a previously stored upload. Never touches default.jpg, and path.basename keeps a stored value
 // like "../x" from escaping the folder. A file that is already gone is not an error.
-exports.removeStoredFile = async (subdir, filename) => {
+export const removeStoredFile = async (subdir, filename) => {
     if (!filename || filename === 'default.jpg') return;
     try {
         await fs.promises.unlink(path.join(uploadDir(subdir), path.basename(filename)));

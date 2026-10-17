@@ -1,17 +1,17 @@
-const express = require('express');
+import express from 'express';
+import cors from 'cors';
+import morgan from 'morgan';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
+import hpp from 'hpp';
+import mongoSanitize from 'express-mongo-sanitize';
+import xss from 'xss-clean';
+import path from 'path';
+import rateLimit from 'express-rate-limit';
+import authRouter from './routes/authRoute.js';
+import userRouter from './routes/userRoute.js';
+import postRouter from './routes/postRoute.js';
 const app = express();
-const cors = require('cors');
-const morgan = require('morgan');
-const helmet = require('helmet');
-const cookieParser = require('cookie-parser');
-const hpp = require('hpp');
-const mongoSanitize = require('express-mongo-sanitize');
-const xss = require('xss-clean');
-const path = require('path');
-const rateLimit = require('express-rate-limit');
-const authRouter = require('./routes/authRoute');
-const userRouter = require('./routes/userRoute');
-const postRouter = require('./routes/postRoute');
 
 //Middleware
 app.use(morgan('dev'));
@@ -59,11 +59,11 @@ app.use((err, req, res, next) => {
 });
 
 if (process.env.NODE_ENV === 'production') {
-   const clientBuild = path.resolve(__dirname, '../../client/build');
+   const clientBuild = path.resolve(import.meta.dirname, '../../client/build');
    app.use(express.static(clientBuild));
    app.get('*', (req, res) => {
       res.sendFile(path.join(clientBuild, 'index.html'))
    });
 }
 
-module.exports = app;
+export default app;

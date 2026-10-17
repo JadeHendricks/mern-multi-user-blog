@@ -2,6 +2,7 @@
   "name": "@mern-blog/server",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "Express API for the MERN multi-user blog",
   "main": "src/server.js",
   "engines": {

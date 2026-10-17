@@ -1,10 +1,10 @@
-const User = require('../models/UserModel');
-const jwt = require('jsonwebtoken');
-const sendGridMail = require('@sendgrid/mail');
-const config = require('config');
-const { newToken, hashToken } = require('../lib/tokens');
-const fs = require('fs');
-const path = require('path');
+import { User } from '../models/UserModel.js';
+import jwt from 'jsonwebtoken';
+import sendGridMail from '@sendgrid/mail';
+import config from 'config';
+import { newToken, hashToken } from '../lib/tokens.js';
+import fs from 'fs';
+import path from 'path';
 
 sendGridMail.setApiKey(config.get('SG_API_KEY'));
 
@@ -29,7 +29,7 @@ const ACTIVATION_TTL_MS = 24 * 60 * 60 * 1000;
 const registerMessage = (email) =>
     `Email has been sent to ${email}. Follow the instructions to activate your account`;
 
-exports.register = async (req, res) => {
+export const register = async (req, res) => {
     const { name, email, password } = req.body;
     try {
         // The same 200 is returned for new, pending and active emails so the endpoint
@@ -85,7 +85,7 @@ exports.register = async (req, res) => {
     }
 }
 
-exports.accountActivation = async (req, res) => {
+export const accountActivation = async (req, res) => {
     const { token } = req.body;
     if (!token) {
         return res.status(400).json({
@@ -124,7 +124,7 @@ exports.accountActivation = async (req, res) => {
 }
 
 // Lets the activation page greet the user by name without decoding anything client side.
-exports.activationPreview = async (req, res) => {
+export const activationPreview = async (req, res) => {
     const user = await User.findOne({
         activationToken: hashToken(req.params.token),
         status: 'pending',
@@ -145,7 +145,7 @@ const baseCookieOptions = () => {
     return options;
 }
 
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
     const { email, password } = req.body;
     try {
         const user = await User.findOne({ email }).select('+password');
@@ -198,7 +198,7 @@ const verifySession = async (token) => {
     }
 }
 
-exports.isLoggedIn = async (req, res) => {
+export const isLoggedIn = async (req, res) => {
     if (req.cookies.authtoken) {
         const currentUser = await verifySession(req.cookies.authtoken);
         if (!currentUser) {
@@ -216,7 +216,7 @@ exports.isLoggedIn = async (req, res) => {
     });
 }
 
-exports.logout = (req, res) => {
+export const logout = (req, res) => {
     res.clearCookie('authtoken', baseCookieOptions());
 
     res.status(200).json({
@@ -225,11 +225,11 @@ exports.logout = (req, res) => {
 }
 
 // GET logout is kept for old clients only; a GET that changes state can be triggered cross-site.
-exports.logoutDeprecated = (req, res) => {
+export const logoutDeprecated = (req, res) => {
     res.set('Deprecation', 'true');
-    return exports.logout(req, res);
+    return logout(req, res);
 }
-exports.protect = async (req, res, next) => {
+export const protect = async (req, res, next) => {
     let token;
     //first part is for the API
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -256,7 +256,7 @@ exports.protect = async (req, res, next) => {
     next();
 }
 
-exports.restrictTo = (...roles) => {
+export const restrictTo = (...roles) => {
     return (req, res, next) => {
       if (!roles.includes(req.user.role)) {
           return res.status(403).json({
@@ -272,7 +272,7 @@ const forgotMessage = (email) =>
     `Email has been sent to ${email}. Follow the instructions to reset your password`;
 const RESET_TTL_MS = 30 * 60 * 1000;
 
-exports.forgotPassword = async (req, res) => {
+export const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
         const user = await User.findOne({ email });
@@ -313,7 +313,7 @@ exports.forgotPassword = async (req, res) => {
     }
 }
 
-exports.resetPassword = async (req, res) => {
+export const resetPassword = async (req, res) => {
     const { resetPasswordLink, newPassword } = req.body;
 
     try {

@@ -8,6 +8,10 @@ const { randomBytes } = require('node:crypto');
 const { mkdirSync, mkdtempSync, rmSync } = require('node:fs');
 const { tmpdir } = require('node:os');
 const path = require('node:path');
+const { pathToFileURL } = require('node:url');
+
+// The server is an ES module package; this launcher stays CommonJS, so it loads it with import().
+const load = (relative) => import(pathToFileURL(path.join(__dirname, relative)).href);
 
 const fake = (label) => `e2e-${label}-${randomBytes(16).toString('hex')}`;
 const runDir = mkdtempSync(path.join(tmpdir(), 'mern-blog-e2e-'));
@@ -42,7 +46,7 @@ const PORT = 5000;
 async function main() {
   const { MongoMemoryServer } = require('mongodb-memory-server');
   const mongoose = require('mongoose');
-  const { seed } = require('../../server/scripts/seed');
+  const { seed } = await load('../../server/scripts/seed.js');
 
   const mongod = await MongoMemoryServer.create();
   await mongoose.connect(`${mongod.getUri()}e2e`, {
@@ -51,11 +55,13 @@ async function main() {
     useFindAndModify: false,
     useUnifiedTopology: true,
   });
-  await require('../../server/src/models/UserModel').init();
-  await require('../../server/src/models/PostModel').init();
-  const counts = await seed(mongoose);
+  const { User } = await load('../../server/src/models/UserModel.js');
+  const { Post } = await load('../../server/src/models/PostModel.js');
+  await User.init();
+  await Post.init();
+  const counts = await seed();
 
-  const app = require('../../server/src/app');
+  const { default: app } = await load('../../server/src/app.js');
   const server = app.listen(PORT, () => {
     console.log(
       `E2E API on http://localhost:${PORT} (seeded ${counts.users} users, ${counts.pending} pending, ${counts.posts} posts)`,

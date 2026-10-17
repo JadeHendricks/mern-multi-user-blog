@@ -1,4 +1,4 @@
-const rateLimit = require('express-rate-limit');
+import rateLimit from 'express-rate-limit';
 
 // One limiter instance per route: each has its own counter, so failed logins do not eat
 // into someone's register or reset attempts. The cap is read on every request so tests
@@ -13,4 +13,4 @@ const authLimiter = () => rateLimit({
     }
 });
 
-module.exports = authLimiter;
+export default authLimiter;

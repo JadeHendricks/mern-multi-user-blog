@@ -1,7 +1,7 @@
-const app = require('./app');
-const mongoose = require('mongoose');
-const connectDB = require('./db');
-const { startServer, createShutdown } = require('./lib/lifecycle');
+import app from './app.js';
+import mongoose from 'mongoose';
+import connectDB from './db.js';
+import { startServer, createShutdown } from './lib/lifecycle.js';
 
 const port = process.env.PORT || 5000;
 

@@ -1,6 +1,6 @@
-const { check } = require('express-validator');
+import { check } from 'express-validator';
 
-exports.updateMeValidator = [
+export const updateMeValidator = [
     check('name').not().isEmpty().withMessage('Name is required'),
 ];
 
@@ -14,7 +14,7 @@ const socialValidator = (field) =>
         .bail()
         .isURL({ protocols: ['https'], require_protocol: true }).withMessage(`${field} link must be a valid https URL`);
 
-exports.updateSocialsValidator = [
+export const updateSocialsValidator = [
     socialValidator('facebook'),
     socialValidator('linkedin'),
     socialValidator('twitter'),

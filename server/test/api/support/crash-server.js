@@ -1,12 +1,12 @@
 // Child process for tests that expect the server to crash (KNOWN BUG B1 / B2).
-// Plain CommonJS on purpose: it is run with `node`, not through Vitest.
+// Plain node script on purpose: it is run with `node`, not through Vitest.
 // Config comes from the parent's NODE_CONFIG env; the port is printed as `PORT=<n>`.
-const app = require('../../../src/app.js');
+import app from '../../../src/app.js';
 
 async function main() {
   // Only the editPost case needs a database (the token check fails before any query).
   if (process.env.CRASH_SERVER_MONGO_URI) {
-    const mongoose = require('mongoose');
+    const { default: mongoose } = await import('mongoose');
     await mongoose.connect(process.env.CRASH_SERVER_MONGO_URI, {
       useNewUrlParser: true,
       useCreateIndex: true,

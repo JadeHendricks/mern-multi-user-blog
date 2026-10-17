@@ -1,13 +1,10 @@
 import { randomBytes } from 'node:crypto';
-import { createRequire } from 'node:module';
 import supertest from 'supertest';
+import app from '../../../src/app.js';
 import { extractLink, readLatestMail, tokenFromLink } from './outbox.js';
 
-// app.js is CommonJS (and the models assign implicit globals), so load it with native require.
-const require = createRequire(import.meta.url);
-
 export function loadApp() {
-  return require('../../../src/app.js');
+  return app;
 }
 
 // Public parts of NODE_CONFIG that tests need (e.g. to sign tokens). Never print these.

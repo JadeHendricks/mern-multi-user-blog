@@ -1,10 +1,10 @@
-const express = require('express');
+import express from 'express';
+import asyncHandler from '../lib/asyncHandler.js';
+import * as userController from '../controllers/userController.js';
+import * as authController from '../controllers/authController.js';
+import { runValidation } from '../validators/index.js';
+import { updateMeValidator, updateSocialsValidator } from '../validators/user.js';
 const router = express.Router();
-const asyncHandler = require('../lib/asyncHandler');
-const userController = require('../controllers/userController');
-const authController = require('../controllers/authController');
-const { runValidation } = require('../validators/index');
-const { updateMeValidator, updateSocialsValidator } = require('../validators/user');
 
 router
     .route('/me')
@@ -26,4 +26,4 @@ router
 //admin only example
 //router.put('/admin', requireSignin, adminOnlyRoutes, updateUser);
 
-module.exports = router;
+export default router;

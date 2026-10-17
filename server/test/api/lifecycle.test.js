@@ -1,10 +1,8 @@
-import { createRequire } from 'node:module';
+import express from 'express';
 import { describe, expect, it, vi } from 'vitest';
 import { connectDb, mongoose } from './support/db.js';
 
-const require = createRequire(import.meta.url);
-const express = require('express');
-const { startServer, createShutdown } = require('../../src/lib/lifecycle');
+import { createShutdown, startServer } from '../../src/lib/lifecycle.js';
 
 describe('startServer', () => {
   it('does not listen until connect has resolved', async () => {

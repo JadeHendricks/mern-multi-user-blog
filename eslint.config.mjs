@@ -18,21 +18,11 @@ export default [
   },
   js.configs.recommended,
   {
-    files: ['**/*.js'],
+    files: ['**/*.js', '**/*.cjs'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'commonjs',
       globals: { ...globals.node },
-    },
-    rules: {
-      // Legacy code predates these rules; warn until the refactor phases clean it up.
-      'no-unused-vars': 'warn',
-      'no-undef': 'warn',
-      'no-empty': 'warn',
-      'no-useless-escape': 'warn',
-      'no-prototype-builtins': 'warn',
-      'no-useless-assignment': 'warn',
-      'preserve-caught-error': 'warn',
     },
   },
   {
@@ -40,9 +30,8 @@ export default [
     languageOptions: { sourceType: 'module', globals: { ...globals.node } },
   },
   {
-    // Vitest files are ES modules; crash-server.js is a plain CommonJS child script.
-    files: ['server/test/**/*.js'],
-    ignores: ['server/test/api/support/crash-server.js'],
+    // The server workspace is "type": "module": source, scripts and tests are all ES modules.
+    files: ['server/**/*.js'],
     languageOptions: { sourceType: 'module', globals: { ...globals.node } },
   },
   {

@@ -1,10 +1,10 @@
-const express = require('express');
+import express from 'express';
+import asyncHandler from '../lib/asyncHandler.js';
+import * as postController from '../controllers/postController.js';
+import * as authController from '../controllers/authController.js';
+import { runValidation } from '../validators/index.js';
+import { addCommentValidator, updatePostValidator, createPostValidator } from '../validators/post.js';
 const router = express.Router();
-const asyncHandler = require('../lib/asyncHandler');
-const postController = require('../controllers/postController')
-const authController = require('../controllers/authController');
-const { runValidation } = require('../validators/index');
-const { addCommentValidator, updatePostValidator, createPostValidator } = require('../validators/post');
 
 router
     .route('/')
@@ -37,4 +37,4 @@ router
     .put(authController.protect, postController.uploadPostPhoto, updatePostValidator, runValidation, asyncHandler(postController.editPost))
     .delete(authController.protect, asyncHandler(postController.deletePost));
 
-module.exports = router;
+export default router;

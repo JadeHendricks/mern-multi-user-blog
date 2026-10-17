@@ -1,10 +1,9 @@
 import { randomBytes } from 'node:crypto';
-import { createRequire } from 'node:module';
+import mongoose from 'mongoose';
 import { inject } from 'vitest';
+import { Post } from '../../../src/models/PostModel.js';
+import { User } from '../../../src/models/UserModel.js';
 
-// Native require so the test shares one mongoose instance (and module cache) with the app.
-const require = createRequire(import.meta.url);
-const mongoose = require('mongoose');
 
 export async function connectDb() {
   const base = inject('mongoUri');
@@ -17,8 +16,8 @@ export async function connectDb() {
     useUnifiedTopology: true,
   });
   // Build the unique email index up front so duplicate checks behave like production.
-  await require('../../../src/models/UserModel.js').init();
-  await require('../../../src/models/PostModel.js').init();
+  await User.init();
+  await Post.init();
 }
 
 export async function clearDb() {

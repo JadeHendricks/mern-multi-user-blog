@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+import crypto from 'crypto';
 
 // Opaque random tokens for emailed links. Only the SHA-256 hash is stored, so a leaked
 // database row cannot be used as a link.
@@ -9,4 +9,4 @@ const newToken = () => {
     return { raw, hash: hashToken(raw) };
 };
 
-module.exports = { newToken, hashToken };
+export { newToken, hashToken };

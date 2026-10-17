@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { createRequire } from 'node:module';
+import jwt from 'jsonwebtoken';
 import supertest from 'supertest';
 import { clearDb, connectDb, disconnectDb, mongoose } from './support/db.js';
 import {
@@ -12,8 +12,6 @@ import {
 } from './support/helpers.js';
 import { extractLink, readLatestMail, readMails, tokenFromLink } from './support/outbox.js';
 
-const require = createRequire(import.meta.url);
-const jwt = require('jsonwebtoken');
 
 describe('auth', () => {
   let app;
