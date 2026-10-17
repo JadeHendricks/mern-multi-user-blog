@@ -2,25 +2,38 @@ import { isValidId, newId } from '../../lib/ids.js';
 import { StoreValidationError } from '../errors.js';
 import { cleanComment, cleanDescription, cleanTitle } from '../rules.js';
 import { DEFAULT_AVATAR, toCommentView, toLikeView, toPostView } from '../views.js';
-import { commentAuthor, toPostRecord } from './records.js';
+import { idOf, toPostRecord } from './records.js';
 import { findPage, guard, oid, trust } from './support.js';
 
 const DEFAULT_TAG = 'general';
+
+const asUserOid = (value) => {
+  if (!isValidId(value)) throw new StoreValidationError('Path `user` is not a valid id.');
+  return oid(value);
+};
+
+// A missing author is filled with the stored id (instead of null), so a comment keeps its userId.
+const keepId = (doc, id) => doc ?? id;
+// Authors are populated on read, so names and avatars are always the current ones.
+const POPULATE = [
+  { path: 'user', select: 'name avatar socials', transform: keepId },
+  { path: 'comments.user', select: 'name avatar', transform: keepId },
+];
 
 // The document to insert from repo input (used by create and insertMany).
 function buildDoc(data) {
   if (data._id !== undefined && !isValidId(data._id)) throw new StoreValidationError('Path `_id` is not a valid id.');
   return {
     _id: oid(data._id ?? newId()),
-    user: data.user ? oid(data.user) : undefined,
+    user: data.user ? asUserOid(data.user) : undefined,
     image: data.image || DEFAULT_AVATAR,
     title: cleanTitle(data.title),
     tag: data.tag || DEFAULT_TAG,
     description: cleanDescription(data.description),
-    likes: (data.likes ?? []).map((like) => ({ _id: oid(like._id ?? newId()), user: oid(like.user) })),
+    likes: (data.likes ?? []).map((like) => ({ _id: oid(like._id ?? newId()), user: asUserOid(like.user) })),
     comments: (data.comments ?? []).map((comment) => ({
       _id: oid(comment._id ?? newId()),
-      userId: comment.user ?? comment.userId,
+      user: asUserOid(comment.user),
       comment: cleanComment(comment.comment),
       date: comment.date ? new Date(comment.date) : new Date(),
     })),
@@ -33,26 +46,24 @@ function buildDoc(data) {
  * @returns {import('../types.js').PostRepo}
  */
 export function createPostRepo({ User, Post }) {
-  // Name, avatar and socials of every author a set of posts mentions, keyed by hex id.
-  async function authorsOf(records) {
-    const ids = new Set();
-    for (const record of records) {
-      if (record.user) ids.add(record.user);
-      for (const comment of record.comments) if (isValidId(comment.user)) ids.add(comment.user);
+  // Splits the populated authors out of lean documents: stored-shape records plus a lookup of
+  // every author that still exists, keyed by hex id.
+  function read(docs) {
+    const authors = new Map();
+    const note = (value) => {
+      if (value && value.name !== undefined) authors.set(idOf(value), { ...value, _id: idOf(value) });
+    };
+    for (const doc of docs) {
+      note(doc.user);
+      for (const comment of doc.comments ?? []) note(comment.user);
     }
-    if (ids.size === 0) return new Map();
-    const docs = await User.find({ _id: trust({ $in: [...ids].map(oid) }) })
-      .select('name avatar socials')
-      .lean();
-    return new Map(docs.map((doc) => [String(doc._id), { ...doc, _id: String(doc._id) }]));
+    return { records: docs.map(toPostRecord), authors };
   }
 
-  async function views(docs, mode) {
-    const records = docs.map(toPostRecord);
-    const byId = await authorsOf(records);
-    return records.map((record) => toPostView(record, byId, mode));
+  function views(docs, mode) {
+    const { records, authors } = read(docs);
+    return records.map((record) => toPostView(record, authors, mode));
   }
-
   const postFilter = (id) => (isValidId(id) ? { _id: oid(id) } : null);
   const exists = async (id) => {
     const filter = postFilter(id);
@@ -63,20 +74,20 @@ export function createPostRepo({ User, Post }) {
     async findById(id) {
       const filter = postFilter(id);
       if (!filter) return null;
-      const doc = await Post.findOne(filter).lean();
-      return doc ? (await views([doc], 'detail'))[0] : null;
+      const doc = await Post.findOne(filter).populate(POPULATE).lean();
+      return doc ? views([doc], 'detail')[0] : null;
     },
 
     async list({ cursor, limit } = {}) {
-      const { rows, nextCursor } = await findPage(Post, {}, { cursor, limit, field: 'date', direction: 'desc' });
-      return { items: await views(rows, 'list'), nextCursor };
+      const { rows, nextCursor } = await findPage(Post, {}, { cursor, limit, field: 'date', direction: 'desc', populate: POPULATE });
+      return { items: views(rows, 'list'), nextCursor };
     },
 
     // Oldest first: the order this endpoint has always returned.
     async listByUser(userId, { cursor, limit } = {}) {
       if (!isValidId(userId)) return { items: [], nextCursor: null };
-      const { rows, nextCursor } = await findPage(Post, { user: oid(userId) }, { cursor, limit, field: 'date', direction: 'asc' });
-      return { items: await views(rows, 'list'), nextCursor };
+      const { rows, nextCursor } = await findPage(Post, { user: oid(userId) }, { cursor, limit, field: 'date', direction: 'asc', populate: POPULATE });
+      return { items: views(rows, 'list'), nextCursor };
     },
 
     async create({ user, title, tag, description, image }) {
@@ -151,13 +162,14 @@ export function createPostRepo({ User, Post }) {
       if (!(await User.findOne({ _id: oid(userId) }).select('_id').lean())) return null;
       const doc = await Post.findOneAndUpdate(
         filter,
-        { $push: { comments: { $each: [{ _id: oid(newId()), userId, comment, date: new Date() }], $position: 0 } } },
+        { $push: { comments: { $each: [{ _id: oid(newId()), user: oid(userId), comment, date: new Date() }], $position: 0 } } },
         { returnDocument: 'after' },
-      ).lean();
+      )
+        .populate(POPULATE)
+        .lean();
       if (!doc) return null;
-      const record = toPostRecord(doc);
-      const byId = await authorsOf([record]);
-      return record.comments.map((item) => toCommentView(item, byId));
+      const { records, authors } = read([doc]);
+      return records[0].comments.map((item) => toCommentView(item, authors));
     },
 
     async removeComment(id, commentId) {
@@ -181,7 +193,7 @@ export function createPostRepo({ User, Post }) {
       const doc = await Post.findOne({ ...filter, 'comments._id': oid(commentId) })
         .select({ comments: { $elemMatch: { _id: oid(commentId) } } })
         .lean();
-      return doc ? { userId: commentAuthor(doc.comments[0]) } : null;
+      return doc ? { userId: idOf(doc.comments[0].user) } : null;
     },
 
     async insertMany(posts) {

@@ -33,7 +33,7 @@ function toPostDoc(post) {
     likes: (post.likes ?? []).map((like) => ({ _id: asId(like._id), user: asId(like.user) })),
     comments: (post.comments ?? []).map((comment) => ({
       _id: asId(comment._id),
-      userId: comment.user,
+      user: asId(comment.user),
       comment: comment.comment,
       date: new Date(comment.date),
     })),
@@ -87,6 +87,13 @@ export function createAdmin({ User, Post }) {
     },
 
     counts,
+
+    // The indexes beyond _id, for the tests: { users: [{ key, unique }], posts: [...] }.
+    async indexes() {
+      const pick = (list) => list.filter((index) => index.name !== '_id_').map((index) => ({ key: index.key, unique: index.unique === true }));
+      const [users, posts] = await Promise.all([User.listIndexes(), Post.listIndexes()]);
+      return { users: pick(users), posts: pick(posts) };
+    },
 
     // The stored user including secrets, under the repo's own field names.
     async rawUserByEmail(email) {

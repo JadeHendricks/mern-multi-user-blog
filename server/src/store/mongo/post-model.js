@@ -32,11 +32,13 @@ export const postSchema = new mongoose.Schema(
                 }
             }
         ],
-        // Only the author's id is stored. posts.js resolves the current name and avatar on read.
+        // Only a reference to the author is stored; the current name and avatar are populated on read.
         comments: [
             {
-                userId: {
-                    type: String
+                user: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'user',
+                    required: true
                 },
                 comment: {
                     type: String,
@@ -55,5 +57,9 @@ export const postSchema = new mongoose.Schema(
     },
     { versionKey: false }
 );
+
+// A user's posts newest first, and the home feed newest first.
+postSchema.index({ user: 1, date: -1 });
+postSchema.index({ date: -1 });
 
 export const createPostModel = (instance) => instance.model('Post', postSchema);

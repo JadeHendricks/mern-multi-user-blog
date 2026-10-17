@@ -34,7 +34,7 @@ export async function guard(promise) {
 
 // Cursor paging over (field, _id) in `direction`. Without limit and cursor everything is returned.
 // One extra row is fetched to learn whether another page exists.
-export async function findPage(Model, base, { cursor, limit, field, direction, select }) {
+export async function findPage(Model, base, { cursor, limit, field, direction, populate }) {
   if (limit !== undefined && (!Number.isInteger(limit) || limit < 1)) {
     throw new InvalidCursorError('limit must be a positive integer');
   }
@@ -50,7 +50,7 @@ export async function findPage(Model, base, { cursor, limit, field, direction, s
     };
   }
   let query = Model.find(filter).sort({ [field]: sign, _id: sign }).lean();
-  if (select) query = query.select(select);
+  if (populate) query = query.populate(populate);
   if (limit !== undefined) query = query.limit(limit + 1);
   const rows = await query;
   if (limit === undefined || rows.length <= limit) return { rows, nextCursor: null };

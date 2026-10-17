@@ -28,8 +28,10 @@ export function createMongoStore(config) {
       if (!config.MONGO_URI) throw new Error('MONGO_URI is not set');
       await instance.connect(config.MONGO_URI);
       connected = true;
-      // Waits for the unique email index so the first duplicate signup is already rejected.
+      // Waits for the unique email index so the first duplicate signup is already rejected, then
+      // drops indexes an older schema left behind.
       await Promise.all([models.User.init(), models.Post.init()]);
+      await Promise.all([models.User.syncIndexes(), models.Post.syncIndexes()]);
     },
     async close() {
       if (!connected) return;

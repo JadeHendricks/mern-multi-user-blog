@@ -118,6 +118,7 @@
  * @property {() => Promise<{users: number, posts: number}>} counts
  * @property {(email: string) => Promise<object|null>} rawUserByEmail the stored user including secrets
  * @property {(id: string, fields: object) => Promise<boolean>} patchUser overwrite stored fields (tests move time with this)
+ * @property {() => Promise<{users: {key: object, unique: boolean}[], posts: {key: object, unique: boolean}[]}>} [indexes] Mongo adapter only
  */
 
 /**

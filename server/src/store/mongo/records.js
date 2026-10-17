@@ -38,7 +38,7 @@ export function toUserRecord(doc) {
 export function toPostRecord(doc) {
   return {
     _id: String(doc._id),
-    user: doc.user ? String(doc.user) : undefined,
+    user: doc.user ? idOf(doc.user) : undefined,
     image: doc.image,
     title: doc.title,
     tag: doc.tag,
@@ -46,7 +46,7 @@ export function toPostRecord(doc) {
     likes: (doc.likes ?? []).map((like) => ({ _id: String(like._id), user: String(like.user) })),
     comments: (doc.comments ?? []).map((comment) => ({
       _id: String(comment._id),
-      user: commentAuthor(comment),
+      user: idOf(comment.user),
       comment: comment.comment,
       date: comment.date,
     })),
@@ -54,8 +54,8 @@ export function toPostRecord(doc) {
   };
 }
 
-// Comments keep the author's id in `userId` (a string) at this point of the schema.
-export const commentAuthor = (comment) => comment.userId;
+// An id, or an author populated on read: both give the hex id.
+export const idOf = (value) => String(value._id ?? value);
 
 const iso = (value) => new Date(value).toISOString();
 const USER_DATES = ['createdAt', 'updatedAt', 'passwordChangedAt', 'activationExpires', 'resetExpires'];
