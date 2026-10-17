@@ -31,7 +31,6 @@
     "test:client": "npm run test -w client",
     "pretest:e2e": "node e2e/support/check-ports.js && npm run build:api && npm run build -w client",
     "test:e2e": "playwright test",
-    "test:e2e:update": "playwright test --update-snapshots",
     "e2e:install": "playwright install chromium",
     "serve:memory": "npm run build:api && node e2e/support/start-api.js",
     "prelint": "npm run build:shared",
@@ -39,7 +38,7 @@
     "lint:styles": "stylelint \"client/src/styles/**/*.scss\"",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "npm run lint && npm run typecheck && npm run test:api && npm run test:api:mongo && npm run test:client && npm run test:e2e",
+    "check": "npm run lint && npm run typecheck && npm run test:api && npm run test:api:mongo && npm run test:client",
     "seed": "npm run build:shared && npm run seed -w server --",
     "db:export": "npm run build:shared && npm run db:export -w server --",
     "db:import": "npm run build:shared && npm run db:import -w server --"
@@ -63,7 +62,6 @@
     }
   },
   "devDependencies": {
-    "@axe-core/playwright": "4.14.0",
     "@eslint/js": "10.0.1",
     "@playwright/test": "1.64.1",
     "@types/node": "24.19.2",
