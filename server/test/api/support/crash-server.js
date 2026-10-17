@@ -1,6 +1,6 @@
 // Child process for tests that expect the server to crash (KNOWN BUG B1 / B2).
 // Plain node script on purpose: it is run with `node`, not through Vitest.
-// Config comes from the parent's NODE_CONFIG env; the port is printed as `PORT=<n>`.
+// Settings come from the parent's process.env (support/env.js); the port is printed as `PORT=<n>`.
 import app from '../../../src/app.js';
 
 async function main() {

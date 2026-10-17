@@ -1,17 +1,17 @@
 import { User } from '../models/UserModel.js';
 import jwt from 'jsonwebtoken';
 import sendGridMail from '@sendgrid/mail';
-import config from 'config';
+import { config, readConfig } from '../config.js';
 import { newToken, hashToken } from '../lib/tokens.js';
 import fs from 'fs';
 import path from 'path';
 
-sendGridMail.setApiKey(config.get('SG_API_KEY'));
-
-// MAIL_TRANSPORT=file writes mail to disk instead of calling SendGrid (local and test runs)
+// MAIL_TRANSPORT=file (the default) writes mail to <DATA_DIR>/outbox instead of calling SendGrid.
+// Read on every send so a test can switch transport without reloading the app.
 const sendMail = (emailData) => {
-    if (process.env.MAIL_TRANSPORT === 'file') {
-        const dir = process.env.MAIL_OUTBOX_DIR || 'tmp/outbox';
+    const mail = readConfig();
+    if (mail.MAIL_TRANSPORT === 'file') {
+        const dir = path.join(mail.DATA_DIR, 'outbox');
         fs.mkdirSync(dir, { recursive: true });
         const name = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}.json`;
         const { from, to, subject, html } = emailData;
@@ -21,6 +21,7 @@ const sendMail = (emailData) => {
         );
         return Promise.resolve();
     }
+    sendGridMail.setApiKey(mail.SG_API_KEY);
     return sendGridMail.send(emailData);
 };
 
@@ -39,13 +40,13 @@ export const register = async (req, res) => {
 
         if (existing && existing.status === 'active') {
             emailData = {
-                from: config.get('EMAIL_FROM'),
+                from: config.EMAIL_FROM,
                 to: email,
                 subject: `You already have an account`,
                 html: `
                 <h1>You already have an account</h1>
                 <p>Someone tried to sign up with this email address. If it was you, log in or reset your password.</p>
-                <p>${config.get('CLIENT_URL')}/auth/login</p>
+                <p>${config.CLIENT_URL}/auth/login</p>
                 `
             }
         } else {
@@ -59,15 +60,15 @@ export const register = async (req, res) => {
             await user.save();
 
             emailData = {
-                from: config.get('EMAIL_FROM'),
+                from: config.EMAIL_FROM,
                 to: email,
                 subject: `Account activation link`,
                 html: `
                 <h1>Please use the following link to activate your account</h1>
-                <p>${config.get('CLIENT_URL')}/auth/activate/${raw}</p>
+                <p>${config.CLIENT_URL}/auth/activate/${raw}</p>
                 <hr/>
                 <p>This email may contain sensitive information</p>
-                <p>${config.get('CLIENT_URL')}</p>
+                <p>${config.CLIENT_URL}</p>
                 `
             }
         }
@@ -136,12 +137,12 @@ export const activationPreview = async (req, res) => {
     res.status(200).json({ name: user.name });
 }
 // Session length comes from one setting so the JWT and the cookie always expire together.
-const sessionDays = () => Number(config.get('COOKIE_EXPIRES_IN'));
+const sessionDays = () => config.COOKIE_EXPIRES_IN;
 
 // Same flags for setting and clearing: browsers only clear a cookie when the attributes match.
 const baseCookieOptions = () => {
     const options = { httpOnly: true, sameSite: 'lax', path: '/' };
-    if (process.env.NODE_ENV === 'production') options.secure = true;
+    if (config.NODE_ENV === 'production') options.secure = true;
     return options;
 }
 
@@ -156,7 +157,7 @@ export const login = async (req, res) => {
             });
         }
 
-        const token = jwt.sign({ _id: user._id }, config.get('JWT_SECRET'), {
+        const token = jwt.sign({ _id: user._id }, config.JWT_SECRET, {
             expiresIn: sessionDays() * 24 * 60 * 60
         });
 
@@ -185,7 +186,7 @@ export const login = async (req, res) => {
 // password change. Never throws on a bad token.
 const verifySession = async (token) => {
     try {
-        const decoded = jwt.verify(token, config.get('JWT_SECRET'));
+        const decoded = jwt.verify(token, config.JWT_SECRET);
         const user = await User.findById(decoded._id).select('+passwordChangedAt');
         if (!user || user.status !== 'active') return null;
         // iat is in whole seconds, so compare against the change time truncated to seconds
@@ -282,15 +283,15 @@ export const forgotPassword = async (req, res) => {
             const { raw, hash } = newToken();
 
             const emailData = {
-                from: config.get('EMAIL_FROM'),
+                from: config.EMAIL_FROM,
                 to: email,
                 subject: `Password Reset link`,
                 html: `
                 <h1>Please user the following link to reset your password</h1>
-                <p>${config.get('CLIENT_URL')}/auth/password/reset/${raw}</p>
+                <p>${config.CLIENT_URL}/auth/password/reset/${raw}</p>
                 <hr/>
                 <p>This email may contain sensitive information</p>
-                <p>${config.get('CLIENT_URL')}</p>
+                <p>${config.CLIENT_URL}</p>
                 `
             }
 

@@ -8,6 +8,7 @@ import mongoSanitize from 'express-mongo-sanitize';
 import xss from 'xss-clean';
 import path from 'path';
 import rateLimit from 'express-rate-limit';
+import { config } from './config.js';
 import authRouter from './routes/authRoute.js';
 import userRouter from './routes/userRoute.js';
 import postRouter from './routes/postRoute.js';
@@ -16,7 +17,7 @@ const app = express();
 //Middleware
 app.use(morgan('dev'));
 app.use(helmet());
-if (process.env.NODE_ENV === 'development') { app.use(cors({ origin: `http://localhost:3000` })) }
+if (config.NODE_ENV === 'development') { app.use(cors({ origin: `http://localhost:3000` })) }
 
 const limiter = rateLimit({
    max: 1000,
@@ -58,7 +59,7 @@ app.use((err, req, res, next) => {
    res.status(500).json({ message: 'Something went wrong' });
 });
 
-if (process.env.NODE_ENV === 'production') {
+if (config.NODE_ENV === 'production') {
    const clientBuild = path.resolve(import.meta.dirname, '../../client/build');
    app.use(express.static(clientBuild));
    app.get('*', (req, res) => {

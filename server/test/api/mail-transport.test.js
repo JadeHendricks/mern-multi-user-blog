@@ -4,6 +4,7 @@ import sendGridMail from '@sendgrid/mail';
 import supertest from 'supertest';
 import { clearDb, connectDb, disconnectDb } from './support/db.js';
 import { fakeConfig, fakeUser, loadApp } from './support/helpers.js';
+import { outboxDir } from './support/outbox.js';
 
 
 describe('mail transport', () => {
@@ -26,9 +27,9 @@ describe('mail transport', () => {
 
   const filesIn = (dir) => (existsSync(dir) ? readdirSync(dir) : []);
 
-  it('uses SendGrid exactly once and writes no file when MAIL_TRANSPORT is unset', async () => {
-    delete process.env.MAIL_TRANSPORT;
-    const outboxBefore = filesIn(process.env.MAIL_OUTBOX_DIR);
+  it('uses SendGrid exactly once and writes no file when MAIL_TRANSPORT=sendgrid', async () => {
+    process.env.MAIL_TRANSPORT = 'sendgrid';
+    const outboxBefore = filesIn(outboxDir());
     const defaultOutboxBefore = filesIn('tmp/outbox');
     const user = fakeUser();
 
@@ -41,12 +42,12 @@ describe('mail transport', () => {
     expect(mail.from).toBe(fakeConfig().EMAIL_FROM);
     expect(mail.subject).toBe('Account activation link');
     expect(mail.html).toContain('/auth/activate/');
-    expect(filesIn(process.env.MAIL_OUTBOX_DIR)).toEqual(outboxBefore);
+    expect(filesIn(outboxDir())).toEqual(outboxBefore);
     expect(filesIn('tmp/outbox')).toEqual(defaultOutboxBefore);
   });
 
-  it('uses SendGrid for the password reset mail too when MAIL_TRANSPORT is unset', async () => {
-    // Create the account while the file transport is on, then switch to the default path.
+  it('uses SendGrid for the password reset mail too when MAIL_TRANSPORT=sendgrid', async () => {
+    // Create the account while the file transport is on, then switch to SendGrid.
     const user = fakeUser();
     await supertest(app).post('/api/auth/register').send(user);
     const { readLatestMail, extractLink, tokenFromLink } = await import('./support/outbox.js');
@@ -54,7 +55,7 @@ describe('mail transport', () => {
     await supertest(app).post('/api/auth/account-activation').send({ token });
     send.mockClear();
 
-    delete process.env.MAIL_TRANSPORT;
+    process.env.MAIL_TRANSPORT = 'sendgrid';
     const res = await supertest(app).put('/api/auth/forgot-password').send({ email: user.email });
 
     expect(res.status).toBe(200);
@@ -63,11 +64,11 @@ describe('mail transport', () => {
   });
 
   it('writes a JSON file and does not call SendGrid when MAIL_TRANSPORT=file', async () => {
-    const before = filesIn(process.env.MAIL_OUTBOX_DIR).length;
+    const before = filesIn(outboxDir()).length;
 
     await supertest(app).post('/api/auth/register').send(fakeUser());
 
     expect(send).not.toHaveBeenCalled();
-    expect(filesIn(process.env.MAIL_OUTBOX_DIR)).toHaveLength(before + 1);
+    expect(filesIn(outboxDir())).toHaveLength(before + 1);
   });
 });

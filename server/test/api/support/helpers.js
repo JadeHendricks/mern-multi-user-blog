@@ -7,9 +7,11 @@ export function loadApp() {
   return app;
 }
 
-// Public parts of NODE_CONFIG that tests need (e.g. to sign tokens). Never print these.
+// The settings tests need (e.g. to sign tokens), read from the env that support/env.js set up.
+// Never print these.
 export function fakeConfig() {
-  return JSON.parse(process.env.NODE_CONFIG);
+  const { CLIENT_URL, EMAIL_FROM, JWT_SECRET, COOKIE_EXPIRES_IN } = process.env;
+  return { CLIENT_URL, EMAIL_FROM, JWT_SECRET, COOKIE_EXPIRES_IN };
 }
 
 export function fakeUser(overrides = {}) {

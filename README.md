@@ -12,9 +12,8 @@ A blog written in the mern stack that handles:
 ## Installation
 ```bash
 1 - npm install (once, at the repo root: installs the server, client and shared workspaces)
-2 - add a .env file to the root and add in your process.env.NODE_ENV (dev || prod)
-3 - add a server/config/default.json file and add in your config for the application
-4 - npm run dev (API on :5000 and client on :3000 together)
+2 - copy .env.example to .env at the repo root and fill it in (the keys are documented there)
+3 - npm run dev (API on :5000 and client on :3000 together)
 ```
 
 ## Testing
@@ -34,7 +33,7 @@ npm run test:e2e:update  # re-record the screenshot baselines (only for intended
 npm run serve:memory     # API on :5000 with seeded in-memory data, to click around by hand
 ```
 - Mail never leaves the machine in tests: with `MAIL_TRANSPORT=file` each email is written as a
-  JSON file to the outbox folder (`tmp/outbox` by default) and the tests read links from there.
+  JSON file to `<DATA_DIR>/outbox` (`server/data/outbox` by default) and the tests read links from there.
 - Screenshot baselines live in `e2e/__screenshots__`. They are compared with zero pixel tolerance, so
   any visual change fails the run until you review it and run `npm run test:e2e:update`. They were
   rendered on Windows and need regenerating when CI moves to Linux. More in `e2e/README.md`.

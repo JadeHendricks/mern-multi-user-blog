@@ -13,7 +13,6 @@ export default [
       'e2e/__screenshots__/**',
       'coverage/**',
       'server/data/**',
-      'server/config/**',
     ],
   },
   js.configs.recommended,

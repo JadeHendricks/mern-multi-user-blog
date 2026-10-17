@@ -1,9 +1,12 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
-// Mail written by MAIL_TRANSPORT=file. Tokens are returned to the test, never logged.
+// Mail written by MAIL_TRANSPORT=file lands in <DATA_DIR>/outbox. Tokens are returned to the
+// test, never logged.
+export const outboxDir = () => path.join(process.env.DATA_DIR, 'outbox');
+
 export function readMails(to) {
-  const dir = process.env.MAIL_OUTBOX_DIR;
+  const dir = outboxDir();
   return readdirSync(dir)
     .filter((file) => file.endsWith('.json'))
     .sort()
