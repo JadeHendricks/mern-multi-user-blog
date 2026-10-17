@@ -3,14 +3,6 @@
 // are switched off for that path only (an allowlist by path, no disable comments in the source).
 // A partial leaves the list when it is rebuilt; the list must be empty when Phase 7 ends.
 const legacy = {
-  'client/src/styles/molecules/_comment-post.scss': [
-    'color-hex-length',
-    'media-feature-range-notation',
-    'rule-empty-line-before',
-    'selector-max-class',
-    'selector-max-combinators',
-    'selector-max-type',
-  ],
   'client/src/styles/organisms/_account-nav.scss': [
     'color-hex-length',
     'media-feature-range-notation',

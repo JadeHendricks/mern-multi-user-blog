@@ -1,105 +1,91 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+// One comment in the list under a post: avatar, name, date, text and the owner's delete link.
 .comment-post {
-  margin-top: 2.5rem;
-  padding-top: 2.5rem;
-  border-top: 0.2rem solid #f7f7f7;
+  margin-top: $space-25;
+  padding-top: $space-25;
+  border-top: 0.2rem solid $color-background;
   display: flex;
-  position: relative; }
+  position: relative;
 
-.comment-post__icon {
-    flex: 0 0 8rem; }
+  @include respond-to('md') {
+    margin-top: $space-20;
+    padding-top: $space-20;
+  }
 
-.comment-post__icon img {
-  width: 8rem;
-  height: 8rem; }
+  @include respond-to('sm') {
+    margin-top: $space-15;
+    padding-top: $space-15;
+    display: block;
+  }
 
-.comment-post__information {
-    flex: 1;
-    margin: 0 2rem; }
+  &__icon {
+    flex: 0 0 8rem;
 
-.comment-post__user-name {
-    font-size: 1.8rem;
-    margin-bottom: 0.5rem; }
-
-.comment-post__user-name span {
-  margin-left: 1.5rem;
-  font-size: 1.2rem;
-  font-weight: 500; }
-
-.comment-post__user-comment {
-    font-size: 1.6rem; }
-
-.comment-post__interaction {
-    position: absolute;
-    top: 1rem;
-    right: 0;
-    font-size: 1rem; }
-
-.comment-post__interaction .button {
-  display: block;
-  background-color: transparent;
-  text-decoration: underline;
-  color: #cd2d2d;
-  font-size: 1.2rem;
-  padding: 1rem; }
-
-.comment-post__interaction .button:hover {
-  box-shadow: none;
-  border-radius: 0; }
-
-.comment-post__post-icon {
-    fill: #777777;
-    width: 2rem;
-    height: 2rem; }
-
-.comment-post__post-icon:not(:last-child) {
-  margin-right: 1rem; }
-
-.comment-post__count {
-    color: #777777;
-    font-size: 1.6rem;
-    margin-right: 0.5rem;
-    font-weight: 700; }
-
-@media screen and (max-width: 767px) {
-  .comment-post {
-    margin-top: 2rem;
-    padding-top: 2rem; }
-  .comment-post__icon {
-      flex: 0 0 6rem; }
-  .comment-post__icon img {
-        width: 6rem;
-        height: 6rem; }
-  .comment-post__information {
-      margin: 0 1.5rem; }
-  .comment-post__user-name {
-      font-size: 1.6rem; }
-  .comment-post__user-name span {
-        margin-left: 1rem;
-        font-size: 1.2rem; }
-  .comment-post__user-comment {
-      font-size: 1.4rem; }
-  .comment-post__count {
-      font-size: 1.4rem; } }
-
-@media screen and (max-width: 580px) {
-  .comment-post {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    display: block; }
-  .comment-post__icon {
+    @include respond-to('md') {
       flex: 0 0 6rem;
-      margin: 0 1.5rem 1.5rem 0.5rem; }
-  .comment-post__icon img {
-        width: 6rem;
-        height: 6rem; }
-  .comment-post__information {
-      margin: 0 1.5rem 0 0.5rem; }
-  .comment-post__user-name {
-      font-size: 1.6rem; }
-  .comment-post__user-name span {
-        margin-left: 1rem;
-        font-size: 1.2rem; }
-  .comment-post__user-comment {
-      font-size: 1.4rem; }
-  .comment-post__count {
-      font-size: 1.4rem; } }
+    }
+
+    @include respond-to('sm') {
+      margin: 0 $space-15 $space-15 $space-5;
+    }
+  }
+
+  &__avatar {
+    width: 8rem;
+    height: 8rem;
+
+    @include respond-to('md') {
+      width: 6rem;
+      height: 6rem;
+    }
+  }
+
+  &__information {
+    flex: 1;
+    margin: 0 $space-20;
+
+    @include respond-to('md') {
+      margin: 0 $space-15;
+    }
+
+    @include respond-to('sm') {
+      margin: 0 $space-15 0 $space-5;
+    }
+  }
+
+  &__user-name {
+    font-size: $font-18;
+    margin-bottom: $space-5;
+
+    @include respond-to('md') {
+      font-size: $font-16;
+    }
+  }
+
+  &__date {
+    margin-left: $space-15;
+    font-size: $font-12;
+    font-weight: $weight-medium;
+
+    @include respond-to('md') {
+      margin-left: $space-10;
+    }
+  }
+
+  &__user-comment {
+    font-size: $font-16;
+
+    @include respond-to('md') {
+      font-size: $font-14;
+    }
+  }
+
+  &__interaction {
+    position: absolute;
+    top: $space-10;
+    right: 0;
+    font-size: $font-10;
+  }
+}

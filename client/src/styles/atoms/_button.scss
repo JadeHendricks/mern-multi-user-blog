@@ -49,4 +49,20 @@
     font-size: $font-12;
     padding: $space-10 $space-12;
   }
+
+  // Delete link on a comment. Written after the size blocks above so its font size and padding
+  // replace the ones they set. `.button:hover` still supplies the lift.
+  &--link-red {
+    background-color: transparent;
+    text-decoration: underline;
+    color: $color-red;
+    display: block;
+    font-size: $font-12;
+    padding: $space-10;
+  }
+
+  &--link-red:hover {
+    box-shadow: none;
+    border-radius: 0;
+  }
 }
