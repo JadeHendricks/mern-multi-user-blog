@@ -1,14 +1,10 @@
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "jsx": "react-jsx",
-    "allowJs": true,
-    "checkJs": false,
-    "noEmit": true,
-    "skipLibCheck": true,
-    "types": ["vite/client", "vitest/globals"]
-  },
-  "include": ["src", "vite.config.mjs"]
+  // Solution file: `tsc -b` (npm run typecheck) type-checks the app, the tests and the Vite config as
+  // three projects that share the options below. It compiles nothing itself.
+  "files": [],
+  "references": [
+    { "path": "tsconfig.app.json" },
+    { "path": "tsconfig.test.json" },
+    { "path": "tsconfig.node.json" }
+  ]
 }

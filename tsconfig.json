@@ -6,6 +6,8 @@
     { "path": "shared" },
     { "path": "shared/test" },
     { "path": "server" },
+    { "path": "client" },
     { "path": "scripts" }
   ]
 }
+
