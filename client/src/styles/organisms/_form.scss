@@ -16,30 +16,6 @@
   padding: 5rem;
   border-radius: 5px; }
 
-.form__upload {
-  width: 0.01rem;
-  height: 0.01rem;
-  opacity: 0;
-  overflow: hidden;
-  position: absolute;
-  z-index: -1; }
-
-.form__upload + label {
-    color: #55c57a;
-    display: inline-block;
-    text-decoration: none;
-    border-bottom: 0.1rem solid #55c57a;
-    padding: 0.3rem;
-    font-size: 2rem;
-    -webkit-transition: all 0.2s;
-    transition: all 0.2s;
-    cursor: pointer; }
-
-.form__user-photo {
-  height: 8rem;
-  width: 8rem;
-  margin-right: 2rem; }
-
 @media screen and (max-width: 767px) {
   .form--createPost {
     padding: 3rem;
@@ -48,15 +24,5 @@
     padding: 3rem; }
   .form--account {
     padding: 3rem; }
-.form__upload + label {
-    font-size: 1.6rem; }
-  .form__user-photo {
-    height: 6rem;
-    width: 6rem;
-    margin-right: 1.5rem; }
-  }
-
-@media screen and (max-width: 580px) {
-.form__upload + label {
-    font-size: 1.2rem; }
 }
+

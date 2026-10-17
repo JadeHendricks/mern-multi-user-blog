@@ -1,0 +1,44 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+// Photo preview, a visually hidden file input and the label that stands in for it. They sit in a
+// form-group--upload row. The photo is round through the avatar atom.
+.file-upload__input {
+  width: 0.01rem;
+  height: 0.01rem;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+.file-upload__label {
+  color: $color-green;
+  display: inline-block;
+  text-decoration: none;
+  border-bottom: 0.1rem solid $color-green;
+  padding: $space-3;
+  font-size: $font-20;
+  transition: all $duration-fast;
+  cursor: pointer;
+
+  @include respond-to('md') {
+    font-size: $font-16;
+  }
+
+  @include respond-to('sm') {
+    font-size: $font-12;
+  }
+}
+
+.file-upload__photo {
+  height: 8rem;
+  width: 8rem;
+  margin-right: $space-20;
+
+  @include respond-to('md') {
+    height: 6rem;
+    width: 6rem;
+    margin-right: $space-15;
+  }
+}

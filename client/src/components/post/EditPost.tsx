@@ -55,13 +55,13 @@ const PostEditForm = ({ id, post }: PostEditFormProps) => {
                 <textarea className="input input--textarea" onChange={ handleOnChange } value={ description } id="description" name="description" placeholder="Post goes here"></textarea>
             </div>
             <div className="form-group form-group--upload">
-                <img className="avatar form__user-photo" src={ uploadUrl('posts', image) } onError={ onImageError('posts') } alt={ title } title={ title } />
-                <input className="form__upload" type="file" accept="image/*" id="blogimage" name="blogimage" onChange={ e => {
+                <img className="avatar file-upload__photo" src={ uploadUrl('posts', image) } onError={ onImageError('posts') } alt={ title } title={ title } />
+                <input className="file-upload__input" type="file" accept="image/*" id="blogimage" name="blogimage" onChange={ e => {
                     const file = e.target.files?.[0];
                     setBlogImage(file);
                     setUploadName(e.target.value.slice(12));
                 } } />
-                <label htmlFor="blogimage">{ uploadName ? uploadName : 'Choose a blog post image' }</label>
+                <label className="file-upload__label" htmlFor="blogimage">{ uploadName ? uploadName : 'Choose a blog post image' }</label>
             </div>
             <div className="form-group">
                 <button className="button button--green form-group__submit">Update Post</button>

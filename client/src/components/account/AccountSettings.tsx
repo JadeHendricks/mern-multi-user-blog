@@ -49,13 +49,13 @@ const AccountSettings = ({ user, email }: AccountSettingsProps) => {
                         <input className="input" id="email" name="email" value={ email ?? '' } placeholder="yourname@example.com" disabled></input>
                     </div>
                     <div className="form-group form-group--upload">
-                        <img className="avatar form__user-photo" src={ uploadUrl('users', user.avatar) } onError={ onImageError('users') } alt={ user.name } title={ user.name } />
-                        <input className="form__upload" type="file" accept="image/*" id="avatar" name="avatar" onChange={ e => {
+                        <img className="avatar file-upload__photo" src={ uploadUrl('users', user.avatar) } onError={ onImageError('users') } alt={ user.name } title={ user.name } />
+                        <input className="file-upload__input" type="file" accept="image/*" id="avatar" name="avatar" onChange={ e => {
                             const file = e.target.files?.[0];
                             setAvatar(file);
                             setUploadName(e.target.value.slice(12));
                         } } />
-                        <label htmlFor="avatar">{ uploadName ? uploadName : 'Choose a new profile picture'}</label>
+                        <label className="file-upload__label" htmlFor="avatar">{ uploadName ? uploadName : 'Choose a new profile picture'}</label>
                     </div>
                     <div className="form-group">
                         <button type="submit" className="button button--green form-group__submit">Update Account</button>

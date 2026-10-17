@@ -59,6 +59,12 @@
   display: flex;
   align-items: center; }
 
+/* Temporary home of the size the author photo used to borrow from form__user-photo; C35 rebuilds it. */
+.post__user-avatar {
+  height: 8rem;
+  width: 8rem;
+  margin-right: 2rem; }
+
 .post__user-social {
   display: flex; }
 
@@ -120,6 +126,10 @@
       font-size: 1.8rem; } }
 
 @media screen and (max-width: 767px) {
+  .post__user-avatar {
+    height: 6rem;
+    width: 6rem;
+    margin-right: 1.5rem; }
   .post__banner .author-options .button {
     font-size: 1.2rem; }
   .post__banner .back-button {
