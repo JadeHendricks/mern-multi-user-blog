@@ -11,9 +11,6 @@ const legacy = {
     'selector-max-combinators',
     'selector-max-type',
   ],
-  'client/src/styles/molecules/_load-more.scss': [
-    'shorthand-property-no-redundant-values',
-  ],
   'client/src/styles/organisms/_account-nav.scss': [
     'color-hex-length',
     'media-feature-range-notation',
