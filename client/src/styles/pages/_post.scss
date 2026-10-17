@@ -1,0 +1,149 @@
+.post__banner {
+  height: 50rem;
+  position: relative;
+  background-image: linear-gradient(to right bottom, #7dd56f, #28b487); }
+
+.post__banner .author-options {
+    display: flex;
+    position: absolute;
+    top: 2rem;
+    left: 2rem; }
+
+.post__banner .author-options .button {
+  width: 20rem; }
+
+.post__banner .author-options .button:not(:last-child) {
+  margin-right: 1rem; }
+
+.post__banner--edit {
+    background-image: linear-gradient(to right bottom, #fcd983, #f7c74f); }
+
+.post__banner--account {
+  height: auto;
+  padding: 5rem 0; }
+
+.post__container {
+  max-width: 80rem;
+  margin: 0 auto;
+  position: relative;
+  top: -45rem; }
+
+.post__header {
+  margin: 3rem 0 1.5rem 0; }
+
+.post__top {
+  display: flex;
+  margin-bottom: 5rem; }
+
+.post__image-block {
+  flex: 0 0 20rem;
+  margin-right: 2.5rem; }
+
+.post__image-block img {
+    width: 100%;
+    height: 20rem;
+    object-fit: cover; }
+
+.post__title {
+  flex: 1;
+  color: #ffffff;
+  font-size: 5rem;
+  margin-bottom: 3rem; }
+
+.post__user {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; }
+
+.post__user-block {
+  display: flex;
+  align-items: center; }
+
+.post__user-social {
+  display: flex; }
+
+.post__user-social-icon {
+  fill: #ffffff;
+  width: 3rem;
+  height: 3rem;
+  cursor: pointer; }
+
+.post__user-social-icon:not(:last-child) {
+    margin-right: 1.5rem; }
+
+.post__user-icon {
+  width: 5rem;
+  height: 5rem;
+  margin-right: 1rem;
+  border-radius: 100%; }
+
+.post__user-name {
+  color: #ffffff;
+  font-size: 1.8rem;
+  font-weight: 700; }
+
+.post__body {
+  border-radius: 0.3rem;
+  overflow: hidden;
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  padding: 5rem 4rem; }
+
+.post__body h3 {
+    margin-bottom: 1rem;
+    color: #55c57a; }
+
+.post__body p {
+    font-size: 2rem; }
+
+.post__body p:not(:last-child) {
+  margin-bottom: 4rem; }
+
+@media screen and (max-width: 991px) {
+  .post__banner .author-options {
+    display: flex;
+    left: 0;
+    width: 100%; }
+  .post__banner .author-options .button {
+      width: 21%;
+      margin: 2%; }
+  .post__header {
+    margin: 3rem 0 1.5rem 0; }
+  .post__top {
+    display: flex;
+    margin-bottom: 4rem; }
+  .post__title {
+    font-size: 4rem; }
+  .post__body {
+    padding: 2.5rem 2rem; }
+  .post__body p {
+      font-size: 1.8rem; } }
+
+@media screen and (max-width: 767px) {
+  .post__banner .author-options .button {
+    font-size: 1.2rem; }
+  .post__banner .back-button {
+    position: absolute;
+    left: 5rem;
+    bottom: 5rem; }
+  .post__header {
+    margin: 3rem 0 1.5rem 0; }
+  .post__body {
+    padding: 2rem; }
+  .post__body p {
+      font-size: 1.6rem; } }
+
+@media screen and (max-width: 580px) {
+  .post__top {
+    display: block;
+    margin-bottom: 4rem; }
+  .post__image-block {
+    display: block;
+    margin: 0 auto;
+    width: 20rem;
+    height: 20rem;
+    object-fit: cover; }
+  .post__title {
+    margin-top: 2.5rem;
+    text-align: center;
+    font-size: 2.5rem; } }

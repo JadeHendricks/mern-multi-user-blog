@@ -1,0 +1,35 @@
+.comment-form {
+  padding-bottom: 2rem; }
+
+.comment {
+  margin: 4rem 0;
+  background-color: #ffffff;
+  padding: 4rem 2.5rem;
+  border-radius: 0.3rem;
+  overflow: hidden;
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.1); }
+
+.comment__header {
+    margin-bottom: 2.5rem; }
+
+.comment__title {
+    margin-bottom: 0.5rem; }
+
+.comment__auth {
+    color: #3f4bf9;
+    font-weight: 500;
+    text-decoration: none;
+    font-size: 1.8rem; }
+
+.comment .button {
+    display: block;
+    margin-left: auto; }
+
+.comment__total {
+    float: right;
+    font-size: 1.8rem; }
+
+@media screen and (max-width: 580px) {
+  .comment {
+    margin: 4rem 0;
+    padding: 2rem; } }

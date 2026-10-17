@@ -1,0 +1,107 @@
+.comment-post {
+  margin-top: 2.5rem;
+  padding-top: 2.5rem;
+  border-top: 0.2rem solid #f7f7f7;
+  display: flex;
+  position: relative; }
+
+.comment-post__icon {
+    flex: 0 0 8rem; }
+
+.comment-post__icon img {
+  width: 8rem;
+  height: 8rem;
+  object-fit: cover;
+  border-radius: 100%; }
+
+.comment-post__information {
+    flex: 1;
+    margin: 0 2rem; }
+
+.comment-post__user-name {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem; }
+
+.comment-post__user-name span {
+  margin-left: 1.5rem;
+  font-size: 1.2rem;
+  font-weight: 500; }
+
+.comment-post__user-comment {
+    font-size: 1.6rem; }
+
+.comment-post__interaction {
+    position: absolute;
+    top: 1rem;
+    right: 0;
+    font-size: 1rem; }
+
+.comment-post__interaction .button {
+  display: block;
+  background-color: transparent;
+  text-decoration: underline;
+  color: #cd2d2d;
+  font-size: 1.2rem;
+  padding: 1rem; }
+
+.comment-post__interaction .button:hover {
+  box-shadow: none;
+  border-radius: 0; }
+
+.comment-post__post-icon {
+    fill: #777777;
+    width: 2rem;
+    height: 2rem; }
+
+.comment-post__post-icon:not(:last-child) {
+  margin-right: 1rem; }
+
+.comment-post__count {
+    color: #777777;
+    font-size: 1.6rem;
+    margin-right: 0.5rem;
+    font-weight: 700; }
+
+@media screen and (max-width: 767px) {
+  .comment-post {
+    margin-top: 2rem;
+    padding-top: 2rem; }
+  .comment-post__icon {
+      flex: 0 0 6rem; }
+  .comment-post__icon img {
+        width: 6rem;
+        height: 6rem; }
+  .comment-post__information {
+      margin: 0 1.5rem; }
+  .comment-post__user-name {
+      font-size: 1.6rem; }
+  .comment-post__user-name span {
+        margin-left: 1rem;
+        font-size: 1.2rem; }
+  .comment-post__user-comment {
+      font-size: 1.4rem; }
+  .comment-post__count {
+      font-size: 1.4rem; } }
+
+@media screen and (max-width: 580px) {
+  .comment-post {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    display: block; }
+  .comment-post__icon {
+      flex: 0 0 6rem;
+      margin: 0 1.5rem 1.5rem 0.5rem; }
+  .comment-post__icon img {
+        width: 6rem;
+        height: 6rem; }
+  .comment-post__information {
+      margin: 0 1.5rem 0 0.5rem; }
+  .comment-post__user-name {
+      font-size: 1.6rem; }
+  .comment-post__user-name span {
+        margin-left: 1rem;
+        font-size: 1.2rem; }
+  .comment-post__user-comment {
+      font-size: 1.4rem; }
+  .comment-post__count {
+      font-size: 1.4rem; } }

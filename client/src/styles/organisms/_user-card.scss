@@ -1,0 +1,88 @@
+.card-user {
+  border-radius: 0.3rem;
+  overflow: hidden;
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  backface-visibility: hidden;
+  flex: 0 1 48%;
+  margin-top: 5rem; }
+
+.card-user__header {
+    display: flex;
+    align-items: center;
+    padding: 3rem 1.5rem; }
+
+.card-user__image {
+    margin-right: 1.5rem;
+    flex: 0 0 12rem; }
+
+.card-user__image img {
+  width: 12rem;
+  height: 12rem;
+  object-fit: cover;
+  border-radius: 100%;
+  cursor: pointer; }
+
+.card-user__userInfo {
+    flex: 1; }
+
+.card-user__title {
+    font-size: 2.8rem;
+    text-decoration: none;
+    color: #444444;
+    cursor: pointer;
+    font-weight: 700; }
+
+.card-user__date {
+    font-size: 1.8rem;
+    margin: 1rem 0 1.5rem 0; }
+
+.card-user__footer {
+    background-color: #f7f7f7;
+    border-top: 0.1rem solid #eaeaea;
+    cursor: pointer;
+    height: 6.5rem;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center; }
+
+.card-user__social-icon {
+    width: 5rem;
+    height: 5rem;
+    fill: #444444; }
+
+.card-user__social-icon:not(:last-child) {
+  margin-right: 1.5rem; }
+
+@media screen and (max-width: 991px) {
+  .card-user {
+    margin-top: 4rem; }
+  .card-user__header {
+      display: flex;
+      align-items: flex-start;
+      padding: 2rem 1rem; }
+  .card-user__image {
+      flex: 0 0 9rem; }
+  .card-user__image img {
+        width: 9rem;
+        height: 9rem; }
+  .card-user__title {
+      font-size: 1.8rem; }
+  .card-user__date {
+      font-size: 1.4rem;
+      margin: 0 0 1.5rem 0; }
+  .card-user__footer {
+      height: 5rem;
+      padding: 1rem; }
+  .card-user__social-icon {
+      width: 4rem;
+      height: 4rem; }
+  .card-user__social-icon:not(:last-child) {
+        margin-right: 0.5rem; } }
+
+@media screen and (max-width: 580px) {
+  .card-user {
+    flex: 0 1 100%;
+    margin-top: 3rem; }
+  __title {
+    font-size: 1.8rem; } }

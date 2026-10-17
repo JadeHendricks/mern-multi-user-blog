@@ -1,0 +1,34 @@
+.account-nav__ul {
+  list-style-type: none; }
+
+.account-nav__el {
+  border-bottom: 0.1rem solid #ffffff;
+  padding: 2rem 0; }
+
+.account-nav__el:last-child {
+    border: 0; }
+
+.account-nav__el button {
+    font-size: 1.8rem;
+    text-transform: uppercase;
+    border: 0;
+    background: transparent;
+    color: #ffffff; }
+
+@media screen and (max-width: 1200px) {
+  .account-nav__ul {
+    list-style-type: none; }
+  .account-nav__el {
+    padding: 1.5rem 0; }
+  .account-nav__el:last-child {
+      border: 0; }
+  .account-nav__el button {
+      font-size: 1.6rem;
+      text-transform: uppercase;
+      border: 0;
+      background: transparent;
+      color: #ffffff; } }
+
+@media screen and (max-width: 991px) {
+  .account-nav__ul {
+    list-style-type: none; } }

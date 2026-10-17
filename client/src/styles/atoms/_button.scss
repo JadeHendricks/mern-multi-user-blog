@@ -1,0 +1,43 @@
+.button {
+  font-size: 1.8rem;
+  padding: 1.4rem 3rem;
+  border-radius: 10rem;
+  text-transform: uppercase;
+  display: inline-block;
+  text-decoration: none;
+  position: relative;
+  transition: all 0.4s;
+  font-weight: 400;
+  border: none;
+  text-align: center;
+  cursor: pointer; }
+
+.button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15); }
+
+.button--green {
+    background-color: #55c57a;
+    color: #ffffff; }
+
+.button--white {
+    background-color: #ffffff;
+    color: #444444; }
+
+.button--yellow {
+    background-color: #fcd983;
+    color: #444444; }
+
+.button--red {
+    background-color: #cd2d2d;
+    color: #ffffff; }
+
+@media screen and (max-width: 991px) {
+  .button {
+    font-size: 1.6rem;
+    padding: 1rem 1.5rem; } }
+
+@media screen and (max-width: 580px) {
+  .button {
+    font-size: 1.2rem;
+    padding: 1rem 1.2rem; } }
