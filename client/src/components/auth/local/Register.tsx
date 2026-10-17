@@ -1,20 +1,21 @@
-import React, { useState, useContext } from 'react';
+import { useState } from 'react';
+import type { ChangeEvent, SubmitEvent } from 'react';
 import { Link, Navigate } from 'react-router';
-import AuthContext from '../../../context/authContext/AuthContext';
+import { useAuth } from '../../../context/authContext/AuthContext';
 
 const Register = () => {
 
-    const { register, isAuthenticated, loggedInUser } = useContext(AuthContext);
+    const { register, isAuthenticated, loggedInUser } = useAuth();
 
     const [values, setValues] = useState({ name: '', email: '', password: ''});
     const { name, email, password } = values;
 
-    const handleOnChange = e => setValues({ ...values, [e.target.name]: e.target.value });
+    const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => { setValues({ ...values, [e.target.name]: e.target.value }); };
 
-    const handleOnSubmit = async (e) => {
+    const handleOnSubmit = (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        register(name, email, password);
+        void register(name, email, password);
     }
 
     if (isAuthenticated && loggedInUser) {

@@ -1,16 +1,17 @@
-import React, { useState, useContext } from 'react';
-import AuthContext from '../../../context/authContext/AuthContext';
+import { useState } from 'react';
+import type { ChangeEvent, SubmitEvent } from 'react';
+import { useAuth } from '../../../context/authContext/AuthContext';
 
 const ForgotPassword = () => {
-    const { forgotPassword } = useContext(AuthContext);
+    const { forgotPassword } = useAuth();
     const [values, setValues] = useState({ email: '' });
     const { email } = values;
 
-    const handleOnChange = e => setValues({ ...values, [e.target.name]: e.target.value });
+    const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => { setValues({ ...values, [e.target.name]: e.target.value }); };
 
-    const handleOnSubmit = async (e) => {
+    const handleOnSubmit = (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
-        forgotPassword(email);
+        void forgotPassword(email);
     }
     
     return (

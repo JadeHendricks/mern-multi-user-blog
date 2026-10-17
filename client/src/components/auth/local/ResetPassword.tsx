@@ -1,21 +1,23 @@
-import React, { useState, useContext } from 'react';
+import { useState } from 'react';
+import type { ChangeEvent, SubmitEvent } from 'react';
 import { useParams } from 'react-router';
-import AuthContext from '../../../context/authContext/AuthContext';
+import { useAuth } from '../../../context/authContext/AuthContext';
 
 const ResetPassword = () => {
-    const { resetPassword } = useContext(AuthContext);
+    const { resetPassword } = useAuth();
     const [values, setValues] = useState({ name: '', newPassword: ''});
     const { newPassword } = values;
 
     // The token comes straight from the URL, so derive it while rendering instead of copying it
     // into state in an effect.
-    const { token } = useParams();
+    // The route always has :token; the empty default only satisfies the types (the API sees a missing link as empty too).
+    const { token = '' } = useParams();
 
-    const handleOnChange = e => setValues({ ...values, [e.target.name]: e.target.value });
+    const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => { setValues({ ...values, [e.target.name]: e.target.value }); };
 
-    const handleOnSubmit = async (e) => {
+    const handleOnSubmit = (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
-        resetPassword(newPassword, token);
+        void resetPassword(newPassword, token);
     }
 
     return (
