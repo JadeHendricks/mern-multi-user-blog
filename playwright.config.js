@@ -63,6 +63,8 @@ module.exports = defineConfig({
     {
       // Vite dev server on the fixed port 3000 (strictPort in client/vite.config.mjs).
       command: 'npm run dev -w client',
+      // The query devtools button would sit on top of every screenshot.
+      env: { VITE_QUERY_DEVTOOLS: 'false' },
       url: 'http://localhost:3000',
       reuseExistingServer: false,
       timeout: 300000,
