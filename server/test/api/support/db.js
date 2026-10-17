@@ -30,4 +30,7 @@ export async function disconnectDb() {
   await mongoose.disconnect();
 }
 
+// Random valid id, so tests need no driver-specific id class.
+export const newId = () => new mongoose.Types.ObjectId().toString();
+
 export { mongoose };
