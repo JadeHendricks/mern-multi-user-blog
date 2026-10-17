@@ -203,9 +203,9 @@ npm run check
   Settings, pagination parameters and import files use `zod` too.
 - **Storage:** JSON files by default so the project runs anywhere with no setup; Mongo sits behind the
   same interface for when you want it.
-- **Known dependency warning:** `npm audit` reports 3 high findings, all in client dependencies that
-  are pinned on purpose (`axios`, `follow-redirects`, `moment`). `npm audit -w server` is clean.
-  Upgrading them is a separate change.
+- **Known dependency warning:** `npm audit` reports 1 high finding, in the client dependency `moment`,
+  which is pinned on purpose until the dates move to `Intl`. `npm audit -w server` is clean. The client's
+  old `axios` and `follow-redirects` are gone: requests go through `fetch` in `client/src/lib/api.js`.
 - **Client build:** Vite replaced create-react-app 3.4. Measured sizes and audit counts:
 
 | | Before (CRA 3.4) | After (Vite 8) |

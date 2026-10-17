@@ -18,8 +18,6 @@ import AllUsers from './components/layouts/AllUsers';
 import MostPopularPosts from './components/layouts/MostPopularPosts';
 import { queryClient } from './lib/queryClient';
 import AuthState from "./context/authContext/AuthState";
-import PostState from "./context/postContext/PostState";
-import UserState from "./context/userContext/UserState";
 
 // Dev only: import.meta.env.DEV is false in a production build, so the devtools chunk is never
 // bundled. VITE_QUERY_DEVTOOLS=false hides it in dev too (Playwright does, so the floating button
@@ -33,8 +31,6 @@ function App () {
     <QueryClientProvider client={ queryClient }>
     <BrowserRouter>
       <AuthState>
-      <PostState>
-      <UserState>
         <Routes>
           <Route element={ <AppShell /> }>
             <Route path='/' element={ <Base /> } />
@@ -55,8 +51,6 @@ function App () {
             <Route path='*' element={ null } />
           </Route>
         </Routes>
-      </UserState>
-      </PostState>
       </AuthState>
     </BrowserRouter>
     { ReactQueryDevtools && (
