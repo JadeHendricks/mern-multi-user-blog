@@ -85,7 +85,8 @@ const toLikeView = (like) => ({ _id: like._id, user: like.user });
 // mode 'list': author populated with _id, name, avatar.
 // mode 'detail': the same plus socials when set.
 export function toPostView(record, byId, mode = 'list') {
-  let user = record.user;
+  // A post imported without an author has no `user`; say null (as find and list do), not a missing key.
+  let user = record.user ?? null;
   if (mode !== 'id') {
     const author = byId.get(record.user);
     if (!author) {

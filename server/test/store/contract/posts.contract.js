@@ -91,6 +91,18 @@ export function runPostContract(label, makeStore) {
       expect((await store.posts.findById(post._id)).user).toBeNull();
     });
 
+    it('answers a null author, not a missing key, for an imported post without an author', async () => {
+      // An export can carry a post with no `user`; update returns the author as an id, so it must
+      // say null here just like find and list do.
+      await store.posts.insertMany([postInput(undefined, { title: 'Orphan' })]);
+      const [orphan] = (await store.posts.list()).items;
+
+      const updated = await store.posts.update(orphan._id, { title: 'Orphan, edited' });
+
+      expect(updated.user).toBeNull();
+      expect(orphan.user).toBeNull();
+    });
+
     it('lists newest first and pages through ties on identical dates', async () => {
       const sameDate = new Date('2025-12-01T09:00:00.000Z');
       for (let n = 1; n <= 4; n += 1) {
