@@ -45,14 +45,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JadeHendricks/mern-starterkit.git"
+    "url": "git+https://github.com/JadeHendricks/mern-multi-user-blog.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/JadeHendricks/mern-starterkit/issues"
+    "url": "https://github.com/JadeHendricks/mern-multi-user-blog/issues"
   },
-  "homepage": "https://github.com/JadeHendricks/mern-starterkit#readme",
+  "homepage": "https://github.com/JadeHendricks/mern-multi-user-blog#readme",
   "overrides": {
     "eslint-plugin-react": {
       "eslint": "$eslint"

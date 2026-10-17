@@ -29,9 +29,7 @@ const PostForm = () => {
                     <div>
                         <h1 className="create-post__title">Create a blog post!</h1>
                         <p className="create-post__description">
-                            Lorem ipsum dolor sit, amet consectetur adipisicing elit. 
-                            Modi cupiditate minus adipisci aliquid dolor deleniti excepturi, 
-                            nemo quisquam ea eos saepe quidem ipsum assumenda omnis.
+                            Share a story, a trip or something funny. Give it a title, pick a tag and add a photo if you have one.
                         </p>
                     </div>
                     <form className="form form--post" onSubmit={ handleSubmit }>

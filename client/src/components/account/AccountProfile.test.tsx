@@ -9,6 +9,7 @@ import { queryKeys } from '../../lib/queryKeys';
 import { mockApi, asFormData } from '../../testing/mockApi';
 import type { MockHandler } from '../../testing/mockApi';
 import { testAuth } from '../../testing/testAuth';
+import { formatDate } from '../../lib/formatDate';
 import { expectEveryFieldLabelled } from '../../testing/dom';
 
 const ann = { _id: 'u1', name: 'Ann', avatar: 'a.png', socials: { facebook: 'https://fb.test/ann' } };
@@ -85,6 +86,23 @@ describe('AccountProfile data', () => {
     render(tree());
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('User not found!'));
     expect(document.querySelector('.user-header__info-name')).toBeEmptyDOMElement();
+  });
+});
+
+describe('AccountProfile header', () => {
+  it('shows the member-since date instead of placeholder text', async () => {
+    const createdAt = '2021-03-04T10:00:00.000Z';
+    mockApi({ ...baseRoutes(), 'GET /api/user/u1': { body: { user: { ...ann, createdAt } } } });
+    render(tree());
+    expect(await screen.findByText(`Member since ${formatDate(createdAt)}`)).toBeInTheDocument();
+    expect(screen.queryByText(/lorem ipsum/i)).toBeNull();
+  });
+
+  it('names the profile picture and the social links', async () => {
+    mockApi(baseRoutes());
+    render(tree());
+    expect(await screen.findByRole('img', { name: "Ann's avatar" })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Facebook profile' })).toHaveAttribute('href', 'https://fb.test/ann');
   });
 });
 

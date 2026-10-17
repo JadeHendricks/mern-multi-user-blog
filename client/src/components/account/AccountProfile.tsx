@@ -10,6 +10,7 @@ import { useAuth } from '../../context/authContext/AuthContext';
 import ContentLoader from '../layouts/ContentLoader';
 import { isHttpsUrl } from '../../utils/safeUrl';
 import { avatarAlt } from '../../utils/a11y';
+import { formatDate } from '../../lib/formatDate';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
 import { useUserPosts } from '../../hooks/useUserPosts';
 import { useUser } from '../../hooks/useUser';
@@ -43,8 +44,7 @@ const Profile = () => {
                                     <div className="user-header__info">
                                         <h3 className="user-header__info-name">{ user.name }</h3>
                                         <p className="user-header__info-description">
-                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-                                            Corporis iusto quasi, quidem molestias aperiam in earum deleniti amet incidunt possimus.
+                                            { user.createdAt ? `Member since ${formatDate(user.createdAt)}` : null }
                                         </p>
                                         <div className="user-header__socials">    
                                             { user.socials && (

@@ -85,9 +85,7 @@ const PostForm = () => {
                     <div>
                         <h1 className="create-post__title">Edit your blog post!</h1>
                         <p className="create-post__description">
-                            Lorem ipsum dolor sit, amet consectetur adipisicing elit. 
-                            Modi cupiditate minus adipisci aliquid dolor deleniti excepturi, 
-                            nemo quisquam ea eos saepe quidem ipsum assumenda omnis.
+                            Change the title, tag, text or photo, then save to update your post.
                         </p>
                     </div>
                     <PostEditForm key={ `${id}:${post ? 'loaded' : 'loading'}` } id={ id } post={ post } />
