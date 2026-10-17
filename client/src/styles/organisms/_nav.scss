@@ -150,4 +150,11 @@
   &__el--create:hover {
     box-shadow: $shadow-sm;
   }
+
+  // Log out is a button, not a link. Remove the browser's button background and padding so it
+  // renders exactly like the nav links around it (colour, size and border come from nav__el).
+  &__el--button {
+    background-color: transparent;
+    padding: 0;
+  }
 }

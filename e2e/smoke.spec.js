@@ -31,10 +31,10 @@ test('login and logout through the UI', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'Create Post' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Log in' })).toHaveCount(0);
 
-  await page.getByRole('link', { name: 'Log out' }).click();
+  await page.getByRole('button', { name: 'Log out' }).click();
   await page.waitForURL('**/login');
   await expect(page.getByRole('link', { name: 'Log in' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Log out' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Log out' })).toHaveCount(0);
 });
 
 // B15/B14: PrivateRoute waits for the session check, then redirects; public pages are never redirected.
