@@ -33,7 +33,7 @@ const PostEditForm = ({ id, post }: PostEditFormProps) => {
         <form className="form form--createPost" onSubmit={ handleSubmit }>
             <div className="form__group">
                 <label className="form__label" htmlFor="title">Post Title</label>
-                <input className="form__input" id="title" onChange={ handleOnChange } value={ title } name="title" type="text" placeholder="Title goes here" />
+                <input className="input" id="title" onChange={ handleOnChange } value={ title } name="title" type="text" placeholder="Title goes here" />
             </div>
             <div className="form__group">
                 <label className="form__label" htmlFor="tag">Post Tag</label>
@@ -52,7 +52,7 @@ const PostEditForm = ({ id, post }: PostEditFormProps) => {
             </div>
             <div className="form__group">
                 <label className="form__label" htmlFor="description">Post Body</label>
-                <textarea className="form__input form__textarea" onChange={ handleOnChange } value={ description } id="description" name="description" placeholder="Post goes here"></textarea>
+                <textarea className="input input--textarea" onChange={ handleOnChange } value={ description } id="description" name="description" placeholder="Post goes here"></textarea>
             </div>
             <div className="form__group form__photo-upload">
                 <img className="form__user-photo" src={ uploadUrl('posts', image) } onError={ onImageError('posts') } alt={ title } title={ title } />

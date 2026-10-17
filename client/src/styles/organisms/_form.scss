@@ -33,29 +33,6 @@
   margin-bottom: 1rem;
   color: #777777; }
 
-.form__textarea, .form__input {
-  display: block;
-  font-family: inherit;
-  font-size: 1.6rem;
-  color: inherit;
-  padding: 1.25rem 1.75rem;
-  border: none;
-  width: 100%;
-  background-color: #f2f2f2;
-  border-top: 3px solid transparent;
-  border-bottom: 3px solid transparent;
-  -webkit-transition: all 0.3s;
-  transition: all 0.3s;
-  border-radius: 4px;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  outline: none;
-  color: #444444; }
-
-.form__textarea {
-  min-height: 15rem;
-  background-color: #eaeaea; }
-
 .form__radio {
   margin-bottom: 1.5rem; }
 
