@@ -92,62 +92,54 @@ export const createAuthController = ({ store }) => {
     //Signup - email work flow
     const register = async (req, res) => {
         const { name, email, password } = req.body;
-        try {
-            // The same 200 is returned for new, pending and active emails so the endpoint
-            // cannot be used to find out who has an account.
-            const existing = await store.users.findByEmail(email);
-            let emailData;
+        // The same 200 is returned for new, pending and active emails so the endpoint
+        // cannot be used to find out who has an account.
+        const existing = await store.users.findByEmail(email);
+        let emailData;
 
-            if (existing && existing.status === 'active') {
-                emailData = {
-                    from: config.EMAIL_FROM,
-                    to: email,
-                    subject: `You already have an account`,
-                    html: `
-                    <h1>You already have an account</h1>
-                    <p>Someone tried to sign up with this email address. If it was you, log in or reset your password.</p>
-                    <p>${config.CLIENT_URL}/auth/login</p>
-                    `
-                }
+        if (existing && existing.status === 'active') {
+            emailData = {
+                from: config.EMAIL_FROM,
+                to: email,
+                subject: `You already have an account`,
+                html: `
+                <h1>You already have an account</h1>
+                <p>Someone tried to sign up with this email address. If it was you, log in or reset your password.</p>
+                <p>${config.CLIENT_URL}/auth/login</p>
+                `
+            }
+        } else {
+            const { raw, hash } = newToken();
+            const signup = {
+                name,
+                passwordHash: await hashPassword(password),
+                activationHash: hash,
+                activationExpires: new Date(Date.now() + ACTIVATION_TTL_MS)
+            };
+            if (existing) {
+                await store.users.refreshPending(existing._id, signup);
             } else {
-                const { raw, hash } = newToken();
-                const signup = {
-                    name,
-                    passwordHash: await hashPassword(password),
-                    activationHash: hash,
-                    activationExpires: new Date(Date.now() + ACTIVATION_TTL_MS)
-                };
-                if (existing) {
-                    await store.users.refreshPending(existing._id, signup);
-                } else {
-                    await store.users.createPending({ ...signup, email });
-                }
-
-                emailData = {
-                    from: config.EMAIL_FROM,
-                    to: email,
-                    subject: `Account activation link`,
-                    html: `
-                    <h1>Please use the following link to activate your account</h1>
-                    <p>${config.CLIENT_URL}/auth/activate/${raw}</p>
-                    <hr/>
-                    <p>This email may contain sensitive information</p>
-                    <p>${config.CLIENT_URL}</p>
-                    `
-                }
+                await store.users.createPending({ ...signup, email });
             }
 
-            await sendMail(emailData);
-            res.status(200).json({
-                message: registerMessage(email)
-            });
-
-        } catch (err) {
-            console.error(err);
-            res.status(500).json({
-                message: err.message
-            });
+            emailData = {
+                from: config.EMAIL_FROM,
+                to: email,
+                subject: `Account activation link`,
+                html: `
+                <h1>Please use the following link to activate your account</h1>
+                <p>${config.CLIENT_URL}/auth/activate/${raw}</p>
+                <hr/>
+                <p>This email may contain sensitive information</p>
+                <p>${config.CLIENT_URL}</p>
+                `
+            }
         }
+
+        await sendMail(emailData);
+        res.status(200).json({
+            message: registerMessage(email)
+        });
     }
 
     const accountActivation = async (req, res) => {
@@ -158,32 +150,24 @@ export const createAuthController = ({ store }) => {
             });
         }
 
-        try {
-            const user = await store.users.findByActivationHash(hashToken(token));
-            if (!user || (user.status !== 'active' && !(user.activationExpires > new Date()))) {
-                return res.status(401).json({
-                    message: 'Expired Link. Signup again'
-                });
-            }
-            // The hash is kept after activation on purpose: a second use of the link is a 409, not "expired".
-            if (user.status === 'active') {
-                return res.status(409).json({
-                    message: 'Account is already activated'
-                });
-            }
-
-            await store.users.activate(user._id);
-
-            res.status(201).json({
-                message: 'Activation successful. Please login.'
-            });
-
-        } catch (err) {
-            console.error(err);
-            res.status(500).json({
-                message: err.message
+        const user = await store.users.findByActivationHash(hashToken(token));
+        if (!user || (user.status !== 'active' && !(user.activationExpires > new Date()))) {
+            return res.status(401).json({
+                message: 'Expired Link. Signup again'
             });
         }
+        // The hash is kept after activation on purpose: a second use of the link is a 409, not "expired".
+        if (user.status === 'active') {
+            return res.status(409).json({
+                message: 'Account is already activated'
+            });
+        }
+
+        await store.users.activate(user._id);
+
+        res.status(201).json({
+            message: 'Activation successful. Please login.'
+        });
     }
 
     // Lets the activation page greet the user by name without decoding anything client side.
@@ -197,35 +181,27 @@ export const createAuthController = ({ store }) => {
 
     const login = async (req, res) => {
         const { email, password } = req.body;
-        try {
-            const user = await store.users.findByEmail(email, { secrets: true });
+        const user = await store.users.findByEmail(email, { secrets: true });
 
-            if (!user || user.status !== 'active' || !(await verifyPassword(password, user.passwordHash))) {
-                return res.status(401).json({
-                    message: 'Incorrect email or password'
-                });
-            }
-
-            const token = jwt.sign({ _id: user._id }, config.JWT_SECRET, {
-                expiresIn: sessionDays() * 24 * 60 * 60
-            });
-
-            res.cookie('authtoken', token, {
-                ...baseCookieOptions(),
-                expires: new Date(Date.now() + sessionDays() * 24 * 60 * 60 * 1000)
-            });
-
-            // The token only travels in the httpOnly cookie, never in the body.
-            res.status(200).json({
-                user: await store.users.findById(user._id)
-            });
-
-        } catch (err) {
-            console.error(err);
-            res.status(500).json({
-                message: err.message
+        if (!user || user.status !== 'active' || !(await verifyPassword(password, user.passwordHash))) {
+            return res.status(401).json({
+                message: 'Incorrect email or password'
             });
         }
+
+        const token = jwt.sign({ _id: user._id }, config.JWT_SECRET, {
+            expiresIn: sessionDays() * 24 * 60 * 60
+        });
+
+        res.cookie('authtoken', token, {
+            ...baseCookieOptions(),
+            expires: new Date(Date.now() + sessionDays() * 24 * 60 * 60 * 1000)
+        });
+
+        // The token only travels in the httpOnly cookie, never in the body.
+        res.status(200).json({
+            user: await store.users.findById(user._id)
+        });
     }
 
     const isLoggedIn = async (req, res) => {
@@ -274,67 +250,53 @@ export const createAuthController = ({ store }) => {
     }
 
     const forgotPassword = async (req, res) => {
-        try {
-            const { email } = req.body;
-            const user = await store.users.findByEmail(email);
+        const { email } = req.body;
+        const user = await store.users.findByEmail(email);
 
-            // Unknown and pending emails get the same 200 so the endpoint cannot be used to find accounts.
-            if (user && user.status === 'active') {
-                const { raw, hash } = newToken();
+        // Unknown and pending emails get the same 200 so the endpoint cannot be used to find accounts.
+        if (user && user.status === 'active') {
+            const { raw, hash } = newToken();
 
-                const emailData = {
-                    from: config.EMAIL_FROM,
-                    to: email,
-                    subject: `Password Reset link`,
-                    html: `
-                    <h1>Please user the following link to reset your password</h1>
-                    <p>${config.CLIENT_URL}/auth/password/reset/${raw}</p>
-                    <hr/>
-                    <p>This email may contain sensitive information</p>
-                    <p>${config.CLIENT_URL}</p>
-                    `
-                }
-
-                await store.users.setResetToken(user._id, hash, new Date(Date.now() + RESET_TTL_MS));
-
-                await sendMail(emailData);
+            const emailData = {
+                from: config.EMAIL_FROM,
+                to: email,
+                subject: `Password Reset link`,
+                html: `
+                <h1>Please user the following link to reset your password</h1>
+                <p>${config.CLIENT_URL}/auth/password/reset/${raw}</p>
+                <hr/>
+                <p>This email may contain sensitive information</p>
+                <p>${config.CLIENT_URL}</p>
+                `
             }
 
-            res.status(200).json({
-                message: forgotMessage(email)
-            });
-        } catch (err) {
-            console.error(err);
-            res.status(500).json({
-                message: err.message
-            });
+            await store.users.setResetToken(user._id, hash, new Date(Date.now() + RESET_TTL_MS));
+
+            await sendMail(emailData);
         }
+
+        res.status(200).json({
+            message: forgotMessage(email)
+        });
     }
 
     const resetPassword = async (req, res) => {
         const { resetPasswordLink, newPassword } = req.body;
 
-        try {
-            const user = await store.users.findByResetHash(hashToken(resetPasswordLink));
-            if (!user) {
-                return res.status(400).json({
-                    message: 'Invalid or expired reset link'
-                });
-            }
-
-            // consumeReset clears the hash (single-use link) and sets passwordChangedAt,
-            // which invalidates sessions issued before the reset.
-            await store.users.consumeReset(user._id, await hashPassword(newPassword));
-
-            res.status(200).json({
-                message: 'Password has been updated, Login!'
-            });
-        } catch (err) {
-            console.error(err);
-            res.status(500).json({
-                message: err.message
+        const user = await store.users.findByResetHash(hashToken(resetPasswordLink));
+        if (!user) {
+            return res.status(400).json({
+                message: 'Invalid or expired reset link'
             });
         }
+
+        // consumeReset clears the hash (single-use link) and sets passwordChangedAt,
+        // which invalidates sessions issued before the reset.
+        await store.users.consumeReset(user._id, await hashPassword(newPassword));
+
+        res.status(200).json({
+            message: 'Password has been updated, Login!'
+        });
     }
 
     return {

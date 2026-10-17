@@ -188,7 +188,7 @@ describe('editPost with an unknown post id', () => {
     );
 
     expect(result.status).toBe(404);
-    // The handler used to send 200 after the 404 and kill the process; asyncHandler now contains it.
+    // The handler used to send 200 after the 404 and kill the process; Express 5 now contains it.
     expect(child.exitCode).toBeNull();
   });
 });
