@@ -1,9 +1,7 @@
 # Legacy code is reformatted in later phases, not now.
 server/src/modules/
-server/src/models/
 server/src/server.js
 server/src/app.js
-server/src/db.js
 client/
 node_modules/
 package-lock.json
