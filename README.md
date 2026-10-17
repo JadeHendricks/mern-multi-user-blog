@@ -134,11 +134,10 @@ Run from the repo root.
 | `npm run test:api` | Vitest + supertest on the JSON store, plus the store contract tests on both stores and the shared package tests. |
 | `npm run test:api:mongo` | The same API tests on the Mongo store (in-memory MongoDB). |
 | `npm run test:client` | Client unit tests (Vitest + jsdom + Testing Library). |
-| `npm run test:e2e` | Playwright: screenshots, smoke flows, axe report and the `prod-smoke` project (the built client served by Express). Builds `shared/`, `server/` and the client first (`pretest:e2e`), after checking that ports 3000, 5000 and 5001 are free. |
-| `npm run test:e2e:update` | Re-record screenshot baselines (only for intended visual changes). |
-| `npm run e2e:install` | Download the Chromium build Playwright uses. |
+| `npm run test:e2e` | Playwright behaviour smoke suite (no screenshots, no axe): `smoke.spec.js` on the dev server and the `prod-smoke` project (the built client served by Express). Builds `shared/`, `server/` and the client first (`pretest:e2e`), after checking that ports 3000, 5000 and 5001 are free. Not part of `check`. |
+| `npm run e2e:install` | Download the Chromium build Playwright uses (once, before `test:e2e`). |
 | `npm run serve:memory` | Compiled API on :5000 with seeded throwaway data, to click around by hand. |
-| `npm run check` | lint + typecheck + `test:api` + `test:api:mongo` + `test:client` + `test:e2e`. Run before a commit. |
+| `npm run check` | lint + typecheck + `test:api` + `test:api:mongo` + `test:client`. It does not run E2E. Run before a commit. |
 
 Scripts inside `server/` (`npm run <name> -w server`) add the compiled variants `seed:dist`,
 `db:export:dist` and `db:import:dist`, which run `node dist/scripts/<name>.js` instead of `tsx`.
@@ -187,12 +186,12 @@ None of the tests need real config, a real database server or a network service.
 goes to a temp folder. Details are in `server/test/README.md` and `e2e/README.md`.
 
 ```bash
-npm run e2e:install    # once
-npm run check
+npm run check          # lint, typecheck, API tests (JSON and Mongo) and client tests; no E2E
+npm run e2e:install    # once, to download Chromium
+npm run test:e2e       # the smoke suite, when you want it
 ```
-
-- Screenshot baselines live in `e2e/__screenshots__` and are compared with zero tolerance. They were
-  rendered on Windows and need regenerating when CI moves to Linux.
+- `npm run check` does not run E2E. `npm run test:e2e` is a small behaviour smoke suite (home, login and
+  logout, route guards, social links, images, the production bundle). There are no screenshot tests.
 - `prod-smoke` (`e2e/prod-smoke.spec.js`) runs against `client/dist` served by a second API instance on port
   5001, so the production bundle is checked without the Vite dev server. Run only it with
   `npm run pretest:e2e` then `npx playwright test --project=prod-smoke`.
@@ -237,7 +236,7 @@ React 19 with React Router 8 and TanStack Query 5 (TypeScript, Vite). Source is 
 - **Router version:** React Router 8.4 (needs React >= 19.2.7). The move went 5 to 7 on React 18, then React 19,
   then router 8, because router 5 uses legacy context that React 19 removed. Imports come from `react-router`.
 - **Devtools:** in `npm run dev` the TanStack Query devtools button sits in the bottom corner. It is not part
-  of the production build. Set `VITE_QUERY_DEVTOOLS=false` to hide it (Playwright does, for screenshots).
+  of the production build. Set `VITE_QUERY_DEVTOOLS=false` to hide it (Playwright does, so it stays out of the way).
 
 ## Client data layer
 
@@ -271,6 +270,9 @@ Sass partials in `client/src/styles`, one entry (`main.scss`, imported once from
 - **Tokens:** `settings/_tokens.scss` holds Sass variables (colours, spacing, radii, shadows, gradients, font sizes and weights, durations) and emits them as CSS custom properties on `:root`. Use a token instead of a literal.
 - **Breakpoints:** all max-width: `xxl` 1400, `xl` 1200, `lg` 991, `md` 767, `sm-wide` 590, `sm` 580, `xs` 500 px (590 and 580 are different on purpose). Write `@include respond-to('lg') { ... }` inside the block, widest first so the narrower query wins.
 - **Add a component's styles:** pick the level, create `_name.scss` in that folder, `@use '../tools/mixins'` and `'../settings/tokens'` as needed, write `.name`, `.name__el` and `.name--mod` with one class each, add `@use 'level/name';` to `main.scss` in the right place, then put the classes in the component.
+- **Accessibility mixins and tokens:** `focus-ring` (a 2px outline, applied through `:focus-visible` in `generic/_base.scss` to links, buttons, inputs and textareas, with a light variant in the dark header), `visually-hidden` (text for screen readers only) and `reduced-motion` (wraps styles in `prefers-reduced-motion: reduce`; the loader uses it). The ring colours are the tokens `focus` and `focus-inverse`.
+- **Contrast:** `client/src/styles/contrast.test.ts` compiles the tokens and asserts the WCAG ratios of the colour pairs the app uses, so a token edit that breaks contrast fails `npm run test:client`.
+- **Fonts:** Lato is self-hosted with `@fontsource/lato` (only the 300, 300 italic and 700 faces, the same as the old Google Fonts link), so the CSP allows no third-party font or style hosts.
 - **Check:** `npm run lint:styles` (also part of `npm run lint` and `npm run check`).
 
 ## Tooling notes
@@ -316,13 +318,43 @@ server/           Express 5 API (TypeScript, ESM)
 client/           React 19 app (Vite, TypeScript)
 shared/           @mern-blog/shared: zod schemas, DTO types, constants
   dist/             compiled package the server and client load (generated, gitignored)
-e2e/              Playwright specs (CommonJS JavaScript), support and screenshot baselines
+e2e/              Playwright smoke specs (CommonJS JavaScript) and support files
+.github/workflows/ci.yml   light CI: build, lint, typecheck and unit/API tests
 scripts/          setup.mts
 tsconfig.base.json shared compiler options
 tsconfig.json     solution file for `npm run typecheck`
 ```
 
+## Accessibility
+
+- **Keyboard and focus:** every interactive element shows a visible focus ring for keyboard users
+  (`:focus-visible`, at least 3:1 against the page). The like heart is a real button with `aria-pressed`
+  (its label is "Like <post title>" in both states); Log out is a button; the hidden radio and file inputs
+  draw their ring on the visible label.
+- **Forms:** every input, textarea and radio group has a label (the comment box has a visually hidden one,
+  the post tag radios are a `radiogroup` named "Post Tag"). Tests assert it for the main forms.
+- **Images:** post images use the post title as alt text; avatars beside a visible name have empty alt; an
+  avatar on its own reads "<name>'s avatar"; icon-only social links have an `aria-label`.
+- **Contrast:** text and UI colours meet WCAG AA (4.5:1 for text, 3:1 for large text and UI parts), locked in
+  by `contrast.test.ts`. Known exception: white headings and names on the green banner gradients
+  (1.8 to 2.6:1). They are large display text, and fixing them would darken every banner.
+- **Motion:** the loader animation stops under `prefers-reduced-motion`.
+- **Not covered:** an axe-core pass over the main routes reports no serious or critical violations, but
+  automated checks find only part of the problems and do not prove WCAG compliance. A manual keyboard and
+  screen-reader pass is still recommended. Remaining moderate findings: two unlabelled `nav` landmarks, a
+  nested `main` on the account page, heading levels that skip, and no `h1` on some pages.
+
+## CI
+
+`.github/workflows/ci.yml` runs on pushes to `master` and on pull requests: `npm ci`, `npm run build`,
+`npm run lint`, `npm run typecheck`, `npm run test:api`, `npm run test:api:mongo` and
+`npm run test:client` on Node 24 (read from `.nvmrc`). It has no secrets and does not deploy. Playwright is
+deliberately not in CI; run the smoke suite locally with `npm run e2e:install` once, then `npm run test:e2e`.
+Dependency updates are manual (`npm outdated`); Dependabot and Renovate are not set up.
+
 ## Roadmap
 
-Phases 4 to 9 (client modernisation, state, styling, accessibility, performance and deployment) are
-planned separately and are not part of this setup.
+Phases 0 to 9 are done: safety net, security fixes, ESM and Express 5, file storage, TypeScript on the
+server, Vite, React 19 with Router and Query, the BEM and atomic styles, and accessibility with CI. Deferred:
+the moderate axe findings above, a manual screen-reader pass, and the create-post form's always-checked
+"general" radio (kept as it was).
