@@ -29,6 +29,11 @@ $color-grey-light: #b7b7b7;
 $color-border: #eaeaea;
 $color-surface: #f2f2f2;
 $color-background: #f7f7f7;
+
+// Keyboard focus ring. The old ring colour (green) was only 2.18:1 on white; these reach 3:1 on every
+// background the app uses (see contrast.test.ts).
+$color-focus: #444;
+$color-focus-inverse: #f7f7f7;
 $color-shadow-sm: rgb(0 0 0 / 15%);
 $color-shadow-md: rgb(0 0 0 / 10%);
 $color-shadow-lg: rgb(0 0 0 / 6%);
@@ -126,6 +131,8 @@ $colors: (
   'border': $color-border,
   'surface': $color-surface,
   'background': $color-background,
+  'focus': $color-focus,
+  'focus-inverse': $color-focus-inverse,
   'shadow-sm': $color-shadow-sm,
   'shadow-md': $color-shadow-md,
   'shadow-lg': $color-shadow-lg,

@@ -17,6 +17,11 @@
     font-size: $font-16;
   }
 
+  // The file input is visually hidden, so the keyboard ring is drawn on the label that stands in for it.
+  &--upload:has(:focus-visible) {
+    --upload-ring: 0.2rem solid #{$color-focus};
+  }
+
   // The submit button of a form: right-aligned block. Mixed onto .button.
   &__submit {
     margin-left: auto;

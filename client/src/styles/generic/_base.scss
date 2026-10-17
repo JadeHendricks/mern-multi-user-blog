@@ -73,6 +73,17 @@ strong {
   font-weight: $weight-bold;
 }
 
+// One baseline ring for every focusable element. It lives here because some focusable elements have
+// no class (the card image link, social icon links) and type selectors are only allowed in generic/.
+// `:focus-visible` shows it for keyboard users but not on mouse clicks.
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  @include focus-ring;
+}
+
 // One standard selector replaces the four vendor-prefixed placeholder rules.
 ::placeholder {
   color: $color-muted;

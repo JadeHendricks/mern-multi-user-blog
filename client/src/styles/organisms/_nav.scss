@@ -81,6 +81,11 @@
     text-shadow: 0 0.7rem 1rem $color-black;
   }
 
+  // The header is dark, so the ring is light here.
+  &__el:focus-visible {
+    @include focus-ring($color-focus-inverse);
+  }
+
   &__el:not(:last-child) {
     margin-right: $space-30;
 

@@ -1,6 +1,6 @@
 @use '../settings/tokens' as *;
 
-// Text field and textarea. `outline: none` stays until the Phase 8 accessibility pass.
+// Text field and textarea. The keyboard focus ring comes from the baseline rule in generic/_base.scss.
 .input {
   display: block;
   font-family: inherit;
@@ -14,7 +14,6 @@
   transition: all $duration-base;
   border-radius: $radius-4px;
   box-sizing: border-box;
-  outline: none;
   color: $color-text;
 
   &--textarea {

@@ -13,8 +13,9 @@
   }
 }
 
-// Phase 8 (accessibility) will use these two. They are defined now so the API is stable, and are
-// not applied anywhere yet because applying them would change the look.
+// Accessibility helpers. `focus-ring` is applied to every focusable element from generic/_base.scss,
+// `visually-hidden` hides text from sight but not from screen readers, and `reduced-motion` wraps
+// styles for people who asked the OS for less animation.
 @mixin visually-hidden {
   position: absolute;
   width: 0.1rem;
@@ -27,9 +28,15 @@
   border: 0;
 }
 
-@mixin focus-ring($color: t.$color-green) {
+@mixin focus-ring($color: t.$color-focus) {
   outline: 0.2rem solid $color;
   outline-offset: 0.2rem;
+}
+
+@mixin reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    @content;
+  }
 }
 
 // Box shared by .card and .card-user.

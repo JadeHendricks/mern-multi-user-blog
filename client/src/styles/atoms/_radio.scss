@@ -7,6 +7,7 @@
   --radio-bg: #{$color-background};
   --radio-border: #{$color-grey-light};
   --radio-dot: none;
+  --radio-ring: none;
 
   margin-bottom: $space-15;
 
@@ -21,6 +22,11 @@
 
   &:focus-within {
     --radio-border: #{$color-green};
+  }
+
+  // The input is visually hidden, so the keyboard ring is drawn on the visible circle instead.
+  &:has(:focus-visible) {
+    --radio-ring: 0.2rem solid #{$color-focus};
   }
 
   &__input {
@@ -41,6 +47,8 @@
     border-radius: $radius-round;
     border: 0.1rem solid var(--radio-border);
     box-shadow: var(--radio-dot);
+    outline: var(--radio-ring);
+    outline-offset: 0.2rem;
     display: inline-block;
     width: 2rem;
     height: 2rem;
