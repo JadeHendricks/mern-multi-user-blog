@@ -1,4 +1,5 @@
-import React, { Fragment, useState } from 'react';
+import { Fragment, useState } from 'react';
+import type { ChangeEvent, SubmitEvent } from 'react';
 import { useCreatePost } from '../../hooks/useCreatePost';
 import noImageFound from '../../assets/images/posts/default.jpg';
 
@@ -8,12 +9,12 @@ const PostForm = () => {
     const [values, setValues] = useState({ title: '', tag: '', description: ''});
     const { title, tag, description } = values;
 
-    const [ image, setImage] = useState();
-    const [ uploadName, setUploadName] = useState();
+    const [ image, setImage] = useState<File | undefined>();
+    const [ uploadName, setUploadName] = useState('');
 
-    const handleOnChange = e => setValues({ ...values, [e.target.name]: e.target.value });
+    const handleOnChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => { setValues({ ...values, [e.target.name]: e.target.value }); };
 
-    const handleSubmit = e => {
+    const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         createPost.mutate({ title, tag, description, image });
     }
@@ -33,7 +34,7 @@ const PostForm = () => {
                             nemo quisquam ea eos saepe quidem ipsum assumenda omnis.
                         </p>
                     </div>
-                    <form className="form form--createPost" onSubmit={ (e) => handleSubmit(e) }>
+                    <form className="form form--createPost" onSubmit={ handleSubmit }>
                         <div className="form__group">
                             <label className="form__label" htmlFor="title">Post Title</label>
                             <input className="form__input" id="title" onChange={ handleOnChange } name="title" type="text" placeholder="Title goes here" />
@@ -41,17 +42,17 @@ const PostForm = () => {
                         <div className="form__group">
                             <label className="form__label" htmlFor="tag">Post Tag</label>
                             <div className="form__radio">
-                                { tag && tag === 'general' ? <input type="radio" id="general" value="general" name="tag" onChange={ handleOnChange } checked={tag && tag === 'general'} /> :
-                                <input type="radio" id="general" value="general" name="tag" onChange={ handleOnChange } checked />}
+                                {/* Always checked: both branches of the old ternary rendered checked=true. */}
+                                <input type="radio" id="general" value="general" name="tag" onChange={ handleOnChange } checked />
                                 
                                 <label htmlFor="general" className="form__radio-label">general</label>
                             </div>
                             <div className="form__radio">
-                                <input type="radio" id="travel" value="travel" name="tag" onChange={ handleOnChange } checked={tag && tag === 'travel'} />
+                                <input type="radio" id="travel" value="travel" name="tag" onChange={ handleOnChange } checked={tag === 'travel'} />
                                 <label htmlFor="travel" className="form__radio-label">travel</label>
                             </div>
                             <div className="form__radio">
-                                <input type="radio" id="funny" value="funny" name="tag" onChange={ handleOnChange } checked={tag && tag === 'funny'} />
+                                <input type="radio" id="funny" value="funny" name="tag" onChange={ handleOnChange } checked={tag === 'funny'} />
                                 <label htmlFor="funny" className="form__radio-label">funny</label>
                             </div>
                         </div>
@@ -62,7 +63,7 @@ const PostForm = () => {
                         <div className="form__group form__photo-upload">
                             <img className="form__user-photo" src={ noImageFound } alt="Something could be here" title="Something could be here" />
                             <input className="form__upload" type="file" accept="image/*" id="image" name="image" onChange={ e => {
-                                const file = e.target.files[0];
+                                const file = e.target.files?.[0];
                                 setImage(file);
                                 setUploadName(e.target.value.slice(12));
                             } } />

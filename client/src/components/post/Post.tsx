@@ -1,7 +1,8 @@
-import React, { Fragment, useContext } from 'react';
+import { Fragment } from 'react';
 import svg from '../../assets/images/icons/sprite.svg'
 import { Link, useNavigate, useParams } from 'react-router';
-import AuthContext from '../../context/authContext/AuthContext';
+import { useAuth } from '../../context/authContext/AuthContext';
+import type { PostWithAuthor } from '../../lib/types';
 import CommentSubmit from '../comment/CommentSubmit';
 import ContentLoader from '../layouts/ContentLoader';
 import { isHttpsUrl } from '../../utils/safeUrl';
@@ -12,12 +13,13 @@ import { useToggleLike } from '../../hooks/useToggleLike';
 import { useDeletePost } from '../../hooks/useDeletePost';
 
 // A post that has not arrived (or failed to load) renders the empty frame, as before.
-const NO_POST = {};
+const NO_POST: Partial<PostWithAuthor> = {};
 
 const FullPost = () => {
-    const { id } = useParams();
+    // The route always has :id; the empty default only satisfies the types.
+    const { id = '' } = useParams();
     const navigate = useNavigate();
-    const { loggedInUser, isUsersData, authLoading } = useContext(AuthContext);
+    const { loggedInUser, isUsersData, authLoading } = useAuth();
     const { data, isPending: postLoading } = usePost(id);
     const post = data ?? NO_POST;
     const toggleLike = useToggleLike();
@@ -26,7 +28,7 @@ const FullPost = () => {
 
     // useDeletePost only leaves the page once the server confirmed the delete.
     const handleDelete = () => {
-        if (!window.confirm('Delete this post? This cannot be undone.')) {
+        if (_id === undefined || !window.confirm('Delete this post? This cannot be undone.')) {
             return;
         }
         deletePost.mutate(_id);
@@ -37,12 +39,12 @@ const FullPost = () => {
                 <div className="post">
                     <div className="post__banner">
                         <div className="author-options">
-                            { post._id && (
+                            { _id && (
                                 <Fragment>
-                                    <button className="button button--white" onClick={ () => navigate(-1) }>Go back</button>
+                                    <button className="button button--white" onClick={ () => { void navigate(-1); } }>Go back</button>
                                     { postIsLiked(likes, loggedInUser) ? 	
-                                        <button className="button button--red" onClick={ () => toggleLike(_id, true) }>Unlike Post</button> :	
-                                        <button className="button" onClick={ () => toggleLike(_id, false) }>Like Post</button>	
+                                        <button className="button button--red" onClick={ () => { toggleLike(_id, true); } }>Unlike Post</button> :	
+                                        <button className="button" onClick={ () => { toggleLike(_id, false); } }>Like Post</button>	
                                     }
                                     { loggedInUser && isUsersData(loggedInUser._id, user?._id) && (
                                         <Fragment>
@@ -98,7 +100,7 @@ const FullPost = () => {
                             <div className="post__body">
                                 <p>{ description }</p>
                             </div>
-                            <CommentSubmit postId={_id} comments={ comments } />
+                            <CommentSubmit postId={ _id ?? '' } comments={ comments } />
                         </div>
                     </div>
                 </div> 

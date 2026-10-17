@@ -1,12 +1,19 @@
-import React, { Fragment, useState } from 'react';
+import { Fragment, useState } from 'react';
+import type { ChangeEvent, SubmitEvent } from 'react';
+import type { PostWithAuthor } from '../../lib/types';
 import { useParams } from 'react-router';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
 import { usePost } from '../../hooks/usePost';
 import { useEditPost } from '../../hooks/useEditPost';
 
+interface PostEditFormProps {
+    id: string;
+    post: PostWithAuthor | undefined;
+}
+
 // The form starts from the saved post through lazy state, so there is no effect that resets and
 // refills it. The key restarts the form for another post, and again when the post arrives.
-const PostEditForm = ({ id, post }) => {
+const PostEditForm = ({ id, post }: PostEditFormProps) => {
     const editPost = useEditPost(id);
     const [ values, setValues ] = useState(() => ({
         image: post?.image ?? '',
@@ -15,10 +22,10 @@ const PostEditForm = ({ id, post }) => {
         description: post?.description ?? ''
     }));
     const { image, title, tag, description } = values;
-    const [ blogimage, setBlogImage] = useState();
-    const [ uploadName, setUploadName] = useState();
-    const handleOnChange = e => setValues({ ...values, [e.target.name]: e.target.value });
-    const handleSubmit = e => {
+    const [ blogimage, setBlogImage] = useState<File | undefined>();
+    const [ uploadName, setUploadName] = useState('');
+    const handleOnChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => { setValues({ ...values, [e.target.name]: e.target.value }); };
+    const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         editPost.mutate({ title, tag, description, image: blogimage });
     }
@@ -31,15 +38,15 @@ const PostEditForm = ({ id, post }) => {
             <div className="form__group">
                 <label className="form__label" htmlFor="tag">Post Tag</label>
                 <div className="form__radio">
-                    <input type="radio" id="general" value="general" name="tag" onChange={ handleOnChange } checked={tag && tag === 'general'} />
+                    <input type="radio" id="general" value="general" name="tag" onChange={ handleOnChange } checked={tag === 'general'} />
                     <label htmlFor="general" className="form__radio-label">general</label>
                 </div>
                 <div className="form__radio">
-                    <input type="radio" id="travel" value="travel" name="tag" onChange={ handleOnChange } checked={tag && tag === 'travel'} />
+                    <input type="radio" id="travel" value="travel" name="tag" onChange={ handleOnChange } checked={tag === 'travel'} />
                     <label htmlFor="travel" className="form__radio-label">travel</label>
                 </div>
                 <div className="form__radio">
-                    <input type="radio" id="funny" value="funny" name="tag" onChange={ handleOnChange } checked={tag && tag === 'funny'} />
+                    <input type="radio" id="funny" value="funny" name="tag" onChange={ handleOnChange } checked={tag === 'funny'} />
                     <label htmlFor="funny" className="form__radio-label">funny</label>
                 </div>
             </div>
@@ -50,7 +57,7 @@ const PostEditForm = ({ id, post }) => {
             <div className="form__group form__photo-upload">
                 <img className="form__user-photo" src={ uploadUrl('posts', image) } onError={ onImageError('posts') } alt={ title } title={ title } />
                 <input className="form__upload" type="file" accept="image/*" id="blogimage" name="blogimage" onChange={ e => {
-                    const file = e.target.files[0];
+                    const file = e.target.files?.[0];
                     setBlogImage(file);
                     setUploadName(e.target.value.slice(12));
                 } } />
@@ -64,7 +71,8 @@ const PostEditForm = ({ id, post }) => {
 }
 
 const PostForm = () => {
-    const { id } = useParams();
+    // The route always has :id; the empty default only satisfies the types.
+    const { id = '' } = useParams();
     const { data: post } = usePost(id);
     return (
         <Fragment>
