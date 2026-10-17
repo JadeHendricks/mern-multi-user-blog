@@ -31,7 +31,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "npm run lint && npm run test:api && npm run test:api:mongo && npm run test:client && npm run test:e2e",
-    "seed": "npm run seed -w server --"
+    "seed": "npm run seed -w server --",
+    "db:export": "npm run db:export -w server --",
+    "db:import": "npm run db:import -w server --"
   },
   "repository": {
     "type": "git",

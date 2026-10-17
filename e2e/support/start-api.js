@@ -1,20 +1,14 @@
-// Starts the real Express app on port 5000 against the JSON-file store in a temp folder, seeded first.
+// Starts the real Express app on port 5000 against a store in a temp folder, seeded first by the same
+// seed() that `npm run seed` uses. E2E_DB_DRIVER picks the store: json (default) or mongo, which runs
+// on a throwaway in-memory MongoDB.
 // Used by Playwright's webServer and by `npm run serve:memory` (browse the seeded app locally).
 // Nothing outlives the run, and no SendGrid call can happen: mail goes to a temp folder.
-// No database server is needed, so this starts in a moment.
+// The JSON store needs no database server, so the default starts in a moment.
 const { randomBytes } = require('node:crypto');
 const { mkdirSync, mkdtempSync, rmSync } = require('node:fs');
 const { tmpdir } = require('node:os');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
-const {
-  E2E_PASSWORD,
-  SEED_ACTIVATION_TOKEN,
-  PENDING_USER,
-  SEED_IDS,
-  SEED_USERS,
-  SEED_POSTS,
-} = require('../../server/scripts/seed-data.cjs');
 
 // The server is an ES module package; this launcher stays CommonJS, so it loads it with import().
 const load = (relative) => import(pathToFileURL(path.join(__dirname, relative)).href);
@@ -38,71 +32,31 @@ Object.assign(process.env, {
   // Mail goes to <DATA_DIR>/outbox; the store keeps its files in DATA_DIR too
   DATA_DIR: runDir,
   UPLOAD_DIR: runDir,
-  DB_DRIVER: 'json',
 });
 // Development mode enables the CORS rule and keeps cookies usable over plain http.
 process.env.NODE_ENV = 'development';
 
 const PORT = 5000;
-
-// Fixed ids and dates, so screenshots look the same on every run. Replaced by the shared seed
-// script when it moves to the repos; until then this does the same inserts through them.
-const CREATED_AT = new Date('2025-11-20T09:00:00.000Z');
-
-async function seed(store) {
-  const { hashPassword } = await load('../../server/src/lib/password.js');
-  const { hashToken } = await load('../../server/src/lib/tokens.js');
-  // One hash for every account: they all share the throwaway password.
-  const passwordHash = await hashPassword(E2E_PASSWORD);
-
-  for (const spec of SEED_USERS) {
-    await store.users.create({
-      _id: SEED_IDS.users[spec.key],
-      name: spec.name,
-      email: spec.email,
-      passwordHash,
-      status: 'active',
-      createdAt: CREATED_AT,
-      ...(spec.socials && { socials: spec.socials }),
-    });
-  }
-  // Pending until the activation link is used; the far-future expiry keeps screenshots stable.
-  await store.users.create({
-    ...PENDING_USER,
-    passwordHash,
-    status: 'pending',
-    createdAt: CREATED_AT,
-    activationHash: hashToken(SEED_ACTIVATION_TOKEN),
-    activationExpires: new Date('2099-01-01T00:00:00.000Z'),
-  });
-
-  await store.posts.insertMany(
-    SEED_POSTS.map((spec, index) => ({
-      _id: SEED_IDS.posts[index],
-      user: spec.author,
-      title: spec.title,
-      tag: spec.tag,
-      description: spec.description,
-      date: new Date(spec.date),
-      likes: spec.likes.map((id) => ({ user: id })),
-      comments: spec.comments.map((comment, i) => ({
-        _id: `64d0000000000000000${index}0${i}`.padEnd(24, '0').slice(0, 24),
-        user: comment.by,
-        comment: comment.text,
-        date: new Date(comment.date),
-      })),
-    })),
-  );
-  return { users: SEED_USERS.length, posts: SEED_POSTS.length, pending: 1 };
-}
+let memoryMongo;
 
 async function main() {
   const { createStore } = await load('../../server/src/store/index.js');
   const { createApp } = await load('../../server/src/app.js');
 
-  const store = await createStore({ DB_DRIVER: 'json', DATA_DIR: dataDir, BACKUP_KEEP: 3 });
+  const { seed } = await load('../../server/scripts/seed.js');
+  const driver = process.env.E2E_DB_DRIVER ?? 'json';
+  if (!['json', 'mongo'].includes(driver)) throw new Error('E2E_DB_DRIVER must be json or mongo');
+  // The mongo store runs on a throwaway in-memory server, never a real database.
+  memoryMongo =
+    driver === 'mongo' ? await (await import('mongodb-memory-server')).MongoMemoryServer.create() : undefined;
+  const store = await createStore({
+    DB_DRIVER: driver,
+    DATA_DIR: dataDir,
+    BACKUP_KEEP: 3,
+    MONGO_URI: memoryMongo?.getUri('e2e'),
+  });
   await store.init();
-  const counts = await seed(store);
+  const counts = await seed(store, { dataDir: runDir });
 
   const server = createApp({ store }).listen(PORT, () => {
     console.log(
@@ -116,6 +70,7 @@ async function main() {
     closing = true;
     server.close();
     await store.close().catch(() => {});
+    await memoryMongo?.stop().catch(() => {});
     rmSync(runDir, { recursive: true, force: true });
     process.exit(0);
   };
@@ -125,6 +80,7 @@ async function main() {
 
 main().catch((err) => {
   console.error(err);
+  memoryMongo?.stop().catch(() => {});
   rmSync(runDir, { recursive: true, force: true });
   process.exit(1);
 });

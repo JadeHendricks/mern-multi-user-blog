@@ -5,7 +5,8 @@
 const E2E_PASSWORD = 'E2e-Throwaway-1!';
 // Raw activation token for the pending user Erin. Only its SHA-256 hash is stored, like a real signup.
 const SEED_ACTIVATION_TOKEN = 'e2e00000000000000000000000000000000000000000000000000000000000a1';
-const PENDING_USER = { name: 'Erin Example', email: 'erin@example.test' };
+// A fixed id too, so a seeded store is the same every time.
+const PENDING_USER = { _id: '64b000000000000000000005', name: 'Erin Example', email: 'erin@example.test' };
 
 const SEED_IDS = {
   users: {
