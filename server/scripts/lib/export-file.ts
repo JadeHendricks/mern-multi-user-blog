@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // The file db:export writes and db:import reads. It is the store's own export (see
-// store/types.js StoreAdmin.exportAll) inside a small envelope that names the format.
+// store/types.ts StoreAdmin.exportAll) inside a small envelope that names the format.
 export const FORMAT = 'mern-blog-export';
 export const FORMAT_VERSION = 1;
 
@@ -49,6 +49,9 @@ const post = z
   })
   .strict();
 
+/** What the file holds, as the schema describes it. */
+export type ExportFile = z.infer<typeof exportFileSchema>;
+
 export const exportFileSchema = z
   .object({
     format: z.literal(FORMAT),
@@ -61,7 +64,7 @@ export const exportFileSchema = z
   .strict();
 
 // One short line per problem, with the path but never the offending value (it may be a hash).
-export function describeProblems(error, limit = 8) {
+export function describeProblems(error: z.ZodError, limit = 8): string {
   const lines = error.issues
     .slice(0, limit)
     .map((issue) => `  - ${issue.path.join('.') || '(file)'}: ${issue.message}`);

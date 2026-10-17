@@ -62,7 +62,7 @@ npm run serve:memory      # API on 5000 with seeded in-memory data (nothing is s
 npm run start:client      # in a second terminal: http://localhost:3000
 ```
 
-All four seeded users share the throwaway E2E password defined in `scripts/seed.js`
+All four seeded users share the throwaway E2E password defined in `scripts/seed.ts`
 (`alice@example.test`, `bob@example.test`, `carol@example.test`, `dan@example.test`).
 
 ## First run

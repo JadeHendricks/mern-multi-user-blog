@@ -12,7 +12,7 @@
     "shared"
   ],
   "scripts": {
-    "setup": "node scripts/setup.mjs",
+    "setup": "tsx scripts/setup.mts",
     "predev": "npm run setup",
     "dev": "concurrently -k -n api,web -c blue,green \"npm:dev:api\" \"npm:dev:web\"",
     "build:shared": "npm run build -w shared",

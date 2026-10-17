@@ -5,7 +5,7 @@ import tseslint from 'typescript-eslint';
 
 // Strict, type-aware rules apply to TypeScript only. Plain JS (e2e, *.mjs, *.cjs and the server files
 // that are not converted yet) keeps the base rules, so the conversion can land file by file.
-const tsFiles = ['server/**/*.ts', 'shared/**/*.ts', 'scripts/**/*.ts'];
+const tsFiles = ['server/**/*.ts', 'shared/**/*.ts', 'scripts/**/*.mts'];
 const typeChecked = [
   ...tseslint.configs.strictTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,

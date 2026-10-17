@@ -1,7 +1,10 @@
 import { copyFile, mkdir, readdir, rm } from 'node:fs/promises';
 import path from 'node:path';
+import { errorCode } from '../src/lib/errors.js';
 import { hashPassword } from '../src/lib/password.js';
+import { SEED_ASSETS_DIR } from '../src/lib/paths.js';
 import { hashToken } from '../src/lib/tokens.js';
+import type { Store } from '../src/store/types.js';
 import {
   describeError,
   isLocalTarget,
@@ -10,6 +13,7 @@ import {
   REMOTE_HINT,
   scriptConfig,
 } from './lib/cli.js';
+import type { ScriptIo } from './lib/cli.js';
 import seedData from './seed-data.cjs';
 
 // Deterministic sample data for the E2E run and for a throwaway local store.
@@ -27,26 +31,28 @@ const { E2E_PASSWORD, SEED_ACTIVATION_TOKEN, PENDING_USER, SEED_IDS, SEED_USERS,
 export const SEED_IMAGES = true;
 
 const CREATED_AT = new Date('2025-11-20T09:00:00.000Z');
-const ASSETS = path.resolve(import.meta.dirname, '../seed-assets');
 
 // Which sample file each seeded user and post gets (posts cycle through the three banners).
-const userImage = (key) => `seed-user-${SEED_USERS.findIndex((user) => user.key === key) + 1}.svg`;
-const postImage = (index) => `seed-post-${(index % 3) + 1}.svg`;
+const userImage = (key: string): string =>
+  `seed-user-${SEED_USERS.findIndex((user) => user.key === key) + 1}.svg`;
+const postImage = (index: number): string => `seed-post-${(index % 3) + 1}.svg`;
 
-async function copyAssets(kind, dataDir) {
+async function copyAssets(kind: 'users' | 'posts', dataDir: string): Promise<void> {
   const target = path.join(dataDir, 'uploads', kind);
   await mkdir(target, { recursive: true });
-  for (const name of await readdir(path.join(ASSETS, kind))) {
-    await copyFile(path.join(ASSETS, kind, name), path.join(target, name));
+  for (const name of await readdir(path.join(SEED_ASSETS_DIR, kind))) {
+    await copyFile(path.join(SEED_ASSETS_DIR, kind, name), path.join(target, name));
   }
 }
 
 /**
  * Fills an empty store through its repos. The caller decides whether it is empty.
- * @param {import('../src/store/types.js').Store} store
- * @param {{dataDir?: string, images?: boolean}} [options] dataDir is needed when images are on
+ * dataDir is needed when images are on.
  */
-export async function seed(store, { dataDir, images = SEED_IMAGES } = {}) {
+export async function seed(
+  store: Store,
+  { dataDir, images = SEED_IMAGES }: { dataDir?: string | undefined; images?: boolean } = {},
+): Promise<{ users: number; posts: number; pending: number }> {
   if (images) {
     if (!dataDir)
       throw new Error('seed with images needs a dataDir to copy the sample files into.');
@@ -105,32 +111,25 @@ export async function seed(store, { dataDir, images = SEED_IMAGES } = {}) {
 }
 
 // Empties the uploads folder but keeps the folder itself.
-async function emptyUploads(dataDir) {
+async function emptyUploads(dataDir: string): Promise<void> {
   const uploads = path.join(dataDir, 'uploads');
-  let names = [];
+  let names: string[] = [];
   try {
     names = await readdir(uploads);
   } catch (err) {
-    if (err.code !== 'ENOENT') throw err;
+    if (errorCode(err) !== 'ENOENT') throw err;
   }
   for (const name of names) await rm(path.join(uploads, name), { recursive: true, force: true });
 }
 
-/**
- * The CLI. Returns the exit code instead of exiting, so tests can call it.
- * @param {string[]} argv
- * @param {{env?: object, out?: (line: string) => void, err?: (line: string) => void, open?: Function}} [io]
- */
+/** The CLI. Returns the exit code instead of exiting, so tests can call it. */
 export async function run(
-  argv,
-  { env = process.env, out = console.log, err = console.error, open = openStore } = {},
-) {
-  let store;
+  argv: readonly string[],
+  { env = process.env, out = console.log, err = console.error, open = openStore }: ScriptIo = {},
+): Promise<number> {
+  let store: Store | undefined;
   try {
-    const { values } = readArgs(argv, {
-      reset: { type: 'boolean' },
-      'allow-remote': { type: 'boolean' },
-    });
+    const { values } = readArgs(argv, ['reset', 'allow-remote']);
     const config = scriptConfig(env, values.driver);
     // A reset deletes data, so a Mongo server that is not on this machine needs an explicit yes.
     if (!isLocalTarget(config) && !values['allow-remote']) {
@@ -157,7 +156,7 @@ export async function run(
     err(describeError(error));
     return 1;
   } finally {
-    await store?.close().catch(() => {});
+    await store?.close().catch(() => undefined);
   }
 }
 

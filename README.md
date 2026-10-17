@@ -179,7 +179,7 @@ server/           Express 5 API (ESM)
 client/           React 16 app (create-react-app 3.4)
 shared/           placeholder workspace for code shared later
 e2e/              Playwright specs, support and screenshot baselines
-scripts/          setup.mjs
+scripts/          setup.mts
 ```
 
 ## Roadmap

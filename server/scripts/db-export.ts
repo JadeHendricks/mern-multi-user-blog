@@ -1,6 +1,8 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { describeError, openStore, readArgs, scriptConfig } from './lib/cli.js';
+import type { ScriptIo } from './lib/cli.js';
+import type { Store } from '../src/store/types.js';
 import { FORMAT, FORMAT_VERSION } from './lib/export-file.js';
 
 // npm run db:export [-- out.json] [--driver json|mongo]
@@ -9,27 +11,23 @@ import { FORMAT, FORMAT_VERSION } from './lib/export-file.js';
 // allowed (that is how you move data off a hosted cluster); db:import is the guarded direction.
 // The file holds password hashes, so it is written under DATA_DIR (gitignored) by default.
 
-const stamp = (date) =>
+const stamp = (date: Date): string =>
   date
     .toISOString()
     .replace(/[-:]/g, '')
     .replace(/\.\d+Z$/, 'Z');
 
-/**
- * @param {string[]} argv
- * @param {{env?: object, out?: Function, err?: Function, open?: Function, now?: () => Date}} [io]
- */
 export async function run(
-  argv,
+  argv: readonly string[],
   {
     env = process.env,
     out = console.log,
     err = console.error,
     open = openStore,
     now = () => new Date(),
-  } = {},
-) {
-  let store;
+  }: ScriptIo & { now?: () => Date } = {},
+): Promise<number> {
+  let store: Store | undefined;
   try {
     const { values, positionals } = readArgs(argv);
     const config = scriptConfig(env, values.driver);
@@ -57,7 +55,7 @@ export async function run(
     err(describeError(error));
     return 1;
   } finally {
-    await store?.close().catch(() => {});
+    await store?.close().catch(() => undefined);
   }
 }
 

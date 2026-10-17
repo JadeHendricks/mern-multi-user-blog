@@ -8,7 +8,10 @@ import {
   REMOTE_HINT,
   scriptConfig,
 } from './lib/cli.js';
+import type { ScriptIo } from './lib/cli.js';
 import { describeProblems, exportFileSchema, FORMAT } from './lib/export-file.js';
+import { errorCode } from '../src/lib/errors.js';
+import type { Store } from '../src/store/types.js';
 
 // npm run db:import -- file.json [--replace] [--allow-remote] [--driver json|mongo]
 //
@@ -17,21 +20,15 @@ import { describeProblems, exportFileSchema, FORMAT } from './lib/export-file.js
 // keeps a backup of its file from startup). A Mongo server that is not on this machine, including
 // every mongodb+srv:// address, is refused unless --allow-remote is given.
 
-/**
- * @param {string[]} argv
- * @param {{env?: object, out?: Function, err?: Function, open?: Function}} [io]
- */
 export async function run(
-  argv,
-  { env = process.env, out = console.log, err = console.error, open = openStore } = {},
-) {
-  let store;
+  argv: readonly string[],
+  { env = process.env, out = console.log, err = console.error, open = openStore }: ScriptIo = {},
+): Promise<number> {
+  let store: Store | undefined;
   try {
-    const { values, positionals } = readArgs(argv, {
-      replace: { type: 'boolean' },
-      'allow-remote': { type: 'boolean' },
-    });
-    if (positionals.length !== 1) {
+    const { values, positionals } = readArgs(argv, ['replace', 'allow-remote']);
+    const [importPath] = positionals;
+    if (positionals.length !== 1 || importPath === undefined) {
       err(
         'Usage: npm run db:import -- <file.json> [--replace] [--allow-remote] [--driver json|mongo]',
       );
@@ -46,11 +43,13 @@ export async function run(
       return 1;
     }
 
-    let json;
+    let json: unknown;
     try {
-      json = JSON.parse(await readFile(path.resolve(positionals[0]), 'utf8'));
+      json = JSON.parse(await readFile(path.resolve(importPath), 'utf8'));
     } catch (error) {
-      err(error.code === 'ENOENT' ? 'Import file not found.' : 'Import file is not valid JSON.');
+      err(
+        errorCode(error) === 'ENOENT' ? 'Import file not found.' : 'Import file is not valid JSON.',
+      );
       return 1;
     }
     const parsed = exportFileSchema.safeParse(json);
@@ -62,7 +61,7 @@ export async function run(
     store = await open(config);
     const { schemaVersion, users, posts } = parsed.data;
     const data = { ...(schemaVersion !== undefined && { schemaVersion }), users, posts };
-    const counts = await store.admin.importAll(data, { replace: Boolean(values.replace) });
+    const counts = await store.admin.importAll(data, { replace: values.replace });
     out(
       `Imported ${counts.users} users and ${counts.posts} posts into the ${config.DB_DRIVER} store.`,
     );
@@ -71,7 +70,7 @@ export async function run(
     err(describeError(error));
     return 1;
   } finally {
-    await store?.close().catch(() => {});
+    await store?.close().catch(() => undefined);
   }
 }
 

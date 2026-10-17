@@ -7,7 +7,9 @@ import path from 'node:path';
 const root = path.resolve(import.meta.dirname, '..');
 
 // Returns { created: boolean }. The secret goes straight into the file and is never returned or logged.
-export function createEnvFile({ examplePath, envPath }) {
+export function createEnvFile({ examplePath, envPath }: { examplePath: string; envPath: string }): {
+  created: boolean;
+} {
   if (existsSync(envPath)) return { created: false };
 
   const secret = randomBytes(48).toString('hex');
@@ -22,7 +24,7 @@ export function createEnvFile({ examplePath, envPath }) {
   try {
     writeFileSync(envPath, content, { flag: 'wx', mode: 0o600 });
   } catch (err) {
-    if (err.code === 'EEXIST') return { created: false };
+    if (err instanceof Error && 'code' in err && err.code === 'EEXIST') return { created: false };
     throw err;
   }
   return { created: true };
@@ -33,9 +35,11 @@ if (import.meta.filename === process.argv[1]) {
   const envPath = path.join(root, '.env');
   try {
     const { created } = createEnvFile({ examplePath, envPath });
-    console.log(created ? 'Created .env with a new random JWT_SECRET.' : '.env exists, left unchanged.');
+    console.log(
+      created ? 'Created .env with a new random JWT_SECRET.' : '.env exists, left unchanged.',
+    );
   } catch (err) {
-    console.error(`Could not create .env: ${err.message}`);
+    console.error(`Could not create .env: ${err instanceof Error ? err.message : String(err)}`);
     process.exitCode = 1;
   }
 }

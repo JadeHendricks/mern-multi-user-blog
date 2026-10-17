@@ -13,9 +13,9 @@
     "start": "tsx --env-file-if-exists=../.env src/server.ts",
     "test:api": "vitest run --config vitest.config.ts",
     "test:api:mongo": "cross-env TEST_DB_DRIVER=mongo vitest run --config vitest.config.ts test/api",
-    "seed": "tsx --env-file-if-exists=../.env scripts/seed.js",
-    "db:export": "tsx --env-file-if-exists=../.env scripts/db-export.js",
-    "db:import": "tsx --env-file-if-exists=../.env scripts/db-import.js"
+    "seed": "tsx --env-file-if-exists=../.env scripts/seed.ts",
+    "db:export": "tsx --env-file-if-exists=../.env scripts/db-export.ts",
+    "db:import": "tsx --env-file-if-exists=../.env scripts/db-import.ts"
   },
   "dependencies": {
     "@mern-blog/shared": "1.0.0",
