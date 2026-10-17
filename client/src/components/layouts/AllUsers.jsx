@@ -1,19 +1,13 @@
-import React, { useEffect, useContext, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import UserCard from '../cards/UserCard';
-import UserContext from '../../context/userContext/UserContext';
 import ContentLoader from '../layouts/ContentLoader';
-
+import { useUsers } from '../../hooks/useUsers';
 const AllUsers = () => {
-    const { getAllUsers, users, userLoading} = useContext(UserContext);
-
-    useEffect(() => {
-        getAllUsers();
-        // eslint-disable-next-line
-    }, []);
-    
+    // A failed request shows the toast and the empty state, as before.
+    const { data: users = [], isPending } = useUsers();
     return (
         <Fragment>
-            { userLoading ? (<ContentLoader />) : (
+            { isPending ? (<ContentLoader />) : (
                 <section className="all-user">
                     <div className="container">
                         <div className="all-userCards">
@@ -23,8 +17,6 @@ const AllUsers = () => {
                 </section>
             ) }
         </Fragment>
-
     )
 }
-
 export default AllUsers;
