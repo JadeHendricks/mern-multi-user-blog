@@ -10,17 +10,6 @@ const legacy = {
     'selector-max-combinators',
     'selector-max-type',
   ],
-  'client/src/styles/organisms/_footer.scss': [
-    'color-hex-length',
-    'declaration-no-important',
-    'media-feature-range-notation',
-    'property-no-deprecated',
-    'property-no-vendor-prefix',
-    'rule-empty-line-before',
-    'selector-max-combinators',
-    'selector-max-type',
-    'shorthand-property-no-redundant-values',
-  ],
   'client/src/styles/organisms/_form.scss': [
     'alpha-value-notation',
     'color-function-alias-notation',
