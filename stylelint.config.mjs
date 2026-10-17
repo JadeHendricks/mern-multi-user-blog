@@ -16,18 +16,6 @@ const legacy = {
     'color-hex-length',
     'value-keyword-case',
   ],
-  'client/src/styles/pages/_post.scss': [
-    'alpha-value-notation',
-    'color-function-alias-notation',
-    'color-function-notation',
-    'color-hex-length',
-    'media-feature-range-notation',
-    'rule-empty-line-before',
-    'selector-max-class',
-    'selector-max-combinators',
-    'selector-max-type',
-    'shorthand-property-no-redundant-values',
-  ],
   'client/src/styles/vendor/_toastify.scss': [
     'comment-whitespace-inside',
   ],

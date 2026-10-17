@@ -1,159 +1,184 @@
-.post__banner {
-  height: 50rem;
-  position: relative;
-  background-image: linear-gradient(to right bottom, #7dd56f, #28b487); }
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
 
-.post__banner .author-options {
+// Single post page: banner with the owner's actions, the title block, the author and the text.
+.post {
+  &__banner {
+    height: 50rem;
+    position: relative;
+    background-image: $gradient-green-diagonal;
+  }
+
+  &__banner--edit {
+    background-image: $gradient-yellow-diagonal;
+  }
+
+  &__banner--account {
+    height: auto;
+    padding: $space-50 0;
+  }
+
+  &__actions {
     display: flex;
     position: absolute;
-    top: 2rem;
-    left: 2rem; }
+    top: $space-20;
+    left: $space-20;
 
-.post__banner .author-options .button {
-  width: 20rem; }
+    @include respond-to('lg') {
+      left: 0;
+      width: 100%;
+    }
+  }
 
-.post__banner .author-options .button:not(:last-child) {
-  margin-right: 1rem; }
+  // Mixed onto a .button. It comes after the button atom, so its width and margin win the tie.
+  &__action {
+    width: 20rem;
 
-.post__banner--edit {
-    background-image: linear-gradient(to right bottom, #fcd983, #f7c74f); }
+    @include respond-to('lg') {
+      width: 21%;
+      margin: 2%;
+    }
 
-.post__banner--account {
-  height: auto;
-  padding: 5rem 0; }
+    @include respond-to('md') {
+      font-size: $font-12;
+    }
+  }
 
-.post__container {
-  max-width: 80rem;
-  margin: 0 auto;
-  position: relative;
-  top: -45rem; }
+  // After the lg block above: a single margin-right must still beat the 2% margin there.
+  &__action:not(:last-child) {
+    margin-right: $space-10;
+  }
 
-.post__header {
-  margin: 3rem 0 1.5rem 0; }
+  &__container {
+    max-width: 80rem;
+    margin: 0 auto;
+    position: relative;
+    top: -45rem;
+  }
 
-.post__top {
-  display: flex;
-  margin-bottom: 5rem; }
+  &__header {
+    margin: $space-30 0 $space-15;
+  }
 
-.post__image-block {
-  flex: 0 0 20rem;
-  margin-right: 2.5rem; }
+  &__top {
+    display: flex;
+    margin-bottom: $space-50;
 
-.post__image-block img {
+    @include respond-to('lg') {
+      margin-bottom: $space-40;
+    }
+
+    @include respond-to('sm') {
+      display: block;
+    }
+  }
+
+  &__image-block {
+    flex: 0 0 20rem;
+    margin-right: $space-25;
+
+    @include respond-to('sm') {
+      display: block;
+      margin: 0 auto;
+      width: 20rem;
+      height: 20rem;
+      object-fit: cover;
+    }
+  }
+
+  &__image {
     width: 100%;
     height: 20rem;
-    object-fit: cover; }
+    object-fit: cover;
+  }
 
-.post__title {
-  flex: 1;
-  color: #ffffff;
-  font-size: 5rem;
-  margin-bottom: 3rem; }
+  &__title {
+    flex: 1;
+    color: $color-white;
+    font-size: $font-50;
+    margin-bottom: $space-30;
 
-.post__user {
-  display: flex;
-  justify-content: space-between;
-  align-items: center; }
+    @include respond-to('lg') {
+      font-size: $font-40;
+    }
 
-.post__user-block {
-  display: flex;
-  align-items: center; }
+    @include respond-to('sm') {
+      margin-top: $space-25;
+      text-align: center;
+      font-size: $font-25;
+    }
+  }
 
-/* Temporary home of the size the author photo used to borrow from form__user-photo; C35 rebuilds it. */
-.post__user-avatar {
-  height: 8rem;
-  width: 8rem;
-  margin-right: 2rem; }
-
-.post__user-social {
-  display: flex; }
-
-.post__user-social-icon {
-  fill: #ffffff;
-  width: 3rem;
-  height: 3rem;
-  cursor: pointer; }
-
-.post__user-social-icon:not(:last-child) {
-    margin-right: 1.5rem; }
-
-.post__user-icon {
-  width: 5rem;
-  height: 5rem;
-  margin-right: 1rem;
-  border-radius: 100%; }
-
-.post__user-name {
-  color: #ffffff;
-  font-size: 1.8rem;
-  font-weight: 700; }
-
-.post__body {
-  border-radius: 0.3rem;
-  overflow: hidden;
-  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.1);
-  background-color: #ffffff;
-  padding: 5rem 4rem; }
-
-.post__body h3 {
-    margin-bottom: 1rem;
-    color: #55c57a; }
-
-.post__body p {
-    font-size: 2rem; }
-
-.post__body p:not(:last-child) {
-  margin-bottom: 4rem; }
-
-@media screen and (max-width: 991px) {
-  .post__banner .author-options {
+  &__user {
     display: flex;
-    left: 0;
-    width: 100%; }
-  .post__banner .author-options .button {
-      width: 21%;
-      margin: 2%; }
-  .post__header {
-    margin: 3rem 0 1.5rem 0; }
-  .post__top {
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__user-block {
     display: flex;
-    margin-bottom: 4rem; }
-  .post__title {
-    font-size: 4rem; }
-  .post__body {
-    padding: 2.5rem 2rem; }
-  .post__body p {
-      font-size: 1.8rem; } }
+    align-items: center;
+  }
 
-@media screen and (max-width: 767px) {
-  .post__user-avatar {
-    height: 6rem;
-    width: 6rem;
-    margin-right: 1.5rem; }
-  .post__banner .author-options .button {
-    font-size: 1.2rem; }
-  .post__banner .back-button {
-    position: absolute;
-    left: 5rem;
-    bottom: 5rem; }
-  .post__header {
-    margin: 3rem 0 1.5rem 0; }
-  .post__body {
-    padding: 2rem; }
-  .post__body p {
-      font-size: 1.6rem; } }
+  // Author photo; the round shape comes from the avatar atom.
+  &__user-avatar {
+    height: 8rem;
+    width: 8rem;
+    margin-right: $space-20;
 
-@media screen and (max-width: 580px) {
-  .post__top {
-    display: block;
-    margin-bottom: 4rem; }
-  .post__image-block {
-    display: block;
-    margin: 0 auto;
-    width: 20rem;
-    height: 20rem;
-    object-fit: cover; }
-  .post__title {
-    margin-top: 2.5rem;
-    text-align: center;
-    font-size: 2.5rem; } }
+    @include respond-to('md') {
+      height: 6rem;
+      width: 6rem;
+      margin-right: $space-15;
+    }
+  }
+
+  &__user-name {
+    color: $color-white;
+    font-size: $font-18;
+    font-weight: $weight-bold;
+  }
+
+  &__user-social {
+    display: flex;
+  }
+
+  &__user-social-icon {
+    fill: $color-white;
+    width: 3rem;
+    height: 3rem;
+    cursor: pointer;
+  }
+
+  &__user-social-icon:not(:last-child) {
+    margin-right: $space-15;
+  }
+
+  &__body {
+    border-radius: $radius-3;
+    overflow: hidden;
+    box-shadow: $shadow-md;
+    background-color: $color-white;
+    padding: $space-50 $space-40;
+
+    @include respond-to('lg') {
+      padding: $space-25 $space-20;
+    }
+
+    @include respond-to('md') {
+      padding: $space-20;
+    }
+  }
+
+  &__text {
+    font-size: $font-20;
+
+    @include respond-to('lg') {
+      font-size: $font-18;
+    }
+
+    @include respond-to('md') {
+      font-size: $font-16;
+    }
+  }
+}
