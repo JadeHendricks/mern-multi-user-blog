@@ -2,6 +2,7 @@
   "name": "@mern-blog/client",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@mern-blog/shared": "1.0.0",
     "@tanstack/react-query": "5.104.3",
