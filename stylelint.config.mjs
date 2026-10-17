@@ -12,10 +12,6 @@ const legacy = {
     'property-no-vendor-prefix',
     'rule-empty-line-before',
   ],
-  'client/src/styles/pages/_create-post.scss': [
-    'color-hex-length',
-    'value-keyword-case',
-  ],
   'client/src/styles/vendor/_toastify.scss': [
     'comment-whitespace-inside',
   ],

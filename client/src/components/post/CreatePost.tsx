@@ -26,7 +26,7 @@ const PostForm = () => {
             </div>
             <div className="container">
                 <div className="create-post">
-                    <div className="create-post__information">
+                    <div>
                         <h1 className="create-post__title">Create a blog post!</h1>
                         <p className="create-post__description">
                             Lorem ipsum dolor sit, amet consectetur adipisicing elit. 
