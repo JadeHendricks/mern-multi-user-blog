@@ -20,7 +20,8 @@ type Params = Record<string, string>;
 // body is read as unknown values even though a well-behaved client sends text.
 type SocialsBody = Partial<Record<'facebook' | 'linkedin' | 'twitter', unknown>>;
 
-const text = (value: unknown): string | undefined => (typeof value === 'string' ? value : undefined);
+const text = (value: unknown): string | undefined =>
+  typeof value === 'string' ? value : undefined;
 
 export const createUserController = ({ store }: { store: Store }) => {
   const getMe = async (

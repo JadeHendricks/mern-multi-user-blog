@@ -154,10 +154,7 @@ export const createAuthController = ({ store, mailer }: { store: Store; mailer: 
     });
   };
 
-  const accountActivation = async (
-    req: Body<{ token?: unknown }>,
-    res: Reply,
-  ): Promise<void> => {
+  const accountActivation = async (req: Body<{ token?: unknown }>, res: Reply): Promise<void> => {
     const { token } = req.body;
     if (!token) {
       res.status(400).json({
