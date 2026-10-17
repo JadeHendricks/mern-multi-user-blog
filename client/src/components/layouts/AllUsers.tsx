@@ -9,9 +9,9 @@ const AllUsers = () => {
     return (
         <Fragment>
             { isPending ? (<ContentLoader />) : (
-                <section className="all-user">
+                <section>
                     <div className="container">
-                        <div className="all-userCards">
+                        <div className="all-users__cards">
                             { users.length === 0 ? <h3>No Content Found...</h3> : users.map(user => <UserCard key={ user._id } user={ user }/>) }
                         </div>
                         { hasNextPage && <LoadMore onClick={ () => void fetchNextPage() } loading={ isFetchingNextPage } /> }

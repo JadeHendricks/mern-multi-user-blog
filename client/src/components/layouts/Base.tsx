@@ -12,7 +12,7 @@ const Base = () => {
                 <section className="all-posts">
                     <div className="container">
                         <div className="cards">
-                            { posts.length === 0 ? <h3 style={{ textAlign: 'center' }}>No Content Found...</h3> : posts.map(post => <PostCard key={ post._id } post={ post } /> )}
+                            { posts.length === 0 ? <h3 className="all-posts__empty">No Content Found...</h3> : posts.map(post => <PostCard key={ post._id } post={ post } /> )}
                         </div>
                         { hasNextPage && <LoadMore onClick={ () => void fetchNextPage() } loading={ isFetchingNextPage } /> }
                     </div>

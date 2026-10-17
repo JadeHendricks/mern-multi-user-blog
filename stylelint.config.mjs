@@ -12,15 +12,9 @@ const legacy = {
     'property-no-vendor-prefix',
     'rule-empty-line-before',
   ],
-  'client/src/styles/pages/_all-users.scss': [
-    'selector-class-pattern',
-  ],
   'client/src/styles/pages/_create-post.scss': [
     'color-hex-length',
     'value-keyword-case',
-  ],
-  'client/src/styles/pages/_feed.scss': [
-    'media-feature-range-notation',
   ],
   'client/src/styles/pages/_post.scss': [
     'alpha-value-notation',
