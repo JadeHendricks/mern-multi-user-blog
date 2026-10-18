@@ -1,0 +1,50 @@
+@use 'sass:map';
+@use '../settings/breakpoints' as bp;
+@use '../settings/tokens' as t;
+
+// @include respond-to('lg') { ... } emits @media screen and (max-width: 991px).
+@mixin respond-to($name) {
+  @if not map.has-key(bp.$breakpoints, $name) {
+    @error 'Unknown breakpoint `#{$name}`. Use one of: #{map.keys(bp.$breakpoints)}';
+  }
+
+  @media screen and (max-width: map.get(bp.$breakpoints, $name)) {
+    @content;
+  }
+}
+
+// Phase 8 (accessibility) will use these two. They are defined now so the API is stable, and are
+// not applied anywhere yet because applying them would change the look.
+@mixin visually-hidden {
+  position: absolute;
+  width: 0.1rem;
+  height: 0.1rem;
+  margin: -0.1rem;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@mixin focus-ring($color: t.$color-green) {
+  outline: 0.2rem solid $color;
+  outline-offset: 0.2rem;
+}
+
+// Box shared by .card and .card-user.
+@mixin card-surface {
+  border-radius: t.$radius-3;
+  overflow: hidden;
+  box-shadow: t.$shadow-md;
+  background-color: t.$color-white;
+  backface-visibility: hidden;
+}
+
+// White form panel shared by the login, recover and create-post forms.
+@mixin auth-card($padding: t.$space-50 t.$space-70) {
+  background-color: t.$color-white;
+  box-shadow: t.$shadow-lg;
+  padding: $padding;
+  border-radius: t.$radius-5px;
+}

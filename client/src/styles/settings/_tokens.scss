@@ -1,0 +1,239 @@
+// Design tokens. Every value found in the old stylesheet gets one name here.
+// Sass has no computed variable names, so each token is a Sass variable first and the maps below
+// are built from those variables. The same maps feed `tokens-to-root`, so a custom property and its
+// Sass twin can never drift apart (client/src/styles/tokens.test.ts proves it).
+// Partials use the Sass variables (media queries cannot read var()); the custom properties are the
+// runtime and theming surface.
+// Names: spacing, radii and font sizes use the value in tenths of a rem ($space-15 = 1.5rem,
+// $font-18 = 1.8rem). A decimal tenth is written with a dash ($space-7-5 = 0.75rem).
+// Not tokenised on purpose (component geometry): widths, heights, flex bases, percentages, z-index
+// and line-heights.
+
+// Colours
+$color-green: #55c57a;
+$color-green-mid: #4fa86d;
+$color-green-dark: #427d56;
+$color-green-light: #7dd56f;
+$color-green-teal: #28b487;
+$color-yellow: #fcd983;
+$color-yellow-dark: #f7c74f;
+$color-orange: #d67d17;
+$color-red: #cd2d2d;
+$color-blue: #3f4bf9;
+$color-white: #fff;
+$color-black: #000;
+$color-text: #444;
+$color-muted: #777;
+$color-grey: #999;
+$color-grey-light: #b7b7b7;
+$color-border: #eaeaea;
+$color-surface: #f2f2f2;
+$color-background: #f7f7f7;
+$color-shadow-sm: rgb(0 0 0 / 15%);
+$color-shadow-md: rgb(0 0 0 / 10%);
+$color-shadow-lg: rgb(0 0 0 / 6%);
+
+// Spacing (margin, padding, gap)
+$space-3: 0.3rem;
+$space-5: 0.5rem;
+$space-7-5: 0.75rem;
+$space-10: 1rem;
+$space-12: 1.2rem;
+$space-12-5: 1.25rem;
+$space-14: 1.4rem;
+$space-15: 1.5rem;
+$space-17-5: 1.75rem;
+$space-20: 2rem;
+$space-25: 2.5rem;
+$space-30: 3rem;
+$space-40: 4rem;
+$space-50: 5rem;
+$space-60: 6rem;
+$space-70: 7rem;
+$space-80: 8rem;
+
+// Radii
+$radius-3: 0.3rem;
+$radius-4px: 4px;
+$radius-5px: 5px;
+$radius-50: 5rem;
+$radius-pill: 10rem;
+$radius-circle: 50%;
+$radius-round: 100%;
+
+// Shadows
+$shadow-sm: 0 1rem 2rem $color-shadow-sm;
+$shadow-md: 0 1.5rem 4rem $color-shadow-md;
+$shadow-lg: 0 2.5rem 8rem 2rem $color-shadow-lg;
+$shadow-dot: inset 0 0 0 0.4rem $color-background;
+
+// Gradients
+$gradient-green: linear-gradient(to right, $color-green, $color-green-mid, $color-green-dark);
+$gradient-green-flat: linear-gradient(to right, $color-green-light, $color-green-teal);
+$gradient-green-diagonal: linear-gradient(to right bottom, $color-green-light, $color-green-teal);
+$gradient-yellow-diagonal: linear-gradient(to right bottom, $color-yellow, $color-yellow-dark);
+
+// Font sizes
+$font-10: 1rem;
+$font-12: 1.2rem;
+$font-14: 1.4rem;
+$font-16: 1.6rem;
+$font-18: 1.8rem;
+$font-20: 2rem;
+$font-22: 2.2rem;
+$font-24: 2.4rem;
+$font-25: 2.5rem;
+$font-26: 2.6rem;
+$font-28: 2.8rem;
+$font-30: 3rem;
+$font-40: 4rem;
+$font-42: 4.2rem;
+$font-50: 5rem;
+$font-60: 6rem;
+
+// Font weights
+$weight-light: 300;
+$weight-regular: 400;
+$weight-medium: 500;
+$weight-semibold: 600;
+$weight-bold: 700;
+
+// Durations
+$duration-fast: 0.2s;
+$duration-base: 0.3s;
+$duration-slow: 0.4s;
+$duration-radio: 250ms;
+$duration-spin: 1s;
+
+// Map: colors
+$colors: (
+  'green': $color-green,
+  'green-mid': $color-green-mid,
+  'green-dark': $color-green-dark,
+  'green-light': $color-green-light,
+  'green-teal': $color-green-teal,
+  'yellow': $color-yellow,
+  'yellow-dark': $color-yellow-dark,
+  'orange': $color-orange,
+  'red': $color-red,
+  'blue': $color-blue,
+  'white': $color-white,
+  'black': $color-black,
+  'text': $color-text,
+  'muted': $color-muted,
+  'grey': $color-grey,
+  'grey-light': $color-grey-light,
+  'border': $color-border,
+  'surface': $color-surface,
+  'background': $color-background,
+  'shadow-sm': $color-shadow-sm,
+  'shadow-md': $color-shadow-md,
+  'shadow-lg': $color-shadow-lg,
+);
+
+// Map: spacing
+$spacing: (
+  '3': $space-3,
+  '5': $space-5,
+  '7-5': $space-7-5,
+  '10': $space-10,
+  '12': $space-12,
+  '12-5': $space-12-5,
+  '14': $space-14,
+  '15': $space-15,
+  '17-5': $space-17-5,
+  '20': $space-20,
+  '25': $space-25,
+  '30': $space-30,
+  '40': $space-40,
+  '50': $space-50,
+  '60': $space-60,
+  '70': $space-70,
+  '80': $space-80,
+);
+
+// Map: radii
+$radii: (
+  '3': $radius-3,
+  '4px': $radius-4px,
+  '5px': $radius-5px,
+  '50': $radius-50,
+  'pill': $radius-pill,
+  'circle': $radius-circle,
+  'round': $radius-round,
+);
+
+// Map: shadows
+$shadows: (
+  'sm': $shadow-sm,
+  'md': $shadow-md,
+  'lg': $shadow-lg,
+  'dot': $shadow-dot,
+);
+
+// Map: gradients
+$gradients: (
+  'green': $gradient-green,
+  'green-flat': $gradient-green-flat,
+  'green-diagonal': $gradient-green-diagonal,
+  'yellow-diagonal': $gradient-yellow-diagonal,
+);
+
+// Map: font-sizes
+$font-sizes: (
+  '10': $font-10,
+  '12': $font-12,
+  '14': $font-14,
+  '16': $font-16,
+  '18': $font-18,
+  '20': $font-20,
+  '22': $font-22,
+  '24': $font-24,
+  '25': $font-25,
+  '26': $font-26,
+  '28': $font-28,
+  '30': $font-30,
+  '40': $font-40,
+  '42': $font-42,
+  '50': $font-50,
+  '60': $font-60,
+);
+
+// Map: font-weights
+$font-weights: (
+  'light': $weight-light,
+  'regular': $weight-regular,
+  'medium': $weight-medium,
+  'semibold': $weight-semibold,
+  'bold': $weight-bold,
+);
+
+// Map: durations
+$durations: (
+  'fast': $duration-fast,
+  'base': $duration-base,
+  'slow': $duration-slow,
+  'radio': $duration-radio,
+  'spin': $duration-spin,
+);
+
+// Category name -> custom property prefix -> map. Breakpoints are Sass only (see _breakpoints.scss).
+$token-groups: (
+  'color': $colors,
+  'space': $spacing,
+  'radius': $radii,
+  'shadow': $shadows,
+  'gradient': $gradients,
+  'font': $font-sizes,
+  'weight': $font-weights,
+  'duration': $durations,
+);
+
+// Emits every token as a custom property. Include it once, inside :root, from main.scss.
+@mixin tokens-to-root {
+  @each $group, $map in $token-groups {
+    @each $name, $value in $map {
+      --#{$group}-#{$name}: #{$value};
+    }
+  }
+}

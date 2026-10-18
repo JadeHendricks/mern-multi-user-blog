@@ -144,7 +144,7 @@ describe('Post page mutations (B21)', () => {
     });
     fireEvent.click(await screen.findByRole('button', { name: 'Like Post' }));
     fireEvent.click(screen.getByRole('button', { name: 'Delete Comment' }));
-    expect(document.querySelector('.loader-container')).toBeNull();
+    expect(document.querySelector('.loader')).toBeNull();
     expect(screen.getByText('Hello world')).toBeInTheDocument();
   });
 });

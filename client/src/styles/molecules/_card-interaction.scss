@@ -1,0 +1,40 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+// Comment count and like heart at the bottom of a post card.
+.card-interaction {
+  display: flex;
+  align-items: center;
+  padding-top: $space-20;
+
+  @include respond-to('xl') {
+    padding-top: $space-15;
+  }
+
+  @include respond-to('sm-wide') {
+    padding-top: $space-20;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    font-size: $font-14;
+    font-weight: $weight-bold;
+    cursor: pointer;
+  }
+
+  &__item:not(:last-child) {
+    margin-right: $space-20;
+  }
+
+  &__icon {
+    fill: $color-red;
+    width: 2rem;
+    height: 2rem;
+    margin-right: $space-10;
+  }
+
+  &__icon--comment {
+    fill: $color-text;
+  }
+}

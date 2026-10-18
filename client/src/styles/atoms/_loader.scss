@@ -1,0 +1,82 @@
+@use '../settings/tokens' as *;
+
+@keyframes rotate-one {
+  0% {
+    transform: rotateX(35deg) rotateY(-45deg) rotateZ(0deg);
+  }
+
+  100% {
+    transform: rotateX(35deg) rotateY(-45deg) rotateZ(360deg);
+  }
+}
+
+@keyframes rotate-two {
+  0% {
+    transform: rotateX(50deg) rotateY(10deg) rotateZ(0deg);
+  }
+
+  100% {
+    transform: rotateX(50deg) rotateY(10deg) rotateZ(360deg);
+  }
+}
+
+@keyframes rotate-three {
+  0% {
+    transform: rotateX(35deg) rotateY(55deg) rotateZ(0deg);
+  }
+
+  100% {
+    transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
+  }
+}
+
+// Full-screen overlay with three spinning rings.
+.loader {
+  background: $gradient-green;
+  height: 100vh;
+  opacity: 1;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  z-index: 100;
+
+  &__spinner {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 7rem;
+    height: 7rem;
+    border-radius: $radius-circle;
+    perspective: 800px;
+  }
+
+  &__ring {
+    position: absolute;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    border-radius: $radius-circle;
+  }
+
+  &__ring--one {
+    left: 0;
+    top: 0;
+    animation: rotate-one $duration-spin linear infinite;
+    border-bottom: 0.5rem solid $color-white;
+  }
+
+  &__ring--two {
+    right: 0;
+    top: 0;
+    animation: rotate-two $duration-spin linear infinite;
+    border-right: 0.5rem solid $color-white;
+  }
+
+  &__ring--three {
+    right: 0;
+    bottom: 0;
+    animation: rotate-three $duration-spin linear infinite;
+    border-top: 0.5rem solid $color-white;
+  }
+}

@@ -1,0 +1,148 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+// Navigation bars inside the header: the left one (logo and All Posts) and the user one.
+.nav {
+  display: flex;
+
+  @include respond-to('xs') {
+    width: 100%;
+    display: block;
+  }
+
+  &--posts {
+    flex: 0 1 20%;
+
+    @include respond-to('xl') {
+      flex: 0 1 25%;
+    }
+
+    @include respond-to('md') {
+      flex: 0 1 100%;
+      margin-bottom: $space-20;
+    }
+
+    @include respond-to('xs') {
+      margin-bottom: 0;
+    }
+  }
+
+  &--user {
+    flex: 0 1 80%;
+    justify-content: flex-end;
+
+    @include respond-to('xl') {
+      flex: 0 1 75%;
+    }
+
+    @include respond-to('md') {
+      flex: 0 1 100%;
+    }
+  }
+
+  &__avatar {
+    height: 4rem;
+    width: 4rem;
+    margin-right: $space-10;
+  }
+
+  &__el {
+    color: $color-background;
+    text-transform: uppercase;
+    font-size: $font-18;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    transition: all $duration-fast;
+    font-weight: $weight-regular;
+    border: none;
+    cursor: pointer;
+
+    @include respond-to('xxl') {
+      font-size: $font-16;
+    }
+
+    @include respond-to('xl') {
+      font-size: $font-14;
+    }
+
+    @include respond-to('md') {
+      font-size: $font-12;
+    }
+
+    @include respond-to('xs') {
+      font-size: $font-14;
+      margin-bottom: $space-15;
+    }
+  }
+
+  &__el:hover {
+    transform: translateY(-2px);
+    text-shadow: 0 0.7rem 1rem $color-black;
+  }
+
+  &__el:not(:last-child) {
+    margin-right: $space-30;
+
+    @include respond-to('xxl') {
+      margin-right: $space-25;
+    }
+
+    @include respond-to('xl') {
+      margin-right: $space-20;
+    }
+
+    @include respond-to('xs') {
+      margin-right: 0;
+    }
+  }
+
+  // Outlined Register link.
+  &__el--cta {
+    padding: $space-15 $space-30;
+    border-radius: $radius-50;
+    border: 1px solid currentcolor;
+    transition: all $duration-base;
+
+    @include respond-to('xxl') {
+      padding: $space-10 $space-20;
+    }
+
+    @include respond-to('xl') {
+      padding: $space-10 $space-15;
+    }
+
+    @include respond-to('md') {
+      padding: $space-10;
+    }
+  }
+
+  &__el--cta:hover {
+    background-color: $color-background;
+    color: $color-muted;
+    text-shadow: none;
+    border-color: $color-background;
+  }
+
+  // Filled Create Post link. Written after nav__el so its own values are the ones that count: the
+  // link used to also carry `button button--green` and the cascade picked between the two.
+  &__el--create {
+    background-color: $color-green;
+    border-radius: $radius-pill;
+    position: relative;
+    text-align: center;
+    padding: $space-14 $space-30;
+
+    @include respond-to('lg') {
+      padding: $space-10 $space-15;
+    }
+
+    @include respond-to('md') {
+      padding: $space-10;
+    }
+  }
+
+  &__el--create:hover {
+    box-shadow: $shadow-sm;
+  }
+}

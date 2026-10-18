@@ -1,0 +1,29 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+// Panel for the login and register pages.
+.login-form {
+  @include auth-card;
+
+  margin: $space-60 auto $space-80;
+  max-width: 65rem;
+
+  @include respond-to('md') {
+    margin: $space-40 auto $space-60;
+    padding: $space-30 $space-50;
+  }
+
+  @include respond-to('sm') {
+    padding: $space-20;
+  }
+
+  &__title {
+    margin: $space-25 0 $space-40;
+    color: $color-green;
+
+    @include respond-to('sm') {
+      margin: $space-20 0;
+      font-size: $font-18;
+    }
+  }
+}

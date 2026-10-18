@@ -21,6 +21,8 @@ export default [
     ignores: [
       'node_modules/**',
       'tmp/**',
+      // Local agent workspace (scratch scripts), not project source.
+      '.agents/**',
       'e2e/test-results/**',
       'playwright-report/**',
       'e2e/__screenshots__/**',

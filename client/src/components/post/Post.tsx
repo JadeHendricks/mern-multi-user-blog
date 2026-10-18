@@ -38,18 +38,18 @@ const FullPost = () => {
             { authLoading && postLoading ? (<ContentLoader />) : (
                 <div className="post">
                     <div className="post__banner">
-                        <div className="author-options">
+                        <div className="post__actions">
                             { _id && (
                                 <Fragment>
-                                    <button className="button button--white" onClick={ () => { void navigate(-1); } }>Go back</button>
+                                    <button className="button button--white post__action" onClick={ () => { void navigate(-1); } }>Go back</button>
                                     { postIsLiked(likes, loggedInUser) ? 	
-                                        <button className="button button--red" onClick={ () => { toggleLike(_id, true); } }>Unlike Post</button> :	
-                                        <button className="button" onClick={ () => { toggleLike(_id, false); } }>Like Post</button>	
+                                        <button className="button button--red post__action" onClick={ () => { toggleLike(_id, true); } }>Unlike Post</button> :	
+                                        <button className="button post__action" onClick={ () => { toggleLike(_id, false); } }>Like Post</button>	
                                     }
                                     { loggedInUser && isUsersData(loggedInUser._id, user?._id) && (
                                         <Fragment>
-                                            <Link to={`/edit-post/${_id}`} className="button button--yellow">Edit Post</Link>
-                                            <button className="button button--red" onClick={ handleDelete }>Delete Post</button>
+                                            <Link to={`/edit-post/${_id}`} className="button button--yellow post__action">Edit Post</Link>
+                                            <button className="button button--red post__action" onClick={ handleDelete }>Delete Post</button>
                                         </Fragment>
                                     )}
                                 </Fragment>
@@ -61,13 +61,13 @@ const FullPost = () => {
                             <div className="post__header">
                                 <div className="post__top">
                                     <div className="post__image-block">
-                                        <img src={ uploadUrl('posts', image) } onError={ onImageError('posts') } alt={ title } title={ title } />
+                                        <img className="post__image" src={ uploadUrl('posts', image) } onError={ onImageError('posts') } alt={ title } title={ title } />
                                     </div>
                                     <h1 className="post__title">{ title }</h1>
                                 </div>
                                 <div className="post__user">
                                     <div className="post__user-block">
-                                        <img className="form__user-photo" src={ uploadUrl('users', user?.avatar) } onError={ onImageError('users') } alt={ user?.name } title={ user?.name } />
+                                        <img className="avatar post__user-avatar" src={ uploadUrl('users', user?.avatar) } onError={ onImageError('users') } alt={ user?.name } title={ user?.name } />
                                         <span className="post__user-name">{ user?.name }</span>
                                     </div>
                                     { user?.socials && (
@@ -98,7 +98,7 @@ const FullPost = () => {
                                 </div>
                             </div>
                             <div className="post__body">
-                                <p>{ description }</p>
+                                <p className="post__text">{ description }</p>
                             </div>
                             <CommentSubmit postId={ _id ?? '' } comments={ comments } />
                         </div>

@@ -1,0 +1,19 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+// Home and popular feeds: a section of post cards.
+.all-posts {
+  padding: $space-60 0;
+
+  @include respond-to('lg') {
+    padding: $space-40 0;
+  }
+
+  @include respond-to('sm-wide') {
+    padding: $space-20 0;
+  }
+
+  &__empty {
+    text-align: center;
+  }
+}

@@ -261,6 +261,18 @@ React 19 with React Router 8 and TanStack Query 5 (TypeScript, Vite). Source is 
   removes it when `nextCursor` is `null`. Most popular posts keep one unpaginated list because they sort the whole set.
 - **Dates:** `lib/formatDate.ts` prints `DD/MM/YYYY` with `Intl` (en-GB); `moment` is gone.
 
+## Styling
+Sass partials in `client/src/styles`, one entry (`main.scss`, imported once from `App.tsx`). Atomic design, BEM names, one class per selector.
+- **Folders, in `@use` order:** `settings/` (`_tokens`, `_breakpoints`), `tools/` (`_mixins`), `generic/` (reset and bare elements, the only place for type selectors), `objects/` (layout helpers), `atoms/` (button, input, label, radio, tag, avatar, loader), `molecules/` (form-group, form-links, file-upload, card-interaction, load-more, comment-post), `organisms/` (card, user-card, header, nav, footer, form, comment ...), `pages/` (feed, post, account ...), `vendor/` (react-toastify override).
+- **Levels:** a component carries the block class of its own level only. A parent never styles a child's internals; it passes a modifier (`<PostCard variant="account">` gives `card card--account`) or adds a layout mix class (`card__action button`).
+- **BEM:** `block__element--modifier`, lowercase, dash-separated words. Write `.card__title`, never `.card div:first-child`.
+- **Two allowed order dependences:** a mix class from a higher layer beats an atom at equal specificity (the layer order in `main.scss` decides), and a modifier sits right after its base and that base's `respond-to` blocks in the same partial.
+- **Stylelint** (`stylelint.config.mjs`, standard-scss plus): max 1 class, 0 ids, 0 types, 0 combinators, 0 attributes per selector (pseudo-classes and pseudo-elements are fine), no `!important`, no descending specificity, nesting depth 1 (`&__el`, `&--mod`, `&:hover`, `@include`), BEM class pattern, no vendor prefixes. `generic/` may use type selectors, combinators and attributes. `vendor/` skips the class pattern. No allowlist and no disable comments.
+- **Tokens:** `settings/_tokens.scss` holds Sass variables (colours, spacing, radii, shadows, gradients, font sizes and weights, durations) and emits them as CSS custom properties on `:root`. Use a token instead of a literal.
+- **Breakpoints:** all max-width: `xxl` 1400, `xl` 1200, `lg` 991, `md` 767, `sm-wide` 590, `sm` 580, `xs` 500 px (590 and 580 are different on purpose). Write `@include respond-to('lg') { ... }` inside the block, widest first so the narrower query wins.
+- **Add a component's styles:** pick the level, create `_name.scss` in that folder, `@use '../tools/mixins'` and `'../settings/tokens'` as needed, write `.name`, `.name__el` and `.name--mod` with one class each, add `@use 'level/name';` to `main.scss` in the right place, then put the classes in the component.
+- **Check:** `npm run lint:styles` (also part of `npm run lint` and `npm run check`).
+
 ## Tooling notes
 
 - **ESLint peers:** `eslint-plugin-react` 7.37 and `eslint-plugin-jsx-a11y` 6.10 do not list ESLint 10 as a

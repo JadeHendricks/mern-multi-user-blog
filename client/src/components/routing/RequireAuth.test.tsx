@@ -24,7 +24,7 @@ const renderAt = (auth: TestAuth) =>
 describe('RequireAuth', () => {
   it('shows the loader while the session is being checked', () => {
     const { container, queryByText } = renderAt({ isAuthenticated: null, authLoading: true });
-    expect(container.querySelector('.loader')).not.toBeNull();
+    expect(container.querySelector('.loader__spinner')).not.toBeNull();
     expect(queryByText('secret page')).toBeNull();
     expect(queryByText('login page')).toBeNull();
   });

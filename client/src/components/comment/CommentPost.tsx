@@ -14,17 +14,17 @@ const CommentPost = ({ comment: { userId, avatar, comment, name, date, _id }, po
     return (
         <div className="comment-post">
             <div className="comment-post__icon">
-                <img src={ uploadUrl('users', avatar) } onError={ onImageError('users') } alt={ name } title={ name } />
+                <img className="avatar comment-post__avatar" src={ uploadUrl('users', avatar) } onError={ onImageError('users') } alt={ name } title={ name } />
             </div>
             <div className="comment-post__information">
-                <h5 className="comment-post__user-name">{ name } <span>{ formatDate(date) }</span></h5>
+                <h5 className="comment-post__user-name">{ name } <span className="comment-post__date">{ formatDate(date) }</span></h5>
                 <p className="comment-post__user-comment">
                     { comment }
                 </p>
             </div>
             { loggedInUser && isUsersData(loggedInUser._id, userId) && (
                 <div className="comment-post__interaction">
-                    <button className="button button--red" onClick={ () => { deleteComment.mutate(_id); } }>Delete Comment</button>
+                    <button className="button button--link-red" onClick={ () => { deleteComment.mutate(_id); } }>Delete Comment</button>
                 </div>
             ) }
         </div>

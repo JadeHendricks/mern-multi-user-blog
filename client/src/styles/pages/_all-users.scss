@@ -1,0 +1,6 @@
+// All users page: the user cards wrap in rows, like the post cards do.
+.all-users__cards {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}

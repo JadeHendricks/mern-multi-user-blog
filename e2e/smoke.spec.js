@@ -69,7 +69,7 @@ test('profile page shows the three https social links', async ({ page }) => {
 // Uploaded images and avatars are served from /uploads and actually decode in the browser.
 test('seeded post images and avatars load from /uploads', async ({ page }) => {
   await visit(page, routes.home);
-  for (const selector of ['.card__image', '.card__user-image']) {
+  for (const selector of ['.card__image', '.card__avatar']) {
     const images = page.locator(selector);
     expect(await images.count()).toBeGreaterThan(0);
     for (const image of await images.all()) {
@@ -86,5 +86,5 @@ test('a broken upload falls back to the bundled default image', async ({ page })
   const image = page.locator('.card__image').first();
   await expect(image).toHaveAttribute('src', /default.*\.jpg$/);
   await expect.poll(() => image.evaluate((img) => img.naturalWidth)).toBeGreaterThan(0);
-  await expect(page.locator('.card__user-image').first()).toHaveAttribute('src', /default.*\.jpg$/);
+  await expect(page.locator('.card__avatar').first()).toHaveAttribute('src', /default.*\.jpg$/);
 });

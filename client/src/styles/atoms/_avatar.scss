@@ -1,0 +1,7 @@
+@use '../settings/tokens' as *;
+
+// Round photo. The block that places the image sets its size and margin.
+.avatar {
+  border-radius: $radius-round;
+  object-fit: cover;
+}

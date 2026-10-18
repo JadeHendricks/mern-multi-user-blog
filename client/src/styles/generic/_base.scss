@@ -1,0 +1,131 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  box-sizing: border-box;
+  background-color: $color-background;
+}
+
+hr {
+  border: 0;
+  height: 0.2rem;
+  background: $color-background;
+}
+
+*,
+html,
+body {
+  font-family: Lato, 'Open Sans', sans-serif, arial;
+  font-weight: $weight-regular;
+  line-height: 1.2;
+}
+
+input,
+select,
+textarea {
+  font-family: Lato, 'Open Sans', sans-serif, arial;
+}
+
+h1 {
+  font-size: $font-60;
+}
+
+h2 {
+  font-size: $font-42;
+}
+
+h3 {
+  font-size: $font-30;
+}
+
+h4 {
+  font-size: $font-24;
+}
+
+h5 {
+  font-size: $font-20;
+}
+
+h6 {
+  font-size: $font-16;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: $weight-bold;
+}
+
+p,
+ul,
+li {
+  font-size: $font-16;
+}
+
+strong {
+  font-weight: $weight-bold;
+}
+
+// One standard selector replaces the four vendor-prefixed placeholder rules.
+::placeholder {
+  color: $color-muted;
+}
+
+@include respond-to('lg') {
+  h1 {
+    font-size: $font-40;
+  }
+
+  h2 {
+    font-size: $font-30;
+  }
+
+  h3 {
+    font-size: $font-24;
+  }
+
+  h4 {
+    font-size: $font-20;
+  }
+
+  h5 {
+    font-size: $font-16;
+  }
+
+  h6 {
+    font-size: $font-14;
+  }
+}
+
+@include respond-to('md') {
+  h1 {
+    font-size: $font-30;
+  }
+
+  h2 {
+    font-size: $font-26;
+  }
+
+  h3 {
+    font-size: $font-20;
+  }
+
+  h4 {
+    font-size: $font-18;
+  }
+
+  h5 {
+    font-size: $font-14;
+  }
+
+  h6 {
+    font-size: $font-12;
+  }
+}

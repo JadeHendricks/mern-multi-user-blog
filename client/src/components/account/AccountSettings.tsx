@@ -37,28 +37,28 @@ const AccountSettings = ({ user, email }: AccountSettingsProps) => {
                     e.preventDefault();
                     updateUser.mutate({ name, avatar });
                 } }>
-                    <div className="form__group">
-                        <label className="form__label" htmlFor="name">Name</label>
-                        <input className="form__input" id="name" value={ name || '' } onChange={ e => {
+                    <div className="form-group">
+                        <label className="label" htmlFor="name">Name</label>
+                        <input className="input" id="name" value={ name || '' } onChange={ e => {
                             const value = e.target.value;
                             setName(value);
                         } } />
                     </div>
-                    <div className="form__group">
-                        <label className="form__label" htmlFor="email">Email</label>
-                        <input className="form__input" id="email" name="email" value={ email ?? '' } placeholder="yourname@example.com" disabled></input>
+                    <div className="form-group">
+                        <label className="label" htmlFor="email">Email</label>
+                        <input className="input" id="email" name="email" value={ email ?? '' } placeholder="yourname@example.com" disabled></input>
                     </div>
-                    <div className="form__group form__photo-upload">
-                        <img className="form__user-photo" src={ uploadUrl('users', user.avatar) } onError={ onImageError('users') } alt={ user.name } title={ user.name } />
-                        <input className="form__upload" type="file" accept="image/*" id="avatar" name="avatar" onChange={ e => {
+                    <div className="form-group form-group--upload">
+                        <img className="avatar file-upload__photo" src={ uploadUrl('users', user.avatar) } onError={ onImageError('users') } alt={ user.name } title={ user.name } />
+                        <input className="file-upload__input" type="file" accept="image/*" id="avatar" name="avatar" onChange={ e => {
                             const file = e.target.files?.[0];
                             setAvatar(file);
                             setUploadName(e.target.value.slice(12));
                         } } />
-                        <label htmlFor="avatar">{ uploadName ? uploadName : 'Choose a new profile picture'}</label>
+                        <label className="file-upload__label" htmlFor="avatar">{ uploadName ? uploadName : 'Choose a new profile picture'}</label>
                     </div>
-                    <div className="form__group">
-                        <button type="submit" className="button button--green">Update Account</button>
+                    <div className="form-group">
+                        <button type="submit" className="button button--green form-group__submit">Update Account</button>
                     </div>
                 </form>
             </section>
@@ -70,20 +70,20 @@ const AccountSettings = ({ user, email }: AccountSettingsProps) => {
                     e.preventDefault();
                     updateUserSocials.mutate({ facebook, linkedin, twitter }) }
                     }>
-                    <div className="form__group">
-                        <label className="form__label" htmlFor="facebook">Facebook URL</label>
-                        <input className="form__input" id="facebook" name="facebook" value={ facebook } onChange={ handleSocialsOnChange } type="text" placeholder="Enter in your Facebook URL" />
+                    <div className="form-group">
+                        <label className="label" htmlFor="facebook">Facebook URL</label>
+                        <input className="input" id="facebook" name="facebook" value={ facebook } onChange={ handleSocialsOnChange } type="text" placeholder="Enter in your Facebook URL" />
                     </div>
-                    <div className="form__group">
-                        <label className="form__label" htmlFor="linkedin">Linkedin URL</label>
-                        <input className="form__input" id="linkedin" name="linkedin" value={ linkedin } onChange={ handleSocialsOnChange } type="text" placeholder="Enter in your Linkedin URL" />
+                    <div className="form-group">
+                        <label className="label" htmlFor="linkedin">Linkedin URL</label>
+                        <input className="input" id="linkedin" name="linkedin" value={ linkedin } onChange={ handleSocialsOnChange } type="text" placeholder="Enter in your Linkedin URL" />
                     </div>
-                    <div className="form__group">
-                        <label className="form__label" htmlFor="twitter">Twitter URL</label>
-                        <input className="form__input" id="twitter" name="twitter" value={ twitter } onChange={ handleSocialsOnChange } type="text" placeholder="Enter in your Twitter URL" />
+                    <div className="form-group">
+                        <label className="label" htmlFor="twitter">Twitter URL</label>
+                        <input className="input" id="twitter" name="twitter" value={ twitter } onChange={ handleSocialsOnChange } type="text" placeholder="Enter in your Twitter URL" />
                     </div>
-                    <div className="form__group">
-                        <button type="submit" className="button button--green">Update Socials</button>
+                    <div className="form-group">
+                        <button type="submit" className="button button--green form-group__submit">Update Socials</button>
                     </div>
                 </form>
             </section>

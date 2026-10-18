@@ -37,7 +37,7 @@ const Profile = () => {
                             <div className="container">
                                 <div className="user-header">
                                     <div className="user-header__image">
-                                        <img src={ uploadUrl('users', user.avatar) } onError={ onImageError('users') } alt={ user.name } title={ user.name } />
+                                        <img className="avatar user-header__avatar" src={ uploadUrl('users', user.avatar) } onError={ onImageError('users') } alt={ user.name } title={ user.name } />
                                     </div>
                                     <div className="user-header__info">
                                         <h3 className="user-header__info-name">{ user.name }</h3>
@@ -80,10 +80,10 @@ const Profile = () => {
                     <div className="container">
                         <div className="account">
                             <aside className="account__options">
-                                <nav className="account-nav">
+                                <nav>
                                     <ul className="account-nav__ul">
-                                        <li className="account-nav__el"><button onClick={ handleNavigationState } name='all-posts'>All posts ({ userPosts.length })</button></li>
-                                        { isUsersData(loggedInUser?._id, user._id) && <li className="account-nav__el"><button onClick={ handleNavigationState } name='account-settings'>Account settings</button></li> }
+                                        <li className="account-nav__el"><button className="account-nav__button" onClick={ handleNavigationState } name='all-posts'>All posts ({ userPosts.length })</button></li>
+                                        { isUsersData(loggedInUser?._id, user._id) && <li className="account-nav__el"><button className="account-nav__button" onClick={ handleNavigationState } name='account-settings'>Account settings</button></li> }
                                     </ul>
                                 </nav>
                             </aside>
@@ -92,10 +92,10 @@ const Profile = () => {
                                     {  navigationState === 'all-posts' ? 'All Posts' : 'Account Settings' }
                                 </h2>
                                 { navigationState === 'all-posts' ? (
-                                    <section className="account-posts">
-                                        <div className="cards cards--account">
-                                            { isUsersData(loggedInUser?._id, user._id) && userPosts.map(post => <ProfileCard key={post._id} post={ post } />) }
-                                            { !isUsersData(loggedInUser?._id, user._id) && userPosts.map(post => <PostCard key={post._id} post={ post } />) }
+                                    <section>
+                                        <div className="cards">
+                                            { isUsersData(loggedInUser?._id, user._id) && userPosts.map(post => <ProfileCard key={post._id} post={ post } variant="account" />) }
+                                            { !isUsersData(loggedInUser?._id, user._id) && userPosts.map(post => <PostCard key={post._id} post={ post } variant="account" />) }
                                         </div>
                                     </section>
                                 ) : <AccountSettings key={ user._id } user={ user } email={ loggedInUser?.email }/> }

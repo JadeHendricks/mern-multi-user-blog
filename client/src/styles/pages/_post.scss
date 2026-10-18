@@ -1,0 +1,184 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+// Single post page: banner with the owner's actions, the title block, the author and the text.
+.post {
+  &__banner {
+    height: 50rem;
+    position: relative;
+    background-image: $gradient-green-diagonal;
+  }
+
+  &__banner--edit {
+    background-image: $gradient-yellow-diagonal;
+  }
+
+  &__banner--account {
+    height: auto;
+    padding: $space-50 0;
+  }
+
+  &__actions {
+    display: flex;
+    position: absolute;
+    top: $space-20;
+    left: $space-20;
+
+    @include respond-to('lg') {
+      left: 0;
+      width: 100%;
+    }
+  }
+
+  // Mixed onto a .button. It comes after the button atom, so its width and margin win the tie.
+  &__action {
+    width: 20rem;
+
+    @include respond-to('lg') {
+      width: 21%;
+      margin: 2%;
+    }
+
+    @include respond-to('md') {
+      font-size: $font-12;
+    }
+  }
+
+  // After the lg block above: a single margin-right must still beat the 2% margin there.
+  &__action:not(:last-child) {
+    margin-right: $space-10;
+  }
+
+  &__container {
+    max-width: 80rem;
+    margin: 0 auto;
+    position: relative;
+    top: -45rem;
+  }
+
+  &__header {
+    margin: $space-30 0 $space-15;
+  }
+
+  &__top {
+    display: flex;
+    margin-bottom: $space-50;
+
+    @include respond-to('lg') {
+      margin-bottom: $space-40;
+    }
+
+    @include respond-to('sm') {
+      display: block;
+    }
+  }
+
+  &__image-block {
+    flex: 0 0 20rem;
+    margin-right: $space-25;
+
+    @include respond-to('sm') {
+      display: block;
+      margin: 0 auto;
+      width: 20rem;
+      height: 20rem;
+      object-fit: cover;
+    }
+  }
+
+  &__image {
+    width: 100%;
+    height: 20rem;
+    object-fit: cover;
+  }
+
+  &__title {
+    flex: 1;
+    color: $color-white;
+    font-size: $font-50;
+    margin-bottom: $space-30;
+
+    @include respond-to('lg') {
+      font-size: $font-40;
+    }
+
+    @include respond-to('sm') {
+      margin-top: $space-25;
+      text-align: center;
+      font-size: $font-25;
+    }
+  }
+
+  &__user {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__user-block {
+    display: flex;
+    align-items: center;
+  }
+
+  // Author photo; the round shape comes from the avatar atom.
+  &__user-avatar {
+    height: 8rem;
+    width: 8rem;
+    margin-right: $space-20;
+
+    @include respond-to('md') {
+      height: 6rem;
+      width: 6rem;
+      margin-right: $space-15;
+    }
+  }
+
+  &__user-name {
+    color: $color-white;
+    font-size: $font-18;
+    font-weight: $weight-bold;
+  }
+
+  &__user-social {
+    display: flex;
+  }
+
+  &__user-social-icon {
+    fill: $color-white;
+    width: 3rem;
+    height: 3rem;
+    cursor: pointer;
+  }
+
+  &__user-social-icon:not(:last-child) {
+    margin-right: $space-15;
+  }
+
+  &__body {
+    border-radius: $radius-3;
+    overflow: hidden;
+    box-shadow: $shadow-md;
+    background-color: $color-white;
+    padding: $space-50 $space-40;
+
+    @include respond-to('lg') {
+      padding: $space-25 $space-20;
+    }
+
+    @include respond-to('md') {
+      padding: $space-20;
+    }
+  }
+
+  &__text {
+    font-size: $font-20;
+
+    @include respond-to('lg') {
+      font-size: $font-18;
+    }
+
+    @include respond-to('md') {
+      font-size: $font-16;
+    }
+  }
+}

@@ -1,0 +1,40 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+// Comment section under a post: heading, the add-comment form and the list (see comment-post).
+.comment {
+  margin: $space-40 0;
+  background-color: $color-white;
+  padding: $space-40 $space-25;
+  border-radius: $radius-3;
+  overflow: hidden;
+  box-shadow: $shadow-md;
+
+  @include respond-to('sm') {
+    padding: $space-20;
+  }
+
+  &__header {
+    margin-bottom: $space-25;
+  }
+
+  &__title {
+    margin-bottom: $space-5;
+  }
+
+  &__auth {
+    color: $color-blue;
+    font-weight: $weight-medium;
+    text-decoration: none;
+    font-size: $font-18;
+  }
+
+  &__form {
+    padding-bottom: $space-20;
+  }
+
+  &__total {
+    float: right;
+    font-size: $font-18;
+  }
+}

@@ -23,7 +23,7 @@ const test = base.test.extend({
 // Waits for: no pending requests, the app loader gone, every image decoded, fonts ready.
 async function settle(page) {
   await page.waitForLoadState('networkidle');
-  await base.expect(page.locator('.loader-container')).toHaveCount(0);
+  await base.expect(page.locator('.loader')).toHaveCount(0);
   await page.waitForFunction(() => Array.from(document.images).every((img) => img.complete));
   await page.evaluate(() => document.fonts.ready);
 }

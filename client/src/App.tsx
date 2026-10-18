@@ -1,7 +1,7 @@
 import { Suspense, lazy } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route } from 'react-router';
-import './App.css';
+import './styles/main.scss';
 import Register from './components/auth/local/Register';
 import Login from './components/auth/local/Login';
 import ActivateAccount from './components/auth/local/ActivateAccount';

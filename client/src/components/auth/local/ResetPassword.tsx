@@ -22,18 +22,18 @@ const ResetPassword = () => {
 
     return (
         <div className="container">
-            <div className="reset-password-form">
-                <h2 className="reset-password-form__title">Reset your password</h2>
-                <p className="reset-password-form__description">
+            <div className="recover-form">
+                <h2 className="recover-form__title">Reset your password</h2>
+                <p className="recover-form__description">
                     Enter in your new password to proceed.
                 </p>
-                <form className="form form--resetPassword" onSubmit={ handleOnSubmit }>
-                    <div className="form__group">
-                        <label className="form__label" htmlFor="newPassword">New Password</label>
-                        <input className="form__input" id="newPassword" onChange={ handleOnChange } name="newPassword" type="password" placeholder="••••••••" />
+                <form onSubmit={ handleOnSubmit }>
+                    <div className="form-group">
+                        <label className="label" htmlFor="newPassword">New Password</label>
+                        <input className="input" id="newPassword" onChange={ handleOnChange } name="newPassword" type="password" placeholder="••••••••" />
                     </div>
-                    <div className="form__group">
-                        <button className="button button--green">Reset Password</button>
+                    <div className="form-group">
+                        <button className="button button--green form-group__submit">Reset Password</button>
                     </div>
                 </form>
             </div>

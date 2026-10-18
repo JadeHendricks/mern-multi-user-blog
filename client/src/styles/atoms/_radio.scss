@@ -1,0 +1,55 @@
+@use '../settings/tokens' as *;
+
+// The wrapper owns the state. `:has(:checked)` and `:focus-within` change three custom properties and
+// the circle (`__label::before`) reads them, so no selector needs a combinator or a sibling chain.
+// There is no `:disabled` rule: no radio in the app is ever disabled.
+.radio {
+  --radio-bg: #{$color-background};
+  --radio-border: #{$color-grey-light};
+  --radio-dot: none;
+
+  margin-bottom: $space-15;
+
+  &:last-child {
+    margin-bottom: $space-30;
+  }
+
+  &:has(:checked) {
+    --radio-bg: #{$color-green};
+    --radio-dot: #{$shadow-dot};
+  }
+
+  &:focus-within {
+    --radio-border: #{$color-green};
+  }
+
+  &__input {
+    position: absolute;
+    opacity: 0;
+  }
+
+  &__label {
+    color: $color-muted;
+    font-weight: $weight-medium;
+    font-size: $font-16;
+    text-transform: capitalize;
+  }
+
+  &__label::before {
+    content: '';
+    background-color: var(--radio-bg);
+    border-radius: $radius-round;
+    border: 0.1rem solid var(--radio-border);
+    box-shadow: var(--radio-dot);
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    position: relative;
+    top: 0.05em;
+    margin-right: $space-10;
+    vertical-align: top;
+    cursor: pointer;
+    text-align: center;
+    transition: all $duration-radio ease;
+  }
+}

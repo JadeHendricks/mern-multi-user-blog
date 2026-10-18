@@ -78,7 +78,7 @@ describe('home feed', () => {
     await screen.findByRole('link', { name: 'Post 2' });
     const before = { 1: rendersOf('img-1.png'), 2: rendersOf('img-2.png'), 3: rendersOf('img-3.png') };
 
-    fireEvent.click(mustQuery(cardOf('Post 2'), 'svg.card__interaction-icon:not(.card__interaction-icon-comment)'));
+    fireEvent.click(mustQuery(cardOf('Post 2'), 'svg.card-interaction__icon:not(.card-interaction__icon--comment)'));
     await waitFor(() => expect(within(cardOf('Post 2')).getByText('1 Like')).toBeInTheDocument());
     await waitFor(() => expect(toast.success).toHaveBeenCalledWith('Post has been liked.'));
 
@@ -99,7 +99,7 @@ describe('home feed', () => {
     });
     renderWithProviders(<Base />, { auth });
     await screen.findByRole('link', { name: 'Post 1' });
-    fireEvent.click(mustQuery(cardOf('Post 1'), 'svg.card__interaction-icon:not(.card__interaction-icon-comment)'));
+    fireEvent.click(mustQuery(cardOf('Post 1'), 'svg.card-interaction__icon:not(.card-interaction__icon--comment)'));
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Server broke'));
     await waitFor(() => expect(within(cardOf('Post 1')).getByText('0 Likes')).toBeInTheDocument());
     expect(cardOf('Post 2')).toBeInTheDocument();
@@ -190,7 +190,7 @@ describe('home feed load more', () => {
     await screen.findByRole('link', { name: 'Post 3' });
     const before = { 1: rendersOf('img-1.png'), 2: rendersOf('img-2.png') };
 
-    fireEvent.click(mustQuery(cardOf('Post 3'), 'svg.card__interaction-icon:not(.card__interaction-icon-comment)'));
+    fireEvent.click(mustQuery(cardOf('Post 3'), 'svg.card-interaction__icon:not(.card-interaction__icon--comment)'));
     await waitFor(() => expect(within(cardOf('Post 3')).getByText('1 Like')).toBeInTheDocument());
     expect(within(cardOf('Post 1')).getByText('0 Likes')).toBeInTheDocument();
     expect(rendersOf('img-1.png')).toBe(before[1]);

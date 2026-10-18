@@ -155,7 +155,7 @@ describe('AccountProfile post cards (B21)', () => {
     mockApi(baseRoutes());
     const { container } = render(tree());
     expect(await screen.findByText('0 Likes')).toBeInTheDocument();
-    fireEvent.click(mustQuery(container, 'svg.card__interaction-icon:not(.card__interaction-icon-comment)'));
+    fireEvent.click(mustQuery(container, 'svg.card-interaction__icon:not(.card-interaction__icon--comment)'));
     expect(await screen.findByText('1 Like')).toBeInTheDocument();
     await waitFor(() => expect(toast.success).toHaveBeenCalledWith('Post has been liked.'));
   });
@@ -165,7 +165,7 @@ describe('AccountProfile post cards (B21)', () => {
     // Bob looks at Ann's profile.
     const { container } = render(tree('u2'));
     expect(await screen.findByText('0 Likes')).toBeInTheDocument();
-    fireEvent.click(mustQuery(container, 'svg.card__interaction-icon:not(.card__interaction-icon-comment)'));
+    fireEvent.click(mustQuery(container, 'svg.card-interaction__icon:not(.card-interaction__icon--comment)'));
     expect(await screen.findByText('1 Like')).toBeInTheDocument();
   });
 

@@ -1,0 +1,34 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+// Side menu on the account page: All posts and Account settings.
+.account-nav {
+  &__ul {
+    list-style-type: none;
+  }
+
+  &__el {
+    border-bottom: 0.1rem solid $color-white;
+    padding: $space-20 0;
+
+    @include respond-to('xl') {
+      padding: $space-15 0;
+    }
+  }
+
+  &__el:last-child {
+    border: 0;
+  }
+
+  &__button {
+    font-size: $font-18;
+    text-transform: uppercase;
+    border: 0;
+    background: transparent;
+    color: $color-white;
+
+    @include respond-to('xl') {
+      font-size: $font-16;
+    }
+  }
+}
