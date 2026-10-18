@@ -84,7 +84,17 @@ describe('comments', () => {
     expect(res.status).toBe(404);
     expect(res.body).toEqual({ msg: 'Comment does not exist' });
   });
-});
+
+  it('answers 404 when deleting a comment on an unknown post', async () => {
+    const { agent } = await createUserAndLogin(app);
+
+    const res = await agent.delete(
+      `/api/post/comment/${new mongoose.Types.ObjectId()}/${new mongoose.Types.ObjectId()}`,
+    );
+
+    expect(res.status).toBe(404);
+    expect(res.body.message).toBe('Post not found');
+  });});
 
 describe('likes', () => {
   let app;
@@ -149,18 +159,32 @@ describe('likes', () => {
     expect(res.status).toBe(401);
   });
 
-  it('KNOWN BUG B5: liking an unknown post answers 401 "Please log in" instead of 404', async () => {
+  it('answers 404 when liking or unliking an unknown post', async () => {
     const { agent } = await createUserAndLogin(app);
 
     const like = await agent.put(`/api/post/like/${new mongoose.Types.ObjectId()}`);
     const unlike = await agent.put(`/api/post/unlike/${new mongoose.Types.ObjectId()}`);
 
-    expect(like.status).toBe(401);
-    expect(like.body.message).toBe('Please log in to like this post');
-    expect(unlike.status).toBe(401);
-    expect(unlike.body.message).toBe('Please log in to unlike this post');
+    expect(like.status).toBe(404);
+    expect(like.body.message).toBe('Post not found');
+    expect(unlike.status).toBe(404);
+    expect(unlike.body.message).toBe('Post not found');
   });
 
+  it('keeps exactly one like when the same user likes in parallel', async () => {
+    const { agent, user } = await createUserAndLogin(app);
+    const post = await createPost(agent);
+
+    const results = await Promise.all(
+      Array.from({ length: 5 }, () => agent.put(`/api/post/like/${post._id}`)),
+    );
+
+    expect(results.filter((r) => r.status === 200)).toHaveLength(1);
+    expect(results.filter((r) => r.status === 400)).toHaveLength(4);
+    const fetched = await supertest(app).get(`/api/post/${post._id}`);
+    expect(fetched.body.post.likes).toHaveLength(1);
+    expect(fetched.body.post.likes[0].user).toBe(user._id);
+  });
   it('answers 404 for a malformed post id', async () => {
     const { agent } = await createUserAndLogin(app);
 

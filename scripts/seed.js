@@ -6,6 +6,9 @@
 // Ids and dates are fixed on purpose: screenshots must look the same on every run.
 // One throwaway password for every seeded account. It only exists in seeded local data.
 const E2E_PASSWORD = 'E2e-Throwaway-1!';
+// Raw activation token for the pending user Erin. Only its SHA-256 hash is stored, like a real signup.
+const SEED_ACTIVATION_TOKEN = 'e2e00000000000000000000000000000000000000000000000000000000000a1';
+const PENDING_USER = { name: 'Erin Example', email: 'erin@example.test' };
 
 const SEED_IDS = {
   users: {
@@ -28,7 +31,16 @@ const SEED_USERS = [
   { key: 'alice', name: 'Alice Archer', email: 'alice@example.test' },
   { key: 'bob', name: 'Bob Baker', email: 'bob@example.test' },
   { key: 'carol', name: 'Carol Chen', email: 'carol@example.test' },
-  { key: 'dan', name: 'Dan Diaz', email: 'dan@example.test' },
+  {
+    key: 'dan',
+    name: 'Dan Diaz',
+    email: 'dan@example.test',
+    socials: {
+      facebook: 'https://facebook.com/dan.diaz.example',
+      linkedin: 'https://linkedin.com/in/dan-diaz-example',
+      twitter: 'https://twitter.com/dandiaz_example',
+    },
+  },
 ];
 
 const u = SEED_IDS.users;
@@ -137,6 +149,7 @@ async function seed(mongoose) {
   // The models are CommonJS and register themselves on the shared mongoose instance.
   const User = require('../models/UserModel');
   const Post = require('../models/PostModel');
+  const { hashToken } = require('../lib/tokens');
   const ObjectId = mongoose.Types.ObjectId;
 
   // Each save runs the bcrypt pre-save hook, so the seeded passwords are hashed like real ones.
@@ -147,8 +160,21 @@ async function seed(mongoose) {
       name: spec.name,
       email: spec.email,
       password: E2E_PASSWORD,
+      status: 'active',
+      // Fixed so the "Joined date" on the users page does not change with the day the tests run.
+      createdAt: new Date('2025-11-20T09:00:00.000Z'),
+      ...(spec.socials && { socials: spec.socials }),
     });
   }
+  // Pending until the activation link is used; the far-future expiry keeps screenshots stable.
+  await User.create({
+    ...PENDING_USER,
+    password: E2E_PASSWORD,
+    status: 'pending',
+    createdAt: new Date('2025-11-20T09:00:00.000Z'),
+    activationToken: hashToken(SEED_ACTIVATION_TOKEN),
+    activationExpires: new Date('2099-01-01T00:00:00.000Z'),
+  });
   const byId = Object.values(users).reduce((acc, user) => ({ ...acc, [user.id]: user }), {});
 
   for (const [index, spec] of SEED_POSTS.entries()) {
@@ -170,7 +196,7 @@ async function seed(mongoose) {
       })),
     });
   }
-  return { users: SEED_USERS.length, posts: SEED_POSTS.length };
+  return { users: SEED_USERS.length, posts: SEED_POSTS.length, pending: 1 };
 }
 
 async function main() {
@@ -209,7 +235,7 @@ async function main() {
       return;
     }
     const counts = await seed(mongoose);
-    console.log(`Seeded ${counts.users} users and ${counts.posts} posts.`);
+    console.log(`Seeded ${counts.users} users, ${counts.pending} pending user and ${counts.posts} posts.`);
   } finally {
     await mongoose.disconnect();
   }
@@ -222,4 +248,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { seed, isLocalMongoUri, E2E_PASSWORD, SEED_IDS, SEED_USERS, SEED_POSTS };
+module.exports = { seed, isLocalMongoUri, E2E_PASSWORD, SEED_ACTIVATION_TOKEN, SEED_IDS, SEED_USERS, SEED_POSTS };

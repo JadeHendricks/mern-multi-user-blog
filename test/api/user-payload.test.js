@@ -8,7 +8,7 @@ import { extractLink, readLatestMail, tokenFromLink } from './support/outbox.js'
 // anything sensitive is compared inside the test and only a boolean reaches the assertion.
 const keysOf = (object) => Object.keys(object).sort();
 
-describe('KNOWN BUG S4/B4: public endpoints expose whole user documents', () => {
+describe('public user payloads expose only the public fields', () => {
   let app;
   let alice;
   let bob;
@@ -29,92 +29,74 @@ describe('KNOWN BUG S4/B4: public endpoints expose whole user documents', () => 
   });
   afterAll(disconnectDb);
 
-  // The resetPasswordLink key only exists on a user document after forgot-password was called for it.
-  const plainUserKeys = ['__v', '_id', 'avatar', 'createdAt', 'email', 'name', 'role', 'updatedAt'];
-  const resetUserKeys = [...plainUserKeys, 'resetPasswordLink'].sort();
+  const publicKeys = ['_id', 'avatar', 'createdAt', 'name'];
+  const ownerKeys = ['__v', '_id', 'avatar', 'createdAt', 'email', 'name', 'role', 'status', 'updatedAt'];
 
-  it('KNOWN BUG S4: GET /api/user (no login) returns every account with email and role', async () => {
+  it('GET /api/user (no login) lists only public keys, even for a user with a pending reset', async () => {
     const res = await supertest(app).get('/api/user');
 
     expect(res.status).toBe(200);
     expect(res.body.users).toHaveLength(2);
-    const byId = Object.fromEntries(res.body.users.map((user) => [user._id, user]));
-    expect(keysOf(byId[alice.user._id])).toEqual(resetUserKeys);
-    expect(keysOf(byId[bob.user._id])).toEqual(plainUserKeys);
-    for (const user of res.body.users) expect('password' in user).toBe(false);
+    for (const user of res.body.users) {
+      for (const key of publicKeys) expect(keysOf(user)).toContain(key);
+      for (const key of keysOf(user)) expect([...publicKeys, 'socials']).toContain(key);
+    }
   });
 
-  it('KNOWN BUG S4: GET /api/user/:id (no login) returns email, role and timestamps', async () => {
+  it('GET /api/user/:id (no login) returns only public keys', async () => {
     const res = await supertest(app).get(`/api/user/${bob.user._id}`);
 
     expect(res.status).toBe(200);
-    expect(keysOf(res.body.user)).toEqual(plainUserKeys);
-    expect('password' in res.body.user).toBe(false);
+    for (const key of keysOf(res.body.user)) expect([...publicKeys, 'socials']).toContain(key);
+    for (const key of ['email', 'role', 'updatedAt', '__v', 'password', 'resetPasswordLink']) {
+      expect(key in res.body.user).toBe(false);
+    }
   });
 
-  it('KNOWN BUG S4/B4: anyone can read a pending password-reset token from /api/user and /api/user/:id', async () => {
+  it('no secret field reaches /api/user or /api/user/:id, and a made-up token resets nothing', async () => {
     const one = await supertest(app).get(`/api/user/${alice.user._id}`);
     const all = await supertest(app).get('/api/user');
     const fromList = all.body.users.find((user) => user._id === alice.user._id);
 
+    expect('resetPasswordLink' in one.body.user).toBe(false);
+    expect('resetPasswordLink' in fromList).toBe(false);
     // Booleans only, so the token never shows up in a failure message.
-    expect(one.body.user.resetPasswordLink === resetToken).toBe(true);
-    expect(fromList.resetPasswordLink === resetToken).toBe(true);
-    // Someone who never requested a reset has no such key at all.
-    const bobs = await supertest(app).get(`/api/user/${bob.user._id}`);
-    expect('resetPasswordLink' in bobs.body.user).toBe(false);
-  });
-
-  it('KNOWN BUG S4: the exposed reset token is enough to take over the account', async () => {
-    const one = await supertest(app).get(`/api/user/${alice.user._id}`);
-    const stolen = one.body.user.resetPasswordLink;
-    const newPassword = `stolen-${alice.credentials.password}`;
+    expect(JSON.stringify(all.body).includes(resetToken)).toBe(false);
 
     const reset = await supertest(app)
       .put('/api/auth/reset-password')
-      .send({ resetPasswordLink: stolen, newPassword });
-    const login = await supertest(app)
-      .post('/api/auth/login')
-      .send({ email: alice.credentials.email, password: newPassword });
-
-    expect(reset.status).toBe(200);
-    expect(login.status).toBe(200);
+      .send({ resetPasswordLink: 'made-up-token', newPassword: 'whatever-password-1' });
+    expect(reset.status).toBeGreaterThanOrEqual(400);
   });
 
-  it('KNOWN BUG S4: GET /api/post exposes the author email next to name, avatar and id', async () => {
+  it('GET /api/post shows the author name, avatar and id only', async () => {
     const res = await supertest(app).get('/api/post');
 
     expect(res.status).toBe(200);
-    expect(keysOf(res.body.posts[0].user)).toEqual(['_id', 'avatar', 'email', 'name']);
-    expect('password' in res.body.posts[0].user).toBe(false);
-    expect('resetPasswordLink' in res.body.posts[0].user).toBe(false);
+    expect(keysOf(res.body.posts[0].user)).toEqual(['_id', 'avatar', 'name']);
   });
 
-  it('KNOWN BUG S4: GET /api/post/:id exposes the author email (and socials when set)', async () => {
+  it('GET /api/post/:id shows the author without email (socials only when set)', async () => {
     const res = await supertest(app).get(`/api/post/${post._id}`);
 
     expect(res.status).toBe(200);
     const keys = keysOf(res.body.post.user);
-    for (const key of ['_id', 'avatar', 'email', 'name']) expect(keys).toContain(key);
-    expect(keys).not.toContain('password');
-    expect(keys).not.toContain('resetPasswordLink');
-    expect(keys).not.toContain('role');
+    for (const key of ['_id', 'avatar', 'name']) expect(keys).toContain(key);
+    for (const key of ['email', 'password', 'resetPasswordLink', 'role']) expect(keys).not.toContain(key);
   });
 
-  it('KNOWN BUG S4: GET /api/post/user/:id exposes the author email too', async () => {
+  it('GET /api/post/user/:id shows the author without email', async () => {
     const res = await supertest(app).get(`/api/post/user/${alice.user._id}`);
 
     expect(res.status).toBe(200);
-    expect(keysOf(res.body.posts[0].user)).toEqual(['_id', 'avatar', 'email', 'name']);
+    expect(keysOf(res.body.posts[0].user)).toEqual(['_id', 'avatar', 'name']);
   });
 
-  it('login and /api/user/me return the owner document without the password hash', async () => {
+  it('login and /api/user/me return the owner view without the password hash or secrets', async () => {
     const me = await alice.agent.get('/api/user/me');
 
     expect(me.status).toBe(200);
-    expect(keysOf(me.body.user)).toEqual(resetUserKeys);
-    // The login payload was captured before the reset request, so it has no reset key yet.
-    expect(keysOf(alice.user)).toEqual(plainUserKeys);
-    expect('password' in me.body.user).toBe(false);
+    expect(keysOf(me.body.user)).toEqual(ownerKeys);
+    expect(keysOf(alice.user)).toEqual(ownerKeys);
   });
 });

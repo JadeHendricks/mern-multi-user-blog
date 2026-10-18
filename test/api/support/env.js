@@ -28,6 +28,8 @@ process.env.NODE_CONFIG = JSON.stringify({
 });
 // An empty folder, so no real config/*.json on the machine can leak into a test run.
 process.env.NODE_CONFIG_DIR = path.join(here, 'fixtures', 'config');
+// High so normal tests never hit the auth limiter; rate-limit.test.js lowers it.
+process.env.AUTH_RATE_LIMIT_MAX = '1000';
 process.env.MAIL_TRANSPORT = 'file';
 process.env.MAIL_OUTBOX_DIR = path.join(runDir, 'outbox');
 process.env.UPLOAD_DIR = runDir;

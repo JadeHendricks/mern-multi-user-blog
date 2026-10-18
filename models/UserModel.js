@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         trim: true,
         required: true,
-        max: 32
+        maxlength: 32
     },
     email: {
         type: String,
@@ -40,15 +40,40 @@ const userSchema = new mongoose.Schema({
         enum: ['user', 'admin'],
         default: 'user'
     },
+    // Defaults to active so documents created before this field existed keep working
+    status: {
+        type: String,
+        enum: ['pending', 'active'],
+        default: 'active'
+    },
+    // Secrets and bookkeeping are select:false so no query can leak them by accident.
     resetPasswordLink: {
-        data: String,
-        default: ''
+        type: String,
+        select: false
+    },
+    resetPasswordExpires: {
+        type: Date,
+        select: false
+    },
+    activationToken: {
+        type: String,
+        select: false
+    },
+    activationExpires: {
+        type: Date,
+        select: false
+    },
+    passwordChangedAt: {
+        type: Date,
+        select: false
     },
 }, { timestamps: true });
 
 userSchema.pre('save', async function(next) {
     if (!this.isModified('password')) return next();
     this.password = await bcrypt.hash(this.password, 12);
+    // Sessions issued before this moment are rejected by verifySession
+    if (!this.isNew) this.passwordChangedAt = new Date();
     next();
 });
 

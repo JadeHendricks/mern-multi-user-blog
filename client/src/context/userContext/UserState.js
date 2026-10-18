@@ -19,7 +19,7 @@ const PostState = props => {
 
   const getAllUsers = async () => {
     try {
-        const res = await axios.get('api/user');
+        const res = await axios.get('/api/user');
         dispatch({
           type: GET_ALL_USERS,
           payload: res.data.users

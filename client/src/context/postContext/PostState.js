@@ -81,10 +81,11 @@ const PostState = props => {
     try {
         await axios.delete(`/api/post/${id}`); 
         toast.success('Post has been deleted.');
-        props.history.push('/');
+        return true;
     } catch (err) {
         dispatch({ type: POST_ERROR });
         toast.error(err.response.data.message);
+        return false;
     }
   }
   
@@ -97,9 +98,11 @@ const PostState = props => {
           type: CREATE_COMMENT,
           payload: res.data.comment
         })
+        return true;
     } catch (err) {
         dispatch({ type: POST_ERROR });
         toast.error(err.response.data.message);
+        return false;
     }
   }
 

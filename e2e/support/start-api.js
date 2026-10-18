@@ -29,6 +29,8 @@ process.env.NODE_CONFIG = JSON.stringify({
 // An empty folder, so a real config/*.json on the machine can never leak into this run.
 process.env.NODE_CONFIG_DIR = path.join(runDir, 'config');
 mkdirSync(process.env.NODE_CONFIG_DIR);
+// Many logins from one IP are expected during E2E runs
+process.env.AUTH_RATE_LIMIT_MAX = '1000';
 process.env.MAIL_TRANSPORT = 'file';
 process.env.MAIL_OUTBOX_DIR = path.join(runDir, 'outbox');
 process.env.UPLOAD_DIR = runDir;
@@ -56,7 +58,7 @@ async function main() {
   const app = require('../../app');
   const server = app.listen(PORT, () => {
     console.log(
-      `E2E API on http://localhost:${PORT} (seeded ${counts.users} users, ${counts.posts} posts)`,
+      `E2E API on http://localhost:${PORT} (seeded ${counts.users} users, ${counts.pending} pending, ${counts.posts} posts)`,
     );
   });
 

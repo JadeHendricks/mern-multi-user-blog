@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useContext, useState } from 'react';
 import UserContext from '../../context/userContext/UserContext';
 import ContentLoader from '../layouts/ContentLoader';
 
-const AccountSettings = ({ user }) => {
+const AccountSettings = ({ user, email }) => {
     const { updateUserSocials, updateUser, userLoading } = useContext(UserContext);
 
     const [ userSocials, setUserSocials] = useState({ facebook: '', linkedin: '', twitter: '' });
@@ -43,7 +43,7 @@ const AccountSettings = ({ user }) => {
                             </div>
                             <div className="form__group">
                                 <label className="form__label" htmlFor="email">Email</label>
-                                <input className="form__input" id="email" name="email" value={ user.email } placeholder="yourname@example.com" disabled></input>
+                                <input className="form__input" id="email" name="email" value={ email || '' } placeholder="yourname@example.com" disabled></input>
                             </div>
                             <div className="form__group form__photo-upload">
                                 <img className="form__user-photo" src={require(`../../assets/images/users/default.jpg`)} alt={ user?.name } title={ user?.name } />

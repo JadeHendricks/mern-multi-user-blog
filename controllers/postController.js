@@ -1,37 +1,14 @@
 const Post = require('../models/PostModel');
 const User = require('../models/UserModel');
 
-const multer = require('multer');
-const path = require('path');
+const mongoose = require('mongoose');
+const { makeUpload, removeStoredFile } = require('../lib/upload');
 
-const multerStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, process.env.UPLOAD_DIR ? path.join(process.env.UPLOAD_DIR, 'posts') : 'client/src/assets/images/posts')
-    },
-    filename: (req, file, cb) => {
-        const ext = file.mimetype.split('/')[1];
-        cb(null, `post-${req.user.id}-${Date.now()}.${ext}`)
-    }
-});
-
-const multerFilter = (req, file, cb) => {
-    if (file.mimetype.startsWith('image')) {
-        cb(null, true);
-    } else {
-        cb('Not an Image! Please upload only images.', false);
-    }
-}
-
-const upload = multer({ 
-    storage: multerStorage,
-    fileFilter: multerFilter
-});
-
-exports.uploadPostPhoto = upload.single('image');
+exports.uploadPostPhoto = makeUpload({ subdir: 'posts', prefix: 'post', field: 'image' });
 
 exports.getAllPosts = async (req, res) => { 
     try {
-        const posts = await Post.find().populate('user', ['name', 'email', 'avatar', '_id']).sort({ 'date': '-1' });
+        const posts = await Post.find().populate('user', ['name', 'avatar', '_id']).sort({ 'date': '-1' });
         
         if (!posts) {
             return res.status(404).json({
@@ -54,7 +31,7 @@ exports.getAllPosts = async (req, res) => {
 
 exports.getPost = async (req, res) => { 
     try {
-        const post = await Post.findById(req.params.id).populate('user', ['name', 'email', 'avatar', '_id', 'socials']);
+        const post = await Post.findById(req.params.id).populate('user', ['name', 'avatar', '_id', 'socials']);
         if (!post) {
           return res.status(404).json({ 
             message: 'Post not found' 
@@ -111,7 +88,8 @@ exports.deletePost = async (req, res) => {
         if (post.user.toString() !== req.user.id) {
             return res.status(401).json({ message: 'This post does not belong to you.' });
         }
-        await post.remove();
+        await post.deleteOne();
+        await removeStoredFile('posts', post.image);
         res.status(200).json({ message: 'Post has been deleted.' });
 
     } catch (err) {
@@ -128,7 +106,7 @@ exports.deletePost = async (req, res) => {
 
 exports.getAllUsersPosts = async (req, res) => { 
     try {
-        const usersPosts = await Post.find({'user': req.params.id}).populate('user', ['name', 'email', 'avatar','_id']);
+        const usersPosts = await Post.find({'user': req.params.id}).populate('user', ['name', 'avatar', '_id']);
         res.status(200).json({
             message: 'success',
             results: usersPosts.length,
@@ -143,28 +121,33 @@ exports.getAllUsersPosts = async (req, res) => {
 }
 
 exports.editPost = async (req, res) => {
-    const { id, title, tag, description } = req.body;
-
+    // The post id comes from the URL only; an id in the body is ignored.
+    const { title, tag, description } = req.body;
+    if (!mongoose.isValidObjectId(req.params.id)) {
+        return res.status(404).json({ message: 'No post found with that ID' });
+    }
     const postFields = {};
-
     if (title) postFields.title = title;
     if (tag) postFields.tag = tag;
     if (description) postFields.description = description;
     if (req.file) postFields.image = req.file.filename;
-
     try {
-        const post = await Post.findOneAndUpdate(
-            { _id: id },
-            { $set: postFields },
-            { new: true}
-          );
-
-        if (!post) {
-            res.status(404).json({
+        const existing = await Post.findById(req.params.id);
+        if (!existing) {
+            return res.status(404).json({
                 message: 'No post found with that ID'
             });
         }
-    
+        if (existing.user.toString() !== req.user.id) {
+            return res.status(403).json({ message: 'This post does not belong to you.' });
+        }
+        const post = await Post.findOneAndUpdate(
+            { _id: req.params.id },
+            { $set: postFields },
+            { new: true, runValidators: true }
+          );
+        // The replaced image is no longer referenced, so drop it from disk
+        if (req.file) await removeStoredFile('posts', existing.image);
         res.status(200).json({
             message: 'Post has been updated',
             post
@@ -177,64 +160,55 @@ exports.editPost = async (req, res) => {
     }
 }
 
-exports.likePost = async (req, res) => { 	
-    try {	
-        const post = await Post.findById(req.params.id);	
-
-        if (post.likes.filter(like => like.user.toString() === req.user.id).length > 0) {	
-          return res.status(400).json({ 	
-              message: 'Post has already been liked.' 	
-          });	
-        }	
-
-        post.likes.unshift({ user: req.user.id });	
-        await post.save();	
-
-        res.status(200).json({	
-            message: 'Post has been liked.',	
-            likes: post.likes,	
-            results: post.likes.length	
-        });	
-
-    } catch (err) {	
-        console.error(err.message);	
-        if (err.kind === 'ObjectId') {	
-          return res.status(404).json({ message: 'Post not found' })	
-        }	
-        res.status(401).json({	
-            message: 'Please log in to like this post'	
-        });	
-    }	
-}	
-
-exports.unlikePost = async (req, res) => { 	
-    try {	
-        const post = await Post.findById(req.params.id);	
-        if (post.likes.filter(like => like.user.toString() === req.user.id).length === 0) {	
-            return res.status(400).json({ 	
-                message: 'Post has not yet been liked.' 	
-            });	
-        }	
-        const removeIndex = post.likes.map(like => like.user.toString()).indexOf(req.user.id);	
-        post.likes.splice(removeIndex, 1);	
-        await post.save();	
-        res.status(200).json({ 	
-            message: 'Post has been disliked.',	
-            likes: post.likes,	
-            results: post.likes.length	
-        });	
-
-    } catch (err) {	
-        console.error(err.message);	
-        if (err.kind === 'ObjectId') {	
-          return res.status(404).json({ message: 'Post not found' })	
-        }	
-        res.status(401).json({	
-            message: 'Please log in to unlike this post'	
-        });	
-    }	
+// Like and unlike are single atomic updates: the filter makes "already liked" a no-op match, so two
+// parallel requests cannot both push (likes subdocuments have their own _id, so $addToSet cannot dedupe).
+exports.likePost = async (req, res) => {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+        return res.status(404).json({ message: 'Post not found' });
+    }
+    const post = await Post.findOneAndUpdate(
+        { _id: req.params.id, 'likes.user': { $ne: req.user.id } },
+        { $push: { likes: { $each: [{ user: req.user.id }], $position: 0 } } },
+        { new: true }
+    );
+    if (!post) {
+        if (!(await Post.exists({ _id: req.params.id }))) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+        return res.status(400).json({
+            message: 'Post has already been liked.'
+        });
+    }
+    res.status(200).json({
+        message: 'Post has been liked.',
+        likes: post.likes,
+        results: post.likes.length
+    });
 }
 
+exports.unlikePost = async (req, res) => {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+        return res.status(404).json({ message: 'Post not found' });
+    }
+    const post = await Post.findOneAndUpdate(
+        { _id: req.params.id, 'likes.user': req.user.id },
+        { $pull: { likes: { user: req.user.id } } },
+        { new: true }
+    );
+    if (!post) {
+        if (!(await Post.exists({ _id: req.params.id }))) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+        return res.status(400).json({
+            message: 'Post has not yet been liked.'
+        });
+    }
+    res.status(200).json({
+        message: 'Post has been disliked.',
+        likes: post.likes,
+        results: post.likes.length
+    });
+}
 exports.addComment = async (req, res) => { 
     try {
         const post = await Post.findById(req.params.id); 
@@ -273,6 +247,9 @@ exports.addComment = async (req, res) => {
 exports.deleteComment = async (req, res) => { 
     try {
         const post = await Post.findById(req.params.id); 
+        if (!post) {
+          return res.status(404).json({ message: 'Post not found' });
+        }
         const comment = post.comments.find(comment => comment._id.toString() === req.params.comment_id);
 
         if (!comment) {

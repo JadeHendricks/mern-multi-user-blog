@@ -5,6 +5,7 @@ import AuthContext from '../../context/authContext/AuthContext';
 import PostContext from '../../context/postContext/PostContext';
 import CommentSubmit from '../comment/CommentSubmit';
 import ContentLoader from '../layouts/ContentLoader';
+import { isHttpsUrl } from '../../utils/safeUrl';
 
 const FullPost = ({ match, history }) => {
     const { loggedInUser, isUsersData, authLoading } = useContext(AuthContext);
@@ -15,6 +16,16 @@ const FullPost = ({ match, history }) => {
         getPost(match.params.id);
         // eslint-disable-next-line
     }, [match.params.id]);
+
+    // Only leave the page once the server confirmed the delete.
+    const handleDelete = async () => {
+        if (!window.confirm('Delete this post? This cannot be undone.')) {
+            return;
+        }
+        if (await deletePost(_id)) {
+            history.push('/');
+        }
+    };
 
     return (
         <Fragment>
@@ -32,7 +43,7 @@ const FullPost = ({ match, history }) => {
                                     { loggedInUser && isUsersData(loggedInUser._id, user._id) && (
                                         <Fragment>
                                             <Link to={`/edit-post/${_id}`} className="button button--yellow">Edit Post</Link>
-                                            <button className="button button--red" onClick={ () => deletePost(_id) }>Delete Post</button>
+                                            <button className="button button--red" onClick={ handleDelete }>Delete Post</button>
                                         </Fragment>
                                     )}
                                 </Fragment>
@@ -55,21 +66,21 @@ const FullPost = ({ match, history }) => {
                                     </div>
                                     { user?.socials && (
                                         <div className="post__user-social">
-                                            { user.socials.facebook && (
+                                            { isHttpsUrl(user.socials.facebook) && (
                                                 <a href={user.socials.facebook} target='_blank' rel='noopener noreferrer'>
                                                     <svg className="post__user-social-icon">
                                                         <use xlinkHref={`${svg}#icon-facebook-square`}></use>
                                                     </svg>  
                                                 </a>
                                             ) }
-                                            { user.socials.linkedin && (
+                                            { isHttpsUrl(user.socials.linkedin) && (
                                                 <a href={user.socials.linkedin} target='_blank' rel='noopener noreferrer'>
                                                     <svg className="post__user-social-icon">
                                                         <use xlinkHref={`${svg}#icon-linkedin-square`}></use>
                                                     </svg>  
                                                 </a>
                                             ) }
-                                            { user.socials.twitter && (
+                                            { isHttpsUrl(user.socials.twitter) && (
                                                 <a href={user.socials.twitter} target='_blank' rel='noopener noreferrer'>
                                                     <svg className="post__user-social-icon">
                                                         <use xlinkHref={`${svg}#icon-twitter-square`}></use>

@@ -1,31 +1,9 @@
 const User = require('../models/UserModel');
-const multer = require('multer');
-const path = require('path');
+const { makeUpload, removeStoredFile } = require('../lib/upload');
 
-const multerStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, process.env.UPLOAD_DIR ? path.join(process.env.UPLOAD_DIR, 'users') : 'client/src/assets/images/users')
-    },
-    filename: (req, file, cb) => {
-        const ext = file.mimetype.split('/')[1];
-        cb(null, `user-${req.user.id}-${Date.now()}.${ext}`)
-    }
-});
+const PUBLIC_FIELDS = '_id name avatar socials createdAt';
 
-const multerFilter = (req, file, cb) => {
-    if (file.mimetype.startsWith('image')) {
-        cb(null, true);
-    } else {
-        cb('Not an Image! Please upload only images.', false);
-    }
-}
-
-const upload = multer({ 
-    storage: multerStorage,
-    fileFilter: multerFilter
-});
-
-exports.uploadUserAvatar = upload.single('avatar');
+exports.uploadUserAvatar = makeUpload({ subdir: 'users', prefix: 'user', field: 'avatar' });
 
 exports.getMe = async (req, res) => {
     try {
@@ -51,7 +29,8 @@ exports.getMe = async (req, res) => {
 
 exports.getUser = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id);
+        // Public view: no email, role or timestamps beyond createdAt
+        const user = await User.findById(req.params.id).select(PUBLIC_FIELDS);
         if (!user) {
             return res.status(400).json({
                 message: 'User not found!'
@@ -73,7 +52,8 @@ exports.getUser = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
     try {
-        const users = await User.find();
+        // Pending (not yet activated) accounts must never be listed
+        const users = await User.find({ status: { $ne: 'pending' } }).select(PUBLIC_FIELDS);
         if (!users) {
             return res.status(404).json({
                 message: 'No user have been found!'
@@ -104,8 +84,13 @@ exports.updateMe = async (req, res) => {
         let user = await User.findOneAndUpdate(
             { _id: req.user.id },
             { $set: userFields },
-            { new: true, upsert: true }
-        );;
+            { new: true }
+        );
+        if (!user) {
+            return res.status(404).json({ message: 'User not found!' });
+        }
+        // req.user still holds the pre-update avatar; the replaced file is no longer referenced
+        if (req.file) await removeStoredFile('users', req.user.avatar);
 
         res.status(200).json({
             message: 'User details has been updated',
@@ -125,19 +110,19 @@ exports.updateUserSocials = async (req, res) => {
     try {
         const { facebook, linkedin, twitter } = req.body;
 
+        // Dotted $set keys touch only the networks that were sent; an empty string clears that one field.
         const userFields = {};
-        userFields.socials = {};
-
-        if (facebook) userFields.socials.facebook = facebook;
-        if (linkedin) userFields.socials.linkedin = linkedin;
-        if (twitter) userFields.socials.twitter = twitter;
-
+        if (facebook !== undefined) userFields['socials.facebook'] = facebook;
+        if (linkedin !== undefined) userFields['socials.linkedin'] = linkedin;
+        if (twitter !== undefined) userFields['socials.twitter'] = twitter;
         let user = await User.findOneAndUpdate(
             { _id: req.user.id },
             { $set: userFields },
-            { new: true, upsert: true }
+            { new: true }
         );
-
+        if (!user) {
+            return res.status(404).json({ message: 'User not found!' });
+        }
         res.status(200).json({
             message: 'Your socials have been updated',
             user

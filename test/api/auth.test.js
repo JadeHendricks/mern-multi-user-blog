@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { createRequire } from 'node:module';
 import supertest from 'supertest';
-import { clearDb, connectDb, disconnectDb } from './support/db.js';
+import { clearDb, connectDb, disconnectDb, mongoose } from './support/db.js';
 import {
   createUserAndLogin,
   fakeConfig,
@@ -10,6 +11,9 @@ import {
   registerAndActivate,
 } from './support/helpers.js';
 import { extractLink, readLatestMail, readMails, tokenFromLink } from './support/outbox.js';
+
+const require = createRequire(import.meta.url);
+const jwt = require('jsonwebtoken');
 
 describe('auth', () => {
   let app;
@@ -49,16 +53,57 @@ describe('auth', () => {
       expect(activation.body.message).toBe('Activation successful. Please login.');
     });
 
-    it('rejects a duplicate email once the account exists', async () => {
+    it('answers a duplicate email with the same 200 and does not change the account', async () => {
       const user = fakeUser();
       await registerAndActivate(app, user);
 
-      const res = await supertest(app).post('/api/auth/register').send(user);
+      const res = await supertest(app)
+        .post('/api/auth/register')
+        .send({ ...user, password: 'someone-elses-pw' });
 
-      expect(res.status).toBe(400);
-      expect(res.body.message).toBe('Email Address already exists');
+      expect(res.status).toBe(200);
+      expect(res.body.message).toBe(
+        `Email has been sent to ${user.email}. Follow the instructions to activate your account`,
+      );
+      expect(readLatestMail(user.email).subject).toBe('You already have an account');
+      const login = await supertest(app)
+        .post('/api/auth/login')
+        .send({ email: user.email, password: user.password });
+      expect(login.status).toBe(200);
     });
 
+    it('the activation mail has a random token link, no password and no JWT', async () => {
+      const user = fakeUser();
+      await supertest(app).post('/api/auth/register').send(user);
+
+      const mail = readLatestMail(user.email);
+      const token = tokenFromLink(extractLink(mail));
+      expect(/^[0-9a-f]{64}$/.test(token)).toBe(true);
+      expect(mail.html.includes(user.password)).toBe(false);
+      expect(/eyJ/.test(mail.html)).toBe(false);
+
+      // Only the hash is stored, and the password is a bcrypt hash.
+      const raw = await mongoose.connection.db.collection('users').findOne({ email: user.email });
+      expect(raw.status).toBe('pending');
+      expect(raw.activationToken === token).toBe(false);
+      expect(/^[0-9a-f]{64}$/.test(raw.activationToken)).toBe(true);
+      expect(raw.password.startsWith('$2')).toBe(true);
+    });
+
+    it('registering again while pending refreshes the link and the old link stops working', async () => {
+      const user = fakeUser();
+      await supertest(app).post('/api/auth/register').send(user);
+      const first = tokenFromLink(extractLink(readLatestMail(user.email)));
+      const again = await supertest(app).post('/api/auth/register').send(user);
+      const second = tokenFromLink(extractLink(readLatestMail(user.email)));
+
+      expect(again.status).toBe(200);
+      expect(second === first).toBe(false);
+      const old = await supertest(app).post('/api/auth/account-activation').send({ token: first });
+      expect(old.status).toBe(401);
+      const fresh = await supertest(app).post('/api/auth/account-activation').send({ token: second });
+      expect(fresh.status).toBe(201);
+    });
     it('validates the register payload', async () => {
       const mailsBefore = readMails().length;
       const missingName = await supertest(app)
@@ -98,7 +143,7 @@ describe('auth', () => {
       expect(res.body.message).toBe('Expired Link. Signup again');
     });
 
-    it('KNOWN BUG B11: using the activation link twice is reported as an expired link', async () => {
+    it('using the activation link twice is a 409, not an expired link', async () => {
       const user = fakeUser();
       await supertest(app).post('/api/auth/register').send(user);
       const token = tokenFromLink(extractLink(readLatestMail(user.email)));
@@ -107,12 +152,50 @@ describe('auth', () => {
       const second = await supertest(app).post('/api/auth/account-activation').send({ token });
 
       expect(first.status).toBe(201);
-      // The duplicate key error is swallowed by the catch-all and looks like an expired link.
-      expect(second.status).toBe(401);
-      expect(second.body.message).toBe('Expired Link. Signup again');
+      expect(second.status).toBe(409);
+      expect(second.body.message).toBe('Account is already activated');
+    });
+
+    it('rejects an expired activation link and keeps the user pending', async () => {
+      const user = fakeUser();
+      await supertest(app).post('/api/auth/register').send(user);
+      const token = tokenFromLink(extractLink(readLatestMail(user.email)));
+      await mongoose.connection.db
+        .collection('users')
+        .updateOne({ email: user.email }, { $set: { activationExpires: new Date(Date.now() - 1000) } });
+
+      const res = await supertest(app).post('/api/auth/account-activation').send({ token });
+
+      expect(res.status).toBe(401);
+      expect(res.body.message).toBe('Expired Link. Signup again');
+      const preview = await supertest(app).get(`/api/auth/account-activation/${token}`);
+      expect(preview.status).toBe(404);
+    });
+
+    it('a pending user cannot log in', async () => {
+      const user = fakeUser();
+      await supertest(app).post('/api/auth/register').send(user);
+
+      const res = await supertest(app)
+        .post('/api/auth/login')
+        .send({ email: user.email, password: user.password });
+
+      expect(res.status).toBe(401);
+      expect(res.body.message).toBe('Incorrect email or password');
+    });
+
+    it('the preview endpoint returns the name for a valid link and 404 for junk', async () => {
+      const user = fakeUser();
+      await supertest(app).post('/api/auth/register').send(user);
+      const token = tokenFromLink(extractLink(readLatestMail(user.email)));
+
+      const ok = await supertest(app).get(`/api/auth/account-activation/${token}`);
+      expect(ok.status).toBe(200);
+      expect(ok.body).toEqual({ name: user.name });
+      const junk = await supertest(app).get('/api/auth/account-activation/not-a-token');
+      expect(junk.status).toBe(404);
     });
   });
-
   describe('login, isloggedin, me, logout', () => {
     it('logs in, sets an httpOnly authtoken cookie and never returns the password', async () => {
       const user = fakeUser();
@@ -123,7 +206,7 @@ describe('auth', () => {
         .send({ email: user.email, password: user.password });
 
       expect(res.status).toBe(200);
-      expect(typeof res.body.token).toBe('string');
+      expect('token' in res.body).toBe(false);
       expect(res.body.user.email).toBe(user.email);
       expect(res.body.user.name).toBe(user.name);
       expect('password' in res.body.user).toBe(false);
@@ -131,8 +214,24 @@ describe('auth', () => {
       const cookie = res.headers['set-cookie'].find((c) => c.startsWith('authtoken='));
       expect(cookie).toBeDefined();
       expect(cookie).toMatch(/HttpOnly/i);
+      expect(cookie).toMatch(/SameSite=Lax/i);
       // NODE_ENV is not production in tests, so the Secure flag is absent.
       expect(cookie).not.toMatch(/Secure/i);
+    });
+
+    it('the session JWT and cookie both last COOKIE_EXPIRES_IN days', async () => {
+      const user = fakeUser();
+      await registerAndActivate(app, user);
+      const res = await supertest(app)
+        .post('/api/auth/login')
+        .send({ email: user.email, password: user.password });
+
+      const cookie = res.headers['set-cookie'].find((c) => c.startsWith('authtoken='));
+      const token = cookie.split(';')[0].slice('authtoken='.length);
+      const { exp, iat } = jwt.decode(token);
+      expect(exp - iat).toBe(Number(fakeConfig().COOKIE_EXPIRES_IN) * 86400);
+      const expires = new Date(/Expires=([^;]+)/i.exec(cookie)[1]).getTime();
+      expect(Math.abs(expires - (exp * 1000))).toBeLessThan(5000);
     });
 
     it('walks register -> activate -> login -> isloggedin -> /api/user/me', async () => {
@@ -148,16 +247,20 @@ describe('auth', () => {
       expect(me.body.user.email).toBe(credentials.email);
     });
 
-    it('accepts the login token as a Bearer header too', async () => {
+    it('accepts the session cookie value as a Bearer header too', async () => {
       const user = fakeUser();
       await registerAndActivate(app, user);
-      const { body } = await supertest(app)
+      const login = await supertest(app)
         .post('/api/auth/login')
         .send({ email: user.email, password: user.password });
+      const token = login.headers['set-cookie']
+        .find((c) => c.startsWith('authtoken='))
+        .split(';')[0]
+        .slice('authtoken='.length);
 
       const me = await supertest(app)
         .get('/api/user/me')
-        .set('Authorization', `Bearer ${body.token}`);
+        .set('Authorization', `Bearer ${token}`);
 
       expect(me.status).toBe(200);
       expect(me.body.user.email).toBe(user.email);
@@ -199,21 +302,34 @@ describe('auth', () => {
       expect(me.body.message).toBe('You are not logged in! Please log in to get access.');
     });
 
-    it('logout overwrites the cookie with "loggedout"', async () => {
+    it('POST logout clears the cookie and ends the session', async () => {
       const { agent } = await createUserAndLogin(app);
 
-      const res = await agent.get('/api/auth/logout');
+      const res = await agent.post('/api/auth/logout');
 
       expect(res.status).toBe(200);
       expect(res.body.message).toBe('success');
+      expect(res.headers.deprecation).toBeUndefined();
       const cookie = res.headers['set-cookie'].find((c) => c.startsWith('authtoken='));
-      expect(cookie.startsWith('authtoken=loggedout')).toBe(true);
+      expect(cookie.startsWith('authtoken=;')).toBe(true);
       expect(cookie).toMatch(/HttpOnly/i);
+      expect(cookie).toMatch(/SameSite=Lax/i);
 
       const after = await agent.get('/api/auth/isloggedin');
       expect(after.status).toBe(401);
     });
 
+    it('GET logout still works as a deprecated alias', async () => {
+      const { agent } = await createUserAndLogin(app);
+
+      const res = await agent.get('/api/auth/logout');
+
+      expect(res.status).toBe(200);
+      expect(res.headers.deprecation).toBe('true');
+      const cookie = res.headers['set-cookie'].find((c) => c.startsWith('authtoken='));
+      expect(cookie.startsWith('authtoken=;')).toBe(true);
+      expect((await agent.get('/api/auth/isloggedin')).status).toBe(401);
+    });
     it('a second login gives a fresh working session', async () => {
       const { credentials } = await createUserAndLogin(app);
 

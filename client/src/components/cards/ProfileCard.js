@@ -2,11 +2,22 @@ import React, { useContext } from 'react';
 import svg from '../../assets/images/icons/sprite.svg';
 import AuthContext from '../../context/authContext/AuthContext';
 import PostContext from '../../context/postContext/PostContext';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 const ProfileCard = ({ post: { _id, title, image, tag, description, comments, likes } }) => {
+    const history = useHistory();
     const { loggedInUser } = useContext(AuthContext);	
     const { deletePost, likePost, unLikePost, postIsLiked, descriptionTrimmer } = useContext(PostContext);
+
+    // Only leave the page once the server confirmed the delete.
+    const handleDelete = async () => {
+        if (!window.confirm('Delete this post? This cannot be undone.')) {
+            return;
+        }
+        if (await deletePost(_id)) {
+            history.push('/');
+        }
+    };
 
     return (
         <div className="card">
@@ -46,7 +57,7 @@ const ProfileCard = ({ post: { _id, title, image, tag, description, comments, li
             <div className="card__user">
                 <div className="card__user-options">
                     <Link to={`/edit-post/${_id}`} className="button button--yellow">Edit post</Link>
-                    <Link to='/' onClick={ () => deletePost(_id) } className="button button--red">Delete post</Link>
+                    <button type="button" onClick={ handleDelete } className="button button--red">Delete post</button>
                 </div>
             </div>
         </div>

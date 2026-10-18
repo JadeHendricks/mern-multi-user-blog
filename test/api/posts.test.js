@@ -1,4 +1,5 @@
 import { existsSync, readdirSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import supertest from 'supertest';
@@ -11,6 +12,7 @@ import {
   TINY_PNG,
 } from './support/helpers.js';
 
+const require = createRequire(import.meta.url);
 const clientPostImages = path.resolve('client/src/assets/images/posts');
 const list = (dir) => (existsSync(dir) ? readdirSync(dir).sort() : []);
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -73,7 +75,7 @@ describe('posts', () => {
 
   it('stores an uploaded image under UPLOAD_DIR and not in the client source tree', async () => {
     const beforeClient = list(clientPostImages);
-    const { agent, user } = await createUserAndLogin(app);
+    const { agent } = await createUserAndLogin(app);
 
     const res = await agent
       .post('/api/post')
@@ -83,14 +85,14 @@ describe('posts', () => {
       .attach('image', TINY_PNG, { filename: 'tiny.png', contentType: 'image/png' });
 
     expect(res.status).toBe(201);
-    expect(res.body.post.image).toMatch(new RegExp(`^post-${user._id}-\\d+\\.png$`));
+    expect(res.body.post.image).toMatch(/^post-[0-9a-f]{32}\.png$/);
 
     const uploaded = path.join(process.env.UPLOAD_DIR, 'posts', res.body.post.image);
     expect(existsSync(uploaded)).toBe(true);
     expect(list(clientPostImages)).toEqual(beforeClient);
   });
 
-  it('rejects a non-image upload with a bare 500 (multer error reaches Express as a string)', async () => {
+  it('rejects a non-image upload with a JSON 400', async () => {
     const { agent } = await createUserAndLogin(app);
 
     const res = await agent
@@ -99,7 +101,8 @@ describe('posts', () => {
       .field('description', LONG_DESCRIPTION)
       .attach('image', Buffer.from('plain text'), { filename: 'a.txt', contentType: 'text/plain' });
 
-    expect(res.status).toBe(500);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBeDefined();
     expect(await mongoose.model('Post').countDocuments()).toBe(0);
   });
 
@@ -188,7 +191,7 @@ describe('posts', () => {
       .attach('image', TINY_PNG, { filename: 'tiny.png', contentType: 'image/png' });
 
     expect(res.status).toBe(200);
-    expect(res.body.post.image).toMatch(/^post-.+-\d+\.png$/);
+    expect(res.body.post.image).toMatch(/^post-[0-9a-f]{32}\.png$/);
     expect(existsSync(path.join(process.env.UPLOAD_DIR, 'posts', res.body.post.image))).toBe(true);
     expect(list(clientPostImages)).toEqual(beforeClient);
   });
@@ -224,5 +227,40 @@ describe('posts', () => {
 
     expect(res.status).toBe(404);
     expect(res.body.message).toBe('Post not found.');
+  });
+});
+
+describe('length limits', () => {
+  let app;
+
+  beforeAll(async () => {
+    await connectDb();
+    app = loadApp();
+  });
+  beforeEach(clearDb);
+  afterAll(disconnectDb);
+
+  it('rejects a 101-character title and accepts a 100-character one', async () => {
+    const { agent } = await createUserAndLogin(app);
+
+    const tooLong = await agent
+      .post('/api/post')
+      .send({ title: 'a'.repeat(101), description: LONG_DESCRIPTION });
+    const ok = await agent
+      .post('/api/post')
+      .send({ title: 'a'.repeat(100), description: LONG_DESCRIPTION });
+
+    expect(tooLong.status).toBeGreaterThanOrEqual(400);
+    expect(ok.status).toBe(201);
+  });
+
+  it('rejects a 33-character user name at the schema level', async () => {
+    const User = require('../../models/UserModel');
+
+    const tooLong = new User({ name: 'n'.repeat(33), email: 'long@example.test', password: 'x' });
+    const ok = new User({ name: 'n'.repeat(32), email: 'ok@example.test', password: 'x' });
+
+    await expect(tooLong.validate()).rejects.toThrow(/maximum allowed length/);
+    await expect(ok.validate()).resolves.toBeUndefined();
   });
 });

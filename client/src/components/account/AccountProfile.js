@@ -6,6 +6,7 @@ import AccountSettings from './AccountSettings';
 import AuthContext from '../../context/authContext/AuthContext';
 import UserContext from '../../context/userContext/UserContext';
 import ContentLoader from '../layouts/ContentLoader';
+import { isHttpsUrl } from '../../utils/safeUrl';
 
 const Profile = ({ match }) => {
     const { loggedInUser, isUsersData, authLoading } = useContext(AuthContext);
@@ -38,23 +39,23 @@ const Profile = ({ match }) => {
                                             Corporis iusto quasi, quidem molestias aperiam in earum deleniti amet incidunt possimus.
                                         </p>
                                         <div className="user-header__socials">    
-                                            { user?.social && (
+                                            { user?.socials && (
                                                 <div className="user-header__socials">    
-                                                    { user?.socials.facebook && (
+                                                    { isHttpsUrl(user.socials.facebook) && (
                                                         <a href={user.socials.facebook} target='_blank' rel='noopener noreferrer'>
                                                             <svg className="user-header__socials-icon">
                                                                 <use xlinkHref={`${svg}#icon-facebook-square`}></use>
                                                             </svg>  
                                                         </a>
                                                     )}
-                                                    { user?.socials.linkedin && (
+                                                    { isHttpsUrl(user.socials.linkedin) && (
                                                         <a href={user.socials.linkedin} target='_blank' rel='noopener noreferrer'>
                                                             <svg className="user-header__socials-icon">
                                                                 <use xlinkHref={`${svg}#icon-linkedin-square`}></use>
                                                             </svg>
                                                         </a>
                                                     )}
-                                                    { user?.socials.twitter && (
+                                                    { isHttpsUrl(user.socials.twitter) && (
                                                         <a href={user.socials.twitter} target='_blank' rel='noopener noreferrer'>
                                                             <svg className="user-header__socials-icon">
                                                                 <use xlinkHref={`${svg}#icon-twitter-square`}></use>
@@ -90,7 +91,7 @@ const Profile = ({ match }) => {
                                             { !isUsersData(loggedInUser?._id, user._id) && userPosts?.map(post => <PostCard key={post._id} post={ post } />) }
                                         </div>
                                     </section>
-                                ) : <AccountSettings user={ user }/> }
+                                ) : <AccountSettings user={ user } email={ loggedInUser?.email }/> }
                             </main>
                         </div>
                     </div>

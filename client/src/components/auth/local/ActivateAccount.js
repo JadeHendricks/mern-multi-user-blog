@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import jwt from 'jsonwebtoken';
+import axios from 'axios';
 import AuthContext from '../../../context/authContext/AuthContext';
 
 const ActivateAccount = ({ match }) => {
@@ -10,8 +10,18 @@ const ActivateAccount = ({ match }) => {
     useEffect(() => {
         const token = match.params.token;
         if (token) {
-            const { name } = jwt.decode(token);
-            setValues({  ...values, name, token });
+            // The token is opaque now, so the server tells us who it belongs to.
+            let cancelled = false;
+            setValues(current => ({ ...current, token }));
+            axios.get(`/api/auth/account-activation/${encodeURIComponent(token)}`)
+                .then(res => {
+                    if (!cancelled && res.data && typeof res.data.name === 'string') {
+                        setValues(current => ({ ...current, name: res.data.name }));
+                    }
+                })
+                // Generic greeting is fine when the lookup fails.
+                .catch(() => {});
+            return () => { cancelled = true; };
         }
     // eslint-disable-next-line
     }, [match.params.token]);

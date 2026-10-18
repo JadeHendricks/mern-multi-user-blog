@@ -37,6 +37,27 @@ app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/post', postRouter);
 
+// Unknown API paths answer JSON; without this the production catch-all below would return index.html
+app.use('/api', (req, res) => {
+   res.status(404).json({ message: 'Not found' });
+});
+
+// JSON error handler. Must keep the 4-argument signature so Express treats it as an error middleware.
+app.use((err, req, res, next) => {
+   if (res.headersSent) return next(err);
+   if (err.name === 'MulterError') {
+      const status = err.code === 'LIMIT_FILE_SIZE' ? 413 : 400;
+      return res.status(status).json({ message: err.message });
+   }
+   // body-parser and similar errors carry a 4xx status (e.g. malformed JSON, payload too large)
+   const status = err.status || err.statusCode;
+   if (status >= 400 && status < 500) {
+      return res.status(status).json({ message: err.expose ? err.message : 'Bad request' });
+   }
+   console.error(err);
+   res.status(500).json({ message: 'Something went wrong' });
+});
+
 if (process.env.NODE_ENV === 'production') {
    app.use(express.static('client/build'));
    app.get('*', (req, res) => {
