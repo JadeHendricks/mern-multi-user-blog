@@ -13,7 +13,8 @@ const seededTitles = [
 test('home page lists the seeded posts', async ({ page }) => {
   await visit(page, routes.home);
   for (const title of seededTitles) {
-    await expect(page.getByRole('link', { name: title })).toBeVisible();
+    // exact: the card's image link is named after the post too (title plus tag), so a substring would match two links.
+    await expect(page.getByRole('link', { name: title, exact: true })).toBeVisible();
   }
 });
 
