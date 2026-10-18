@@ -1,10 +1,10 @@
 const User = require('../models/UserModel');
 const multer = require('multer');
-
+const path = require('path');
 
 const multerStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'client/src/assets/images/users')
+        cb(null, process.env.UPLOAD_DIR ? path.join(process.env.UPLOAD_DIR, 'users') : 'client/src/assets/images/users')
     },
     filename: (req, file, cb) => {
         const ext = file.mimetype.split('/')[1];

@@ -3,8 +3,26 @@ const jwt = require('jsonwebtoken');
 const sendGridMail = require('@sendgrid/mail');
 const config = require('config');
 const _ = require('lodash');
+const fs = require('fs');
+const path = require('path');
 
 sendGridMail.setApiKey(config.get('SG_API_KEY'));
+
+// MAIL_TRANSPORT=file writes mail to disk instead of calling SendGrid (local and test runs)
+const sendMail = (emailData) => {
+    if (process.env.MAIL_TRANSPORT === 'file') {
+        const dir = process.env.MAIL_OUTBOX_DIR || 'tmp/outbox';
+        fs.mkdirSync(dir, { recursive: true });
+        const name = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}.json`;
+        const { from, to, subject, html } = emailData;
+        fs.writeFileSync(
+            path.join(dir, name),
+            JSON.stringify({ from, to, subject, html, createdAt: new Date().toISOString() }, null, 2)
+        );
+        return Promise.resolve();
+    }
+    return sendGridMail.send(emailData);
+};
 
 //Signup - email work flow
 exports.register = async (req, res) => {
@@ -34,7 +52,7 @@ exports.register = async (req, res) => {
             `
         }
 
-        await sendGridMail.send(emailData);
+        await sendMail(emailData);
         res.status(200).json({
             message: `Email has been sent to ${email}. Follow the instructions to activate your account`
         });
@@ -216,7 +234,7 @@ exports.forgotPassword = async (req, res) => {
     
          await user.updateOne({ resetPasswordLink: token });
     
-         await sendGridMail.send(emailData);
+         await sendMail(emailData);
          res.status(200).json({
              message: `Email has been sent to ${email}. Follow the instructions to reset your password`
          });
