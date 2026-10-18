@@ -15,9 +15,9 @@ Playwright starts two servers itself (`webServer` in `playwright.config.js`), th
   `npm run test:e2e` and `npm run serve:memory` build `shared/` and `server/` first
   (`npm run build:api`); if you run `npx playwright test` directly, run `npm run build:api`
   yourself after a server change.
-- Client on exactly `http://localhost:3000`: the CRA dev server. The port is fixed because
-  `AuthState.js` hard-codes that origin in its public-route list (known bug B14). The CRA proxy
-  forwards `/api` to port 5000.
+- Client on exactly `http://localhost:3000`: the Vite dev server (`npm run dev -w client`). The port is fixed
+  (`strictPort`) because `AuthState.jsx` hard-codes that origin in its public-route list (known bug B14).
+  The Vite proxy forwards `/api` and `/uploads` to port 5000.
 
 Ports 3000 and 5000 must be free. The servers are never reused (`reuseExistingServer: false`), so
 every run starts from the same seed and a fresh rate limiter.

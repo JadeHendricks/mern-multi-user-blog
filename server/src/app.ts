@@ -11,7 +11,7 @@ import { config } from './config.js';
 import { errorMessage } from './lib/errors.js';
 import { createMailer } from './lib/mailer.js';
 import type { Mailer } from './lib/mailer.js';
-import { CLIENT_BUILD_DIR } from './lib/paths.js';
+import { CLIENT_DIST_DIR } from './lib/paths.js';
 import { ensureUploadDirs, uploadsRoot } from './lib/upload.js';
 import { createAuthController } from './modules/auth/controller.js';
 import createAuthRouter from './modules/auth/routes.js';
@@ -43,9 +43,14 @@ const isExposed = (err: unknown): boolean =>
 export function createApp({
   store,
   mailer = createMailer(config),
+  clientDir = CLIENT_DIST_DIR,
+  serveClient = config.NODE_ENV === 'production',
 }: {
   store: Store;
   mailer?: Mailer;
+  // Overridable so tests can serve a temp folder; production uses client/dist.
+  clientDir?: string;
+  serveClient?: boolean;
 }): Express {
   const app = express();
 
@@ -55,7 +60,7 @@ export function createApp({
   app.use(
     helmet({
       // Explicit policy so a helmet upgrade cannot change it silently. 'unsafe-inline' is for styles only:
-      // CRA and react-toastify inject <style> tags. Google Fonts hosts stay until Lato is self-hosted.
+      // react-toastify injects <style> tags. The Vite build has no inline scripts. Google Fonts hosts stay until Lato is self-hosted.
       contentSecurityPolicy: {
         useDefaults: false,
         directives: {
@@ -156,12 +161,30 @@ export function createApp({
     res.status(500).json({ message: 'Something went wrong' });
   });
 
-  if (config.NODE_ENV === 'production') {
-    app.use(express.static(CLIENT_BUILD_DIR));
-    app.get('/{*splat}', (_req, res) => {
-      res.sendFile(path.join(CLIENT_BUILD_DIR, 'index.html'));
+  if (serveClient) {
+    // Vite emits content-hashed files under assets/, so they can be cached forever. index.html is
+    // the entry that points at them and must be revalidated on every load.
+    app.use(
+      express.static(clientDir, {
+        index: false,
+        setHeaders: (res, filePath) => {
+          const rel = path.relative(clientDir, filePath).split(path.sep);
+          if (rel[0] === 'assets') res.set('Cache-Control', 'public, max-age=31536000, immutable');
+        },
+      }),
+    );
+    // SPA fallback: only for page loads (GET/HEAD). /api and /uploads misses were answered above.
+    app.use((req, res, next) => {
+      // A missing hashed asset should stay a 404, not turn into HTML that fails to parse as a script.
+      if ((req.method !== 'GET' && req.method !== 'HEAD') || req.path.startsWith('/assets/')) {
+        next();
+        return;
+      }
+      res.set('Cache-Control', 'no-cache');
+      res.sendFile(path.join(clientDir, 'index.html'), (err) => {
+        if (err) next(err);
+      });
     });
   }
-
   return app;
 }

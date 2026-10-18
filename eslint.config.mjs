@@ -2,6 +2,9 @@ import js from '@eslint/js';
 import globals from 'globals';
 import prettier from 'eslint-config-prettier';
 import tseslint from 'typescript-eslint';
+import react from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
+import jsxA11y from 'eslint-plugin-jsx-a11y';
 
 // Strict, type-aware rules apply to TypeScript only. Plain JS (e2e, *.mjs, *.cjs and the server files
 // that are not converted yet) keeps the base rules, so the conversion can land file by file.
@@ -14,7 +17,6 @@ const typeChecked = [
 export default [
   {
     ignores: [
-      'client/**',
       'node_modules/**',
       'tmp/**',
       'e2e/test-results/**',
@@ -53,6 +55,42 @@ export default [
     // Playwright specs pass functions to page.evaluate(), which run in the browser.
     files: ['e2e/**/*.js'],
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
+  },
+  {
+    // Client (React 16, Vite). Classic JSX runtime: every component imports React, so
+    // jsx-uses-react keeps that import from being reported as unused.
+    files: ['client/**/*.{js,jsx}'],
+    plugins: { react, 'react-hooks': reactHooks, 'jsx-a11y': jsxA11y },
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      parserOptions: { ecmaFeatures: { jsx: true } },
+      globals: { ...globals.browser },
+    },
+    // Pinned: 'detect' calls context.getFilename(), which ESLint 10 removed and eslint-plugin-react 7.37 still uses.
+    settings: { react: { version: '16.13' } },
+    rules: {
+      ...react.configs.recommended.rules,
+      ...jsxA11y.flatConfigs.recommended.rules,
+      ...reactHooks.configs.recommended.rules,
+      // React is imported in every file and props are not typed yet.
+      'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off',
+      // Existing catch blocks ignore the error on purpose; changing them would touch component code.
+      'no-unused-vars': ['error', { caughtErrors: 'none' }],
+      // Existing patterns flagged by the React Compiler rules in hooks 7. Warn until the components are reworked.
+      'react-hooks/set-state-in-effect': 'warn',
+      'react-hooks/immutability': 'warn',
+      'react/no-unescaped-entities': 'warn',
+    },
+  },
+  {
+    files: ['client/**/*.test.{js,jsx}', 'client/src/setupTests.js'],
+    languageOptions: { globals: { ...globals.browser, ...globals.vitest } },
+  },
+  {
+    files: ['client/*.{js,mjs}'],
+    languageOptions: { globals: { ...globals.node } },
   },
   ...typeChecked,
   {

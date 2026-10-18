@@ -20,7 +20,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # build, test and local output
-/client/build
+/client/dist
 tmp/
 e2e/test-results
 e2e/.auth
