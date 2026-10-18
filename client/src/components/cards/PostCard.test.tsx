@@ -1,4 +1,5 @@
-import { fireEvent, waitFor, cleanup } from '@testing-library/react';
+import { fireEvent, screen, waitFor, cleanup } from '@testing-library/react';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import PostCard from './PostCard';
 import { mockApi } from '../../testing/mockApi';
@@ -6,6 +7,8 @@ import type { MockHandler, MockReply } from '../../testing/mockApi';
 import { makePost } from '../../testing/fixtures';
 import type { PostWithAuthor } from '../../lib/types';
 import { renderWithProviders } from '../../testing/renderWithProviders';
+import { createQueryClient } from '../../lib/queryClient';
+import { queryKeys } from '../../lib/queryKeys';
 
 const post = makePost({
   _id: 'p1',
@@ -28,10 +31,19 @@ const renderCard = (likes: PostWithAuthor['likes'], routes: Record<string, MockH
   const utils = renderWithProviders(<PostCard post={{ ...post, likes }} />, {
     auth: { loggedInUser: { _id: 'u2' } },
   });
-  // The heart is the interaction icon that is not the comment icon.
-  const heart = utils.container.querySelector('svg.card-interaction__icon:not(.card-interaction__icon--comment)');
-  if (!heart) throw new Error('the card has no heart icon');
+  const heart = utils.getByRole('button', { name: 'Like Hello' });
   return { ...utils, heart, api };
+};
+
+// A card fed from the query cache, like the real feed: the optimistic patch reaches its props.
+const CachedCard = () => {
+  const { data } = useQuery({
+    queryKey: queryKeys.posts.detail('p1'),
+    queryFn: () => Promise.resolve({ post }),
+    select: (payload) => payload.post,
+    staleTime: Infinity,
+  });
+  return data ? <PostCard post={data} /> : null;
 };
 
 describe('PostCard like toggle', () => {
@@ -68,6 +80,48 @@ describe('PostCard like toggle', () => {
     fireEvent.click(heart);
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('You are not logged in! Please log in to get access.'));
     expect(toast.success).not.toHaveBeenCalled();
+  });
+
+  it('describes the post image with the post title and leaves the author avatar decorative', () => {
+    const { container } = renderCard([]);
+    // The post image is a meaningful image named after the post, not after its author.
+    expect(screen.getByRole('img', { name: 'Hello' })).toHaveClass('card__image');
+    // The author name sits right beside the avatar, so the avatar adds nothing for a screen reader.
+    expect(container.querySelector('img.card__avatar')).toHaveAttribute('alt', '');
+    expect(screen.queryByRole('img', { name: 'Ann' })).toBeNull();
+  });
+
+  it('exposes the heart as a focusable toggle button', () => {
+    const { heart } = renderCard([]);
+    expect(heart).toHaveAttribute('type', 'button');
+    expect(heart).toHaveAttribute('aria-pressed', 'false');
+    heart.focus();
+    expect(heart).toHaveFocus();
+  });
+
+  it('starts pressed when the signed-in user already likes the post', () => {
+    const { heart } = renderCard([{ user: 'u2' }]);
+    expect(heart).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('flips aria-pressed right after the click, before the server answers', async () => {
+    const gate = Promise.withResolvers<MockReply>();
+    mockApi({
+      'PUT /api/post/like/p1': () => gate.promise,
+      'PUT /api/post/unlike/p1': () => gate.promise,
+    });
+    const queryClient = createQueryClient({ retry: false });
+    queryClient.setQueryData(queryKeys.posts.detail('p1'), { post: { ...post, likes: [] } });
+    renderWithProviders(<CachedCard />, { auth: { loggedInUser: { _id: 'u2' } }, queryClient });
+    const heart = await screen.findByRole('button', { name: 'Like Hello' });
+    expect(heart).toHaveAttribute('aria-pressed', 'false');
+
+    fireEvent.click(heart);
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Like Hello' })).toHaveAttribute('aria-pressed', 'true'));
+
+    // A failed answer puts the old state back.
+    gate.resolve({ status: 500, body: { message: 'Server broke' } });
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Like Hello' })).toHaveAttribute('aria-pressed', 'false'));
   });
 
   it('ignores more clicks while the request is still running', async () => {

@@ -4,8 +4,8 @@ import type { PostWithAuthor } from '../../lib/types';
 import { Link } from 'react-router';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
 import { descriptionTrimmer, postIsLiked } from '../../utils/postUtils';
-import { useToggleLike } from '../../hooks/useToggleLike';
 import { useDeletePost } from '../../hooks/useDeletePost';
+import LikeButton from './LikeButton';
 interface ProfileCardProps {
     post: PostWithAuthor;
     // 'account' is the two-column card on the account page.
@@ -14,7 +14,6 @@ interface ProfileCardProps {
 
 const ProfileCard = ({ post: { _id, title, image, tag, description, comments, likes }, variant }: ProfileCardProps) => {
     const { loggedInUser } = useAuth();
-    const toggleLike = useToggleLike();
     const deletePost = useDeletePost();
     // useDeletePost only leaves the page once the server confirmed the delete.
     const handleDelete = () => {
@@ -27,7 +26,7 @@ const ProfileCard = ({ post: { _id, title, image, tag, description, comments, li
         <div className={ variant === 'account' ? 'card card--account' : 'card' }>
             <Link to={`/post/${_id}`}>
             <div className="card__header">
-                <img className='card__image' src={ uploadUrl('posts', image) } onError={ onImageError('posts') } alt={ loggedInUser?.name } title={ loggedInUser?.name } />
+                <img className='card__image' src={ uploadUrl('posts', image) } onError={ onImageError('posts') } alt={ title } title={ title } />
                 <h5 className={ tag === 'travel' ? 'tag tag--orange card__tag': tag === 'funny' ? 'tag tag--yellow card__tag': 'tag card__tag'}>
                     { tag }
                 </h5>
@@ -40,20 +39,13 @@ const ProfileCard = ({ post: { _id, title, image, tag, description, comments, li
                 </p>
                 <div className="card-interaction">
                     <div className="card-interaction__item">
-                        <svg className="card-interaction__icon card-interaction__icon--comment">
+                        <svg className="card-interaction__icon card-interaction__icon--comment" aria-hidden="true" focusable="false">
                             <use xlinkHref={`${svg}#icon-comment-o`}></use>
                         </svg>   
                         <span>{ comments.length } { comments.length === 1 ? 'Comment' : 'Comments' }</span>
                     </div>
-                    <div className="card-interaction__item">	
-                        { postIsLiked(likes, loggedInUser) ? 	
-                            <svg className="card-interaction__icon" onClick={ () => { toggleLike(_id, true); } }>	
-                                <use xlinkHref={`${svg}#icon-heart`}></use>	
-                            </svg> :
-                            <svg className="card-interaction__icon" onClick={ () => { toggleLike(_id, false); } }>	
-                                <use xlinkHref={`${svg}#icon-heart-o`}></use>	
-                            </svg>	
-                        } 	
+                    <div className="card-interaction__item">
+                        <LikeButton postId={ _id } title={ title } liked={ Boolean(postIsLiked(likes, loggedInUser)) } />
                         <span>{ likes.length } { likes.length === 1 ? 'Like' : 'Likes' }</span>	
                     </div>
                 </div>

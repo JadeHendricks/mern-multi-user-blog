@@ -8,8 +8,9 @@ import { createQueryClient } from '../../lib/queryClient';
 import { queryKeys } from '../../lib/queryKeys';
 import { mockApi, asFormData } from '../../testing/mockApi';
 import type { MockHandler } from '../../testing/mockApi';
-import { mustQuery } from '../../testing/dom';
 import { testAuth } from '../../testing/testAuth';
+import { formatDate } from '../../lib/formatDate';
+import { expectEveryFieldLabelled } from '../../testing/dom';
 
 const ann = { _id: 'u1', name: 'Ann', avatar: 'a.png', socials: { facebook: 'https://fb.test/ann' } };
 const bob = { _id: 'u2', name: 'Bob', avatar: 'b.png', socials: { facebook: 'https://fb.test/bob' } };
@@ -88,9 +89,34 @@ describe('AccountProfile data', () => {
   });
 });
 
+describe('AccountProfile header', () => {
+  it('shows the member-since date instead of placeholder text', async () => {
+    const createdAt = '2021-03-04T10:00:00.000Z';
+    mockApi({ ...baseRoutes(), 'GET /api/user/u1': { body: { user: { ...ann, createdAt } } } });
+    render(tree());
+    expect(await screen.findByText(`Member since ${formatDate(createdAt)}`)).toBeInTheDocument();
+    expect(screen.queryByText(/lorem ipsum/i)).toBeNull();
+  });
+
+  it('names the profile picture and the social links', async () => {
+    mockApi(baseRoutes());
+    render(tree());
+    expect(await screen.findByRole('img', { name: "Ann's avatar" })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Facebook profile' })).toHaveAttribute('href', 'https://fb.test/ann');
+  });
+});
+
 // B23: the account settings form copied props into state once, so showing a different user kept
 // the previous user's name and socials in the form (and a save would have written them back).
 describe('AccountProfile account settings form', () => {
+  it('gives every settings field a label', async () => {
+    mockApi(baseRoutes());
+    const { container } = render(tree('u1'));
+    fireEvent.click(await screen.findByRole('button', { name: 'Account settings' }));
+    await screen.findByLabelText('Name');
+    expectEveryFieldLabelled(container);
+  });
+
   it('shows the new user values after the user changes', async () => {
     mockApi(baseRoutes());
     const { rerender } = render(tree('u1'));
@@ -153,19 +179,20 @@ describe('AccountProfile account settings form', () => {
 describe('AccountProfile post cards (B21)', () => {
   it('updates the like count on an own post card', async () => {
     mockApi(baseRoutes());
-    const { container } = render(tree());
+    render(tree());
     expect(await screen.findByText('0 Likes')).toBeInTheDocument();
-    fireEvent.click(mustQuery(container, 'svg.card-interaction__icon:not(.card-interaction__icon--comment)'));
+    fireEvent.click(screen.getByRole('button', { name: 'Like Ann post' }));
     expect(await screen.findByText('1 Like')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Like Ann post' })).toHaveAttribute('aria-pressed', 'true');
     await waitFor(() => expect(toast.success).toHaveBeenCalledWith('Post has been liked.'));
   });
 
   it('updates the like count on another user\u2019s post card', async () => {
     mockApi(baseRoutes());
     // Bob looks at Ann's profile.
-    const { container } = render(tree('u2'));
+    render(tree('u2'));
     expect(await screen.findByText('0 Likes')).toBeInTheDocument();
-    fireEvent.click(mustQuery(container, 'svg.card-interaction__icon:not(.card-interaction__icon--comment)'));
+    fireEvent.click(screen.getByRole('button', { name: 'Like Ann post' }));
     expect(await screen.findByText('1 Like')).toBeInTheDocument();
   });
 

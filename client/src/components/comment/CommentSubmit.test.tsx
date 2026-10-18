@@ -4,6 +4,7 @@ import CommentSubmit from './CommentSubmit';
 import { mockApi } from '../../testing/mockApi';
 import type { MockHandler } from '../../testing/mockApi';
 import { renderWithProviders } from '../../testing/renderWithProviders';
+import { expectEveryFieldLabelled } from '../../testing/dom';
 
 const renderSubmit = (isAuthenticated: boolean, routes: Record<string, MockHandler> = {}) => {
   const api = mockApi({
@@ -46,6 +47,12 @@ describe('CommentSubmit', () => {
     fireEvent.click(getByText('Submit comment'));
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Comment is required'));
     expect(box).toHaveValue('nice post');
+  });
+
+  it('gives the comment box a label', () => {
+    const { container, getByLabelText } = renderSubmit(true);
+    expectEveryFieldLabelled(container);
+    expect(getByLabelText('Comment')).toBe(container.querySelector('textarea'));
   });
 
   it('hides the login link when authenticated', () => {

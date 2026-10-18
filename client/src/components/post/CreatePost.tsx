@@ -29,9 +29,7 @@ const PostForm = () => {
                     <div>
                         <h1 className="create-post__title">Create a blog post!</h1>
                         <p className="create-post__description">
-                            Lorem ipsum dolor sit, amet consectetur adipisicing elit. 
-                            Modi cupiditate minus adipisci aliquid dolor deleniti excepturi, 
-                            nemo quisquam ea eos saepe quidem ipsum assumenda omnis.
+                            Share a story, a trip or something funny. Give it a title, pick a tag and add a photo if you have one.
                         </p>
                     </div>
                     <form className="form form--post" onSubmit={ handleSubmit }>
@@ -39,8 +37,9 @@ const PostForm = () => {
                             <label className="label" htmlFor="title">Post Title</label>
                             <input className="input" id="title" onChange={ handleOnChange } name="title" type="text" placeholder="Title goes here" />
                         </div>
-                        <div className="form-group">
-                            <label className="label" htmlFor="tag">Post Tag</label>
+                        {/* No single input owns this label (the tag is a radio group), so it names the group instead. */}
+                        <div className="form-group" role="radiogroup" aria-labelledby="post-tag-label">
+                            <span className="label" id="post-tag-label">Post Tag</span>
                             <div className="radio">
                                 {/* Always checked: both branches of the old ternary rendered checked=true. */}
                                 <input className="radio__input" type="radio" id="general" value="general" name="tag" onChange={ handleOnChange } checked />
@@ -61,7 +60,7 @@ const PostForm = () => {
                             <textarea className="input input--textarea" onChange={ handleOnChange } id="description" name="description" placeholder="Post goes here"></textarea>
                         </div>
                         <div className="form-group form-group--upload">
-                            <img className="avatar file-upload__photo" src={ noImageFound } alt="Something could be here" title="Something could be here" />
+                            <img className="avatar file-upload__photo" src={ noImageFound } alt="" />
                             <input className="file-upload__input" type="file" accept="image/*" id="image" name="image" onChange={ e => {
                                 const file = e.target.files?.[0];
                                 setImage(file);

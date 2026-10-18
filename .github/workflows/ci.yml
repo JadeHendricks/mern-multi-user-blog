@@ -1,0 +1,45 @@
+# Light CI: build, lint, typecheck and the unit/API tests. Nothing is deployed and no secrets are used.
+#
+# It runs the same scripts you run locally:
+#   npm run build, lint (ESLint + Stylelint), typecheck, test:api, test:api:mongo and test:client.
+#
+# Playwright / E2E is intentionally NOT run here (it is slow and needs a browser download). To run the
+# smoke suite on your machine: `npm run e2e:install` once, then `npm run test:e2e`.
+#
+# The first `test:api:mongo` run downloads a MongoDB binary for mongodb-memory-server; later runs reuse
+# the cached copy when the runner has one.
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+# A newer push to the same branch or PR cancels the run that is still going.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          # .nvmrc pins Node 24, the same version the project is developed on.
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test:api
+      - run: npm run test:api:mongo
+      - run: npm run test:client

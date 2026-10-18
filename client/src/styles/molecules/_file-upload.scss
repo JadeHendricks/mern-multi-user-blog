@@ -13,14 +13,16 @@
 }
 
 .file-upload__label {
-  color: $color-green;
+  color: $color-green-dark;
   display: inline-block;
   text-decoration: none;
-  border-bottom: 0.1rem solid $color-green;
+  border-bottom: 0.1rem solid $color-green-dark;
   padding: $space-3;
   font-size: $font-20;
   transition: all $duration-fast;
   cursor: pointer;
+  outline: var(--upload-ring, none);
+  outline-offset: 0.2rem;
 
   @include respond-to('md') {
     font-size: $font-16;

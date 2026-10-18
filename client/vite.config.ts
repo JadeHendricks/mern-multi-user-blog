@@ -20,7 +20,13 @@ export default defineConfig(({ command }) => ({
   server: { port: 3000, strictPort: true, proxy },
   preview: { port: 3000, strictPort: true, proxy },
   // The production server serves client/dist (see server/src/lib/paths.ts).
-  build: { outDir: 'dist', emptyOutDir: true },
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
+    // Never inline fonts: @fontsource would put the small latin-ext fallbacks into the CSS as base64
+    // (about +12 kB gzip). As files they are only fetched when a page needs those characters.
+    assetsInlineLimit: (file) => (/\.woff2?$/.test(file) ? false : undefined),
+  },
   test: {
     environment: 'jsdom',
     // Globals keep the ported Jest-style tests (describe/it/expect) unchanged.

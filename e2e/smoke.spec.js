@@ -13,7 +13,8 @@ const seededTitles = [
 test('home page lists the seeded posts', async ({ page }) => {
   await visit(page, routes.home);
   for (const title of seededTitles) {
-    await expect(page.getByRole('link', { name: title })).toBeVisible();
+    // exact: the card's image link is named after the post too (title plus tag), so a substring would match two links.
+    await expect(page.getByRole('link', { name: title, exact: true })).toBeVisible();
   }
 });
 
@@ -31,10 +32,10 @@ test('login and logout through the UI', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'Create Post' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Log in' })).toHaveCount(0);
 
-  await page.getByRole('link', { name: 'Log out' }).click();
+  await page.getByRole('button', { name: 'Log out' }).click();
   await page.waitForURL('**/login');
   await expect(page.getByRole('link', { name: 'Log in' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Log out' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Log out' })).toHaveCount(0);
 });
 
 // B15/B14: PrivateRoute waits for the session check, then redirects; public pages are never redirected.

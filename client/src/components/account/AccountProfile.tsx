@@ -9,6 +9,8 @@ import AccountSettings from './AccountSettings';
 import { useAuth } from '../../context/authContext/AuthContext';
 import ContentLoader from '../layouts/ContentLoader';
 import { isHttpsUrl } from '../../utils/safeUrl';
+import { avatarAlt } from '../../utils/a11y';
+import { formatDate } from '../../lib/formatDate';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
 import { useUserPosts } from '../../hooks/useUserPosts';
 import { useUser } from '../../hooks/useUser';
@@ -37,34 +39,33 @@ const Profile = () => {
                             <div className="container">
                                 <div className="user-header">
                                     <div className="user-header__image">
-                                        <img className="avatar user-header__avatar" src={ uploadUrl('users', user.avatar) } onError={ onImageError('users') } alt={ user.name } title={ user.name } />
+                                        <img className="avatar user-header__avatar" src={ uploadUrl('users', user.avatar) } onError={ onImageError('users') } alt={ avatarAlt(user.name) } title={ user.name } />
                                     </div>
                                     <div className="user-header__info">
                                         <h3 className="user-header__info-name">{ user.name }</h3>
                                         <p className="user-header__info-description">
-                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-                                            Corporis iusto quasi, quidem molestias aperiam in earum deleniti amet incidunt possimus.
+                                            { user.createdAt ? `Member since ${formatDate(user.createdAt)}` : null }
                                         </p>
                                         <div className="user-header__socials">    
                                             { user.socials && (
                                                 <div className="user-header__socials">    
                                                     { isHttpsUrl(user.socials.facebook) && (
-                                                        <a href={user.socials.facebook} target='_blank' rel='noopener noreferrer'>
-                                                            <svg className="user-header__socials-icon">
+                                                        <a href={user.socials.facebook} aria-label="Facebook profile" target='_blank' rel='noopener noreferrer'>
+                                                            <svg className="user-header__socials-icon" aria-hidden="true" focusable="false">
                                                                 <use xlinkHref={`${svg}#icon-facebook-square`}></use>
                                                             </svg>  
                                                         </a>
                                                     )}
                                                     { isHttpsUrl(user.socials.linkedin) && (
-                                                        <a href={user.socials.linkedin} target='_blank' rel='noopener noreferrer'>
-                                                            <svg className="user-header__socials-icon">
+                                                        <a href={user.socials.linkedin} aria-label="LinkedIn profile" target='_blank' rel='noopener noreferrer'>
+                                                            <svg className="user-header__socials-icon" aria-hidden="true" focusable="false">
                                                                 <use xlinkHref={`${svg}#icon-linkedin-square`}></use>
                                                             </svg>
                                                         </a>
                                                     )}
                                                     { isHttpsUrl(user.socials.twitter) && (
-                                                        <a href={user.socials.twitter} target='_blank' rel='noopener noreferrer'>
-                                                            <svg className="user-header__socials-icon">
+                                                        <a href={user.socials.twitter} aria-label="Twitter profile" target='_blank' rel='noopener noreferrer'>
+                                                            <svg className="user-header__socials-icon" aria-hidden="true" focusable="false">
                                                                 <use xlinkHref={`${svg}#icon-twitter-square`}></use>
                                                             </svg>  
                                                         </a>  

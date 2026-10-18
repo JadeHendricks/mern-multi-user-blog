@@ -81,6 +81,11 @@
     text-shadow: 0 0.7rem 1rem $color-black;
   }
 
+  // The header is dark, so the ring is light here.
+  &__el:focus-visible {
+    @include focus-ring($color-focus-inverse);
+  }
+
   &__el:not(:last-child) {
     margin-right: $space-30;
 
@@ -127,7 +132,7 @@
   // Filled Create Post link. Written after nav__el so its own values are the ones that count: the
   // link used to also carry `button button--green` and the cascade picked between the two.
   &__el--create {
-    background-color: $color-green;
+    background-color: $color-green-dark;
     border-radius: $radius-pill;
     position: relative;
     text-align: center;
@@ -144,5 +149,12 @@
 
   &__el--create:hover {
     box-shadow: $shadow-sm;
+  }
+
+  // Log out is a button, not a link. Remove the browser's button background and padding so it
+  // renders exactly like the nav links around it (colour, size and border come from nav__el).
+  &__el--button {
+    background-color: transparent;
+    padding: 0;
   }
 }

@@ -35,8 +35,9 @@ const PostEditForm = ({ id, post }: PostEditFormProps) => {
                 <label className="label" htmlFor="title">Post Title</label>
                 <input className="input" id="title" onChange={ handleOnChange } value={ title } name="title" type="text" placeholder="Title goes here" />
             </div>
-            <div className="form-group">
-                <label className="label" htmlFor="tag">Post Tag</label>
+            {/* No single input owns this label (the tag is a radio group), so it names the group instead. */}
+            <div className="form-group" role="radiogroup" aria-labelledby="post-tag-label">
+                <span className="label" id="post-tag-label">Post Tag</span>
                 <div className="radio">
                     <input className="radio__input" type="radio" id="general" value="general" name="tag" onChange={ handleOnChange } checked={tag === 'general'} />
                     <label htmlFor="general" className="radio__label">general</label>
@@ -84,9 +85,7 @@ const PostForm = () => {
                     <div>
                         <h1 className="create-post__title">Edit your blog post!</h1>
                         <p className="create-post__description">
-                            Lorem ipsum dolor sit, amet consectetur adipisicing elit. 
-                            Modi cupiditate minus adipisci aliquid dolor deleniti excepturi, 
-                            nemo quisquam ea eos saepe quidem ipsum assumenda omnis.
+                            Change the title, tag, text or photo, then save to update your post.
                         </p>
                     </div>
                     <PostEditForm key={ `${id}:${post ? 'loaded' : 'loading'}` } id={ id } post={ post } />
