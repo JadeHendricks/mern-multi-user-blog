@@ -1,0 +1,34 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+.form-group {
+  margin-bottom: $space-25;
+
+  // Keeps the last row flush. It is one class plus a pseudo-class, so it also beats the smaller
+  // margin the narrow screens set above.
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  // Row that holds a photo next to its file picker (see file-upload).
+  &--upload {
+    display: flex;
+    align-items: center;
+    font-size: $font-16;
+  }
+
+  // The file input is visually hidden, so the keyboard ring is drawn on the label that stands in for it.
+  &--upload:has(:focus-visible) {
+    --upload-ring: 0.2rem solid #{$color-focus};
+  }
+
+  // The submit button of a form: right-aligned block. Mixed onto .button.
+  &__submit {
+    margin-left: auto;
+    display: block;
+  }
+
+  @include respond-to('md') {
+    margin-bottom: $space-20;
+  }
+}

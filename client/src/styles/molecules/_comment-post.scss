@@ -1,0 +1,91 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+// One comment in the list under a post: avatar, name, date, text and the owner's delete link.
+.comment-post {
+  margin-top: $space-25;
+  padding-top: $space-25;
+  border-top: 0.2rem solid $color-background;
+  display: flex;
+  position: relative;
+
+  @include respond-to('md') {
+    margin-top: $space-20;
+    padding-top: $space-20;
+  }
+
+  @include respond-to('sm') {
+    margin-top: $space-15;
+    padding-top: $space-15;
+    display: block;
+  }
+
+  &__icon {
+    flex: 0 0 8rem;
+
+    @include respond-to('md') {
+      flex: 0 0 6rem;
+    }
+
+    @include respond-to('sm') {
+      margin: 0 $space-15 $space-15 $space-5;
+    }
+  }
+
+  &__avatar {
+    width: 8rem;
+    height: 8rem;
+
+    @include respond-to('md') {
+      width: 6rem;
+      height: 6rem;
+    }
+  }
+
+  &__information {
+    flex: 1;
+    margin: 0 $space-20;
+
+    @include respond-to('md') {
+      margin: 0 $space-15;
+    }
+
+    @include respond-to('sm') {
+      margin: 0 $space-15 0 $space-5;
+    }
+  }
+
+  &__user-name {
+    font-size: $font-18;
+    margin-bottom: $space-5;
+
+    @include respond-to('md') {
+      font-size: $font-16;
+    }
+  }
+
+  &__date {
+    margin-left: $space-15;
+    font-size: $font-12;
+    font-weight: $weight-medium;
+
+    @include respond-to('md') {
+      margin-left: $space-10;
+    }
+  }
+
+  &__user-comment {
+    font-size: $font-16;
+
+    @include respond-to('md') {
+      font-size: $font-14;
+    }
+  }
+
+  &__interaction {
+    position: absolute;
+    top: $space-10;
+    right: 0;
+    font-size: $font-10;
+  }
+}

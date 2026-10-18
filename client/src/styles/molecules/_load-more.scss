@@ -1,0 +1,12 @@
+@use '../settings/tokens' as *;
+
+.load-more {
+  display: flex;
+  justify-content: center;
+  padding: $space-20 0 0;
+
+  &__button:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+}

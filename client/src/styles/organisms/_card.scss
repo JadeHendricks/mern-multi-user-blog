@@ -1,0 +1,201 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+// Post card: shell, footer with the author, and the owner's edit and delete actions.
+.card {
+  @include card-surface;
+
+  flex: 0 1 30%;
+  margin-bottom: $space-60;
+
+  @include respond-to('lg') {
+    flex: 0 1 48%;
+    margin-bottom: $space-40;
+  }
+
+  @include respond-to('sm-wide') {
+    flex: 0 1 100%;
+    margin-bottom: $space-20;
+  }
+
+  &__header {
+    position: relative;
+  }
+
+  &__image {
+    width: 100%;
+    height: 30rem;
+    object-fit: cover;
+    cursor: pointer;
+
+    @include respond-to('xl') {
+      height: 22rem;
+    }
+
+    @include respond-to('sm-wide') {
+      height: 25rem;
+    }
+  }
+
+  &__tag {
+    position: absolute;
+    bottom: $space-20;
+    right: $space-20;
+  }
+
+  &__details {
+    padding: $space-30 $space-20;
+
+    @include respond-to('xl') {
+      padding: $space-20 $space-15;
+    }
+
+    @include respond-to('sm-wide') {
+      padding: $space-30 $space-20;
+    }
+  }
+
+  &__title {
+    margin-bottom: $space-10;
+    display: block;
+    color: $color-text;
+    font-size: $font-22;
+    font-weight: $weight-bold;
+    text-decoration: none;
+    cursor: pointer;
+    width: 95%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    @include respond-to('xl') {
+      margin-bottom: $space-5;
+      font-size: $font-18;
+    }
+
+    @include respond-to('sm-wide') {
+      margin-bottom: $space-5;
+      font-size: $font-20;
+    }
+  }
+
+  &__description {
+    line-height: 1.4;
+    display: block;
+    height: 9rem;
+    overflow: hidden;
+
+    @include respond-to('xl') {
+      line-height: 1.2;
+      font-size: $font-14;
+      height: 7rem;
+    }
+
+    @include respond-to('sm-wide') {
+      line-height: 1.4;
+      font-size: $font-16;
+      height: 7rem;
+    }
+  }
+
+  &__footer-link {
+    color: $color-text;
+    text-decoration: none;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    background-color: $color-background;
+    padding: $space-15;
+    border-top: 0.1rem solid $color-border;
+    cursor: pointer;
+
+    @include respond-to('xl') {
+      padding: $space-10;
+    }
+
+    @include respond-to('sm-wide') {
+      padding: $space-20;
+    }
+  }
+
+  &__avatar {
+    width: 6rem;
+    height: 6rem;
+    flex: 0 0 6rem;
+    margin-right: $space-10;
+
+    @include respond-to('xl') {
+      width: 4rem;
+      height: 4rem;
+      flex: 0 0 4rem;
+      margin-right: $space-15;
+    }
+
+    @include respond-to('sm-wide') {
+      width: 6rem;
+      height: 6rem;
+      flex: 0 0 6rem;
+      margin-right: $space-10;
+    }
+  }
+
+  &__author {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    font-size: $font-18;
+
+    @include respond-to('xl') {
+      font-size: $font-16;
+    }
+
+    @include respond-to('sm-wide') {
+      font-size: $font-18;
+    }
+  }
+
+  &__author-name {
+    font-weight: $weight-bold;
+
+    @include respond-to('xl') {
+      font-weight: $weight-medium;
+    }
+
+    @include respond-to('sm-wide') {
+      font-weight: $weight-bold;
+    }
+  }
+
+  &__author-date {
+    font-size: $font-16;
+
+    @include respond-to('xl') {
+      font-size: $font-14;
+    }
+  }
+
+  &__actions {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  // Edit and delete buttons in the owner's card footer.
+  &__action {
+    flex: 0 1 48%;
+  }
+
+  // Account page variant. Written after the base and its respond-to blocks so it replaces their
+  // flex and margin values, and carries its own narrow-screen values.
+  &--account {
+    flex: 0 1 48%;
+    margin-bottom: $space-60;
+
+    @include respond-to('sm-wide') {
+      flex: 0 1 100%;
+      margin-bottom: $space-40;
+    }
+  }
+}

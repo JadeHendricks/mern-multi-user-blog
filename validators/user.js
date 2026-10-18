@@ -1,5 +1,0 @@
-const { check } = require('express-validator');
-
-exports.updateMeValidator = [
-    check('name').not().isEmpty().withMessage('Name is required'),
-];

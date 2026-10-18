@@ -1,0 +1,10 @@
+{
+  // Type-check only. The root scripts (setup.mts) run through tsx, so nothing is emitted. This file
+  // is also what lets the ESLint project service find a config for them (it looks for the nearest
+  // tsconfig.json).
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": ["*.mts"]
+}

@@ -1,0 +1,23 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+// White panel around a form. The create and edit post forms add a shadow and a bottom margin.
+.form {
+  background-color: $color-white;
+  padding: $space-50;
+  border-radius: $radius-5px;
+
+  @include respond-to('md') {
+    padding: $space-30;
+  }
+
+  // Written after the base and its respond-to block so its margin wins on narrow screens too.
+  &--post {
+    box-shadow: $shadow-lg;
+    margin-bottom: $space-60;
+
+    @include respond-to('md') {
+      margin-bottom: 0;
+    }
+  }
+}

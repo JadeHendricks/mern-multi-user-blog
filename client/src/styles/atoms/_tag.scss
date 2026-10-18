@@ -1,0 +1,27 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+// Colour chip on a post card. The card places it (see .card__tag in organisms/_card).
+.tag {
+  color: $color-white;
+  font-weight: $weight-light;
+  background-color: $color-green-dark;
+  padding: $space-10;
+
+  &--orange {
+    background-color: $color-orange;
+  }
+
+  &--yellow {
+    background-color: $color-yellow;
+    color: $color-text;
+  }
+
+  @include respond-to('xl') {
+    font-size: $font-12;
+  }
+
+  @include respond-to('sm-wide') {
+    font-size: $font-14;
+  }
+}

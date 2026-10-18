@@ -1,0 +1,91 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+// Banner at the top of the account page: photo, name, description and social icons.
+.user-header {
+  display: flex;
+  align-items: center;
+
+  @include respond-to('sm') {
+    display: block;
+  }
+
+  &__image {
+    flex: 0 0 20rem;
+
+    @include respond-to('md') {
+      flex: 0 0 15rem;
+    }
+  }
+
+  &__avatar {
+    width: 20rem;
+    height: 20rem;
+
+    @include respond-to('md') {
+      width: 15rem;
+      height: 15rem;
+    }
+
+    @include respond-to('sm') {
+      display: block;
+      margin: 0 auto;
+    }
+  }
+
+  &__info {
+    flex: 0 0 50%;
+    margin: 0 $space-40;
+    color: $color-white;
+
+    @include respond-to('md') {
+      margin: 0 $space-20;
+    }
+
+    @include respond-to('sm') {
+      text-align: center;
+    }
+  }
+
+  &__info-name {
+    color: currentcolor;
+    font-size: $font-40;
+
+    @include respond-to('md') {
+      font-size: $font-26;
+    }
+
+    @include respond-to('sm') {
+      margin-top: $space-20;
+    }
+  }
+
+  &__info-description {
+    color: currentcolor;
+    font-size: $font-18;
+    margin: $space-5 0 $space-20;
+
+    @include respond-to('md') {
+      font-size: $font-16;
+    }
+  }
+
+  &__socials-icon {
+    fill: $color-white;
+    height: 4rem;
+    width: 4rem;
+
+    @include respond-to('md') {
+      height: 3rem;
+      width: 3rem;
+    }
+  }
+
+  &__socials-icon:not(:last-child) {
+    margin-right: $space-20;
+
+    @include respond-to('md') {
+      margin-right: $space-15;
+    }
+  }
+}

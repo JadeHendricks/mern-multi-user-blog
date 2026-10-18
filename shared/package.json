@@ -1,0 +1,33 @@
+{
+  "name": "@mern-blog/shared",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Constants, request schemas and response types shared by the API and the client",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "watch": "tsc -p tsconfig.json --watch --preserveWatchOutput",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p test/tsconfig.json --noEmit",
+    "test": "vitest run --config vitest.config.mjs"
+  },
+  "dependencies": {
+    "validator": "13.15.35",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/validator": "13.15.10",
+    "vitest": "5.0.5"
+  }
+}

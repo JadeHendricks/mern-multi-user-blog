@@ -1,0 +1,24 @@
+@use '../settings/tokens' as *;
+
+// Create and edit post pages: the heading block that sits over the banner, above the form.
+.create-post {
+  max-width: 80rem;
+  margin: 0 auto;
+  transform: translateY(-40rem);
+  color: $color-white;
+
+  &--edit {
+    color: $color-text;
+  }
+
+  &__title {
+    color: currentcolor;
+    margin-bottom: $space-10;
+  }
+
+  &__description {
+    color: currentcolor;
+    font-size: $font-20;
+    margin-bottom: $space-40;
+  }
+}

@@ -1,0 +1,8 @@
+@use '../settings/tokens' as *;
+
+// react-toastify's own class name, so it cannot follow our BEM rules (stylelint allows it in
+// vendor/ only). This is the one place that sizes the toast text and padding.
+.Toastify__toast {
+  font-size: $font-14;
+  padding: $space-10;
+}

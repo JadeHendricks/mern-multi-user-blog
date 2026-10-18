@@ -1,0 +1,17 @@
+{
+  // Compiles the API and its scripts to server/dist (node dist/src/server.js, node dist/scripts/seed.js).
+  // rootDir is the server folder, not src: the output keeps the "src/" and "scripts/" folders, so
+  // dist/src/.. and dist/scripts/.. sit at the same depth as the sources. Tests are not built.
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist",
+    // Inside dist (gitignored) so deleting dist always forces a full rebuild.
+    "tsBuildInfoFile": "dist/.tsbuildinfo",
+    "incremental": true,
+    "sourceMap": true
+  },
+  "include": ["src", "scripts"],
+  // The server imports @mern-blog/shared at runtime, so tsc -b builds shared first.
+  "references": [{ "path": "../shared" }]
+}

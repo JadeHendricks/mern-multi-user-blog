@@ -1,0 +1,34 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+// Panel for the forgot password, reset password and activate account pages.
+.recover-form {
+  @include auth-card;
+
+  margin: $space-40 auto 0;
+  max-width: 80rem;
+
+  @include respond-to('md') {
+    padding: $space-30;
+  }
+
+  &__title {
+    margin: $space-25 0 $space-10;
+    color: $color-green-dark;
+
+    @include respond-to('md') {
+      margin: $space-15 0 $space-10;
+    }
+  }
+
+  &__description {
+    font-size: $font-18;
+    color: $color-muted;
+    margin-bottom: $space-40;
+
+    @include respond-to('md') {
+      font-size: $font-16;
+      margin-bottom: $space-25;
+    }
+  }
+}

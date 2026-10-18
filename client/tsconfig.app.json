@@ -1,0 +1,18 @@
+{
+  // Application code. Tests and test helpers live in tsconfig.test.json so the vitest globals
+  // (describe, it, vi) are not visible to app code.
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "noEmit": true,
+    "types": ["vite/client"],
+    "tsBuildInfoFile": "../node_modules/.tmp/client-app.tsbuildinfo"
+  },
+  "include": ["src"],
+  "exclude": ["src/**/*.test.*", "src/testing", "src/setupTests.*"],
+  "references": [{ "path": "../shared" }]
+}

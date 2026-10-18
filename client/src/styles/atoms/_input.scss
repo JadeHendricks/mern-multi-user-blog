@@ -1,0 +1,23 @@
+@use '../settings/tokens' as *;
+
+// Text field and textarea. The keyboard focus ring comes from the baseline rule in generic/_base.scss.
+.input {
+  display: block;
+  font-family: inherit;
+  font-size: $font-16;
+  padding: $space-12-5 $space-17-5;
+  border: none;
+  width: 100%;
+  background-color: $color-surface;
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  transition: all $duration-base;
+  border-radius: $radius-4px;
+  box-sizing: border-box;
+  color: $color-text;
+
+  &--textarea {
+    min-height: 15rem;
+    background-color: $color-border;
+  }
+}

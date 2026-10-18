@@ -1,0 +1,15 @@
+{
+  // The Vite and Vitest configuration runs in Node.
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "noEmit": true,
+    "types": ["node"],
+    "tsBuildInfoFile": "../node_modules/.tmp/client-node.tsbuildinfo"
+  },
+  "include": ["vite.config.ts"]
+}
+

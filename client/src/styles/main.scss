@@ -1,0 +1,41 @@
+// Layer order matters: settings, tools, generic, objects, atoms, molecules, organisms, pages, vendor.
+@use 'settings/tokens';
+@use 'tools/mixins';
+@use 'generic/reset';
+@use 'generic/base';
+@use 'objects/container';
+@use 'objects/cards';
+@use 'atoms/button';
+@use 'atoms/tag';
+@use 'atoms/input';
+@use 'atoms/label';
+@use 'atoms/radio';
+@use 'atoms/avatar';
+@use 'atoms/loader';
+@use 'molecules/form-group';
+@use 'molecules/form-links';
+@use 'molecules/file-upload';
+@use 'molecules/card-interaction';
+@use 'molecules/load-more';
+@use 'molecules/comment-post';
+@use 'organisms/card';
+@use 'organisms/user-card';
+@use 'organisms/comment';
+@use 'organisms/header';
+@use 'organisms/nav';
+@use 'organisms/footer';
+@use 'organisms/account-nav';
+@use 'organisms/user-header';
+@use 'organisms/form';
+@use 'organisms/login-form';
+@use 'organisms/recover-form';
+@use 'pages/feed';
+@use 'pages/all-users';
+@use 'pages/post';
+@use 'pages/create-post';
+@use 'pages/account';
+@use 'vendor/toastify';
+
+:root {
+  @include tokens.tokens-to-root;
+}

@@ -1,0 +1,25 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+.label {
+  display: block;
+  font-size: $font-18;
+  font-weight: $weight-semibold;
+  margin-bottom: $space-10;
+  color: $color-muted;
+
+  @include respond-to('md') {
+    font-size: $font-16;
+    font-weight: $weight-medium;
+  }
+
+  @include respond-to('sm') {
+    font-size: $font-14;
+  }
+
+  // For a field whose purpose is clear from the layout (the comment box): the label is read by
+  // screen readers but not shown. Last, so it also beats the sizes above.
+  &--visually-hidden {
+    @include visually-hidden;
+  }
+}

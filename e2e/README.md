@@ -1,69 +1,56 @@
-# E2E tests and screenshot baselines
+# E2E smoke tests
 
-`npm run test:e2e` runs Playwright (Chromium) against the real client and API. It records how the
-app looks and behaves today so later phases can prove they changed nothing by accident.
+`npm run test:e2e` runs Playwright (Chromium) against the real client and API. It is a small
+behaviour smoke suite: it proves the app boots, serves the seeded data, logs in and out, guards
+private routes and serves the production build. There are no screenshot/visual tests (the visual
+baseline suite was removed once the styling refactor was done).
 
 ## What runs
 
-Playwright starts two servers itself (`webServer` in `playwright.config.js`), then runs the specs:
+Playwright starts three servers itself (`webServer` in `playwright.config.js`), then runs the specs:
 
-- API on `http://localhost:5000`: `e2e/support/start-api.js` starts an in-memory MongoDB
-  (`mongodb-memory-server`), seeds it with `scripts/seed.js` and serves the real Express app.
-  Mail goes to a temp folder and uploads to a temp folder, so nothing leaves the machine.
-- Client on exactly `http://localhost:3000`: the CRA dev server. The port is fixed because
-  `AuthState.js` hard-codes that origin in its public-route list (known bug B14). The CRA proxy
-  forwards `/api` to port 5000.
+- API on `http://localhost:5000`: `e2e/support/start-api.js` creates a JSON-file store in a temp
+  folder, seeds it through the repositories and serves the real Express app. Mail and uploads go to
+  temp folders, so nothing leaves the machine. It loads the compiled server
+  (`server/dist/src/...` and `server/dist/scripts/seed.js`), so it stays CommonJS like the rest of
+  `e2e/` and needs no tsx. `npm run test:e2e` builds `shared/` and `server/` and the client first
+  (`pretest:e2e`); if you run `npx playwright test` directly, run `npm run build` yourself after a
+  change.
+- A second API instance on `http://localhost:5001` that serves the built client in `client/dist`
+  (`E2E_SERVE_CLIENT=1 E2E_PORT=5001`), used by the `prod-smoke` project.
+- Client on exactly `http://localhost:3000`: the Vite dev server (`npm run dev -w client`), used by
+  the `desktop` project. The port is fixed (`strictPort`) and the Vite proxy forwards `/api` and
+  `/uploads` to port 5000.
 
-Ports 3000 and 5000 must be free. The servers are never reused (`reuseExistingServer: false`), so
-every run starts from the same seed and a fresh rate limiter.
+Ports 3000, 5000 and 5001 must be free. `npm run test:e2e` checks that first
+(`e2e/support/check-ports.js`) and stops with the port and how to find its owner; it never kills
+anything. The servers are never reused (`reuseExistingServer: false`), so every run starts from the
+same seed and a fresh rate limiter.
 
 `e2e/global-setup.js` logs the seeded owner (Alice) and visitor (Bob) in over the API and saves
 their cookies to `e2e/.auth/*.json` (ignored by git).
 
 ## Specs
 
-- `visual.spec.js`: full-page screenshots of every route at 375, 768 and 1280 px, plus header
-  variants, hover and focus states and one toast.
-- `smoke.spec.js` (desktop only): seeded titles on the home page, login and logout through the UI,
-  and the logged-out `/create-post` behaviour (known bug B15).
-- `a11y.spec.js` (desktop only): runs axe on every route, attaches the JSON result to the report and
-  logs counts by impact. It is informational and never fails the run.
+- `smoke.spec.js` (desktop project, dev server): seeded titles on the home page, login and logout
+  through the UI, the logged-out `/create-post` redirect to `/login`, logged-out public pages stay
+  put, profile social links (https only), and uploaded images/avatars loading from `/uploads` with
+  the default-image fallback.
+- `prod-smoke.spec.js` (`prod-smoke` project, built client on `:5001`, no screenshots): home feed,
+  a post page, login through the UI, and Load more with a route fixture. It also asserts the page
+  loaded the hashed `/assets/*.js` bundle and nothing from the Vite dev server.
 
-No spec submits a form that changes data, so the database is identical at the start of every run.
-Failed logins and logins are the only writes (a cookie, no database change).
-
-## Determinism
-
-The clock is frozen at 2026-01-15T10:00:00Z (`page.clock.setFixedTime`), the browser time zone is
-UTC, animations are disabled, the caret is hidden, requests to Google Fonts (and every other
-non-local host) are aborted so the fallback font is always used, and each screenshot waits for the
-network to go idle, the loader to disappear, images to decode and `document.fonts.ready`.
-`maxDiffPixels` is 0: a single changed pixel fails the test.
-
-## Baselines
-
-Baselines live in `e2e/__screenshots__/<project>/<spec file>/<name>.png`. There is no platform
-suffix on purpose, so the names stay stable across phases.
-
-They were rendered with Chromium on Windows. Text rendering differs between operating systems, so
-when CI runs on Linux (Phase 9) the baselines have to be regenerated there and committed again.
-
-Update them only when a visual change is intended:
-
-```powershell
-npm run test:e2e:update
-```
-
-Review the changed PNGs before committing them.
+No spec writes to the database (logins only set a cookie), so the data is identical at the start of
+every run.
 
 ## Try the seeded app by hand
 
 ```powershell
-npm run serve:memory      # API on 5000 with seeded in-memory data (nothing is saved)
-npm run start:client      # in a second terminal: http://localhost:3000
+npm run serve:memory      # API on 5000 with seeded throwaway data (nothing outlives the run)
+npm run dev:web           # in a second terminal: http://localhost:3000
 ```
 
-All four seeded users share the throwaway E2E password defined in `scripts/seed.js`
+All four seeded users share the throwaway E2E password defined in `server/scripts/seed-data.cjs`
 (`alice@example.test`, `bob@example.test`, `carol@example.test`, `dan@example.test`).
 
 ## First run

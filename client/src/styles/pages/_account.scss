@@ -1,0 +1,57 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+// Account page: the side menu column next to the view (all posts or settings).
+.account {
+  display: flex;
+  padding: $space-60 0;
+
+  @include respond-to('xl') {
+    flex-direction: column;
+    padding: $space-40 0;
+  }
+
+  @include respond-to('lg') {
+    padding: $space-20 0;
+  }
+
+  &__options {
+    background-image: $gradient-green-diagonal;
+    flex: 0 0 23%;
+    margin-right: 4%;
+    padding: $space-25;
+
+    @include respond-to('xl') {
+      margin-right: 0;
+      padding: $space-15;
+    }
+
+    @include respond-to('lg') {
+      padding: $space-10;
+    }
+  }
+
+  &__view {
+    flex: 1;
+
+    @include respond-to('xl') {
+      margin-top: $space-40;
+    }
+  }
+
+  &__view-title {
+    text-transform: uppercase;
+    font-weight: $weight-bold;
+    background-image: $gradient-green-flat;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: 0.1rem;
+    line-height: 1.3;
+    display: inline-block;
+    margin-bottom: $space-40;
+  }
+}
+
+.account-settings {
+  margin-bottom: $space-40;
+}

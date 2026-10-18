@@ -1,0 +1,68 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+.button {
+  font-size: $font-18;
+  padding: $space-14 $space-30;
+  border-radius: $radius-pill;
+  text-transform: uppercase;
+  display: inline-block;
+  text-decoration: none;
+  position: relative;
+  transition: all $duration-slow;
+  font-weight: $weight-regular;
+  border: none;
+  text-align: center;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: $shadow-sm;
+  }
+
+  &--green {
+    background-color: $color-green-dark;
+    color: $color-white;
+  }
+
+  &--white {
+    background-color: $color-white;
+    color: $color-text;
+  }
+
+  &--yellow {
+    background-color: $color-yellow;
+    color: $color-text;
+  }
+
+  &--red {
+    background-color: $color-red;
+    color: $color-white;
+  }
+
+  @include respond-to('lg') {
+    font-size: $font-16;
+    padding: $space-10 $space-15;
+  }
+
+  @include respond-to('sm') {
+    font-size: $font-12;
+    padding: $space-10 $space-12;
+  }
+
+  // Delete link on a comment. Written after the size blocks above so its font size and padding
+  // replace the ones they set. `.button:hover` still supplies the lift.
+  &--link-red {
+    background-color: transparent;
+    text-decoration: underline;
+    color: $color-red;
+    display: block;
+    font-size: $font-12;
+    padding: $space-10;
+  }
+
+  &--link-red:hover {
+    box-shadow: none;
+    border-radius: 0;
+  }
+}
