@@ -34,7 +34,7 @@
   },
   "homepage": "https://github.com/JadeHendricks/mern-starterkit#readme",
   "dependencies": {
-    "@sendgrid/mail": "7.2.1",
+    "@sendgrid/mail": "8.1.6",
     "bcryptjs": "2.4.3",
     "config": "3.3.1",
     "cookie-parser": "1.4.5",
