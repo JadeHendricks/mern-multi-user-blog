@@ -1,159 +1,122 @@
-import React, { useReducer, useEffect } from "react";
-import AuthContext from './AuthContext';
-import AuthReducer from './AuthReducer';
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import { useNavigate } from 'react-router';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { withRouter } from 'react-router-dom';
-import axios from 'axios';
-import { LOGIN_SUCCESS, USER_LOADED, AUTH_ERROR, LOGOUT  } from '../types';
+import AuthContext from './AuthContext';
+import { useMe } from '../../hooks/useMe';
+import { api } from '../../lib/api';
+import { queryKeys } from '../../lib/queryKeys';
 
-const AuthState = props => {
+// Same helper as before; it does not depend on state, so it lives outside the component and keeps
+// one identity for the whole session.
+const isUsersData = (loggedInUserId, userId) => {
+  if (loggedInUserId && userId) {
+      return loggedInUserId === userId;
+  }
+}
 
+const AuthState = ({ children }) => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { data: me, isPending } = useMe();
+
+  // useNavigate changes identity when the location changes. Callbacks read it through a ref so
+  // they stay stable and consumers do not re-render on every navigation.
+  const navigateRef = useRef(navigate);
   useEffect(() => {
-    isLoggedin();
-  // eslint-disable-next-line
+    navigateRef.current = navigate;
+  });
+
+  const login = useCallback(async (email, password) => {
+    try {
+      const res = await api.post('/api/auth/login', { body: { email, password } });
+      queryClient.setQueryData(queryKeys.me, res.user);
+      toast.success('Login successful, welcome to the Multi User Blog.');
+      navigateRef.current('/');
+    } catch (err) {
+      toast.error(err.message);
+    }
+  }, [queryClient]);
+
+  const register = useCallback(async (name, email, password) => {
+    try {
+      const res = await api.post('/api/auth/register', { body: { name, email, password } });
+      toast.success(res.message);
+    } catch (err) {
+      toast.error(err.message);
+    }
   }, []);
 
-  const initialState = {
-    isAuthenticated: null,
-    authLoading: true,
-    loggedInUser: null
-  };
-
-  const isLoggedin = async () => {
+  const logout = useCallback(async () => {
+    let res;
     try {
-      const res = await axios.get('/api/auth/isloggedin');
-      if (res.status === 200) {
-        loadUser();
-      }
-    } catch (err) { 
-      // Public pages stay put; PrivateRoute redirects guarded ones.
-      dispatch({ type: AUTH_ERROR });
-    }
-  }
-
-  const loadUser = async () => {
-    try {
-      const res = await axios.get('/api/user/me');
-      dispatch({ type: USER_LOADED, payload: res.data.user });
-    } catch (err) {
-      dispatch({ type: AUTH_ERROR });
-    }
-  }
-
-  const login = async (email, password) => {
-    const config = { headers: {'Content-Type': 'application/json'} };
-    const body = JSON.stringify({ email, password });
-
-    try {
-        await axios.post('/api/auth/login', body, config);
-        dispatch({ type: LOGIN_SUCCESS });
-        toast.success('Login successful, welcome to the Multi User Blog.');
-        loadUser();
-        props.history.push('/');
-    } catch (err) {
-      toast.error(err.response.data.message);
-      dispatch({ type: AUTH_ERROR });
-    }
-  }
-
-  const register = async (name, email, password) => {
-    const config = { headers: {'Content-Type': 'application/json'} };
-    const body = JSON.stringify({ name, email, password });
-
-    try {
-        const res = await axios.post('/api/auth/register', body, config);
-        toast.success(res.data.message);
-    } catch (err) {
-      dispatch({ type: AUTH_ERROR });
-      toast.error(err.response.data.message);
-    }
-  }
-
-  const logout = async () => {
-    try {
-      const res = await axios.post('/api/auth/logout');
+      res = await api.post('/api/auth/logout');
       toast.success('Logging out');
-      dispatch({ type: LOGOUT });
-      if (res.data.message === 'success') {
-          props.history.push('/login')
-      }
     } catch (err) {
-      dispatch({ type: AUTH_ERROR });
+      // Same as before: a failed logout request still leaves the page logged out, without a toast.
     }
-  }
+    // Everything cached belongs to the signed-in user, so none of it may outlive the session.
+    queryClient.clear();
+    queryClient.setQueryData(queryKeys.me, null);
+    if (res?.message === 'success') {
+      navigateRef.current('/login');
+    }
+  }, [queryClient]);
 
-  const forgotPassword = async (email) => {
-    const config = { headers: {'Content-Type': 'application/json'} };
-    const body = JSON.stringify({ email });
-
+  const forgotPassword = useCallback(async (email) => {
     try {
-        const res = await axios.put('/api/auth/forgot-password', body, config);
-        toast.success(res.data.message);
+      const res = await api.put('/api/auth/forgot-password', { body: { email } });
+      toast.success(res.message);
     } catch (err) {
-        dispatch({ type: AUTH_ERROR });
-        toast.error(err.response.data.message);
+      toast.error(err.message);
     }
-  }
+  }, []);
 
-  const resetPassword = async (newPassword, token) => {
-    const config = { headers: {'Content-Type': 'application/json'} };
-    const body = JSON.stringify({ newPassword, resetPasswordLink: token });
-
+  const resetPassword = useCallback(async (newPassword, token) => {
     try {
-        const res = await axios.put('/api/auth/reset-password', body, config);
-        toast.success(res.data.message);
-        if (res.status === 200) {
-          // The toast lives in App.js, so it survives the navigation.
-          props.history.push('/login');
-        }
+      const res = await api.put('/api/auth/reset-password', { body: { newPassword, resetPasswordLink: token } });
+      toast.success(res.message);
+      // The toast lives in the shell, so it survives the navigation.
+      navigateRef.current('/login');
     } catch (err) {
-      console.log(err);
-      dispatch({ type: AUTH_ERROR });
-      toast.error(err.response.data.message);
+      toast.error(err.message);
     }
-  }
+  }, []);
 
-  const activateAccount = async (token) => {
-    const config = { headers: {'Content-Type': 'application/json'} };
-    const body = JSON.stringify({ token });
-
+  const activateAccount = useCallback(async (token) => {
     try {
-        const res = await axios.post('/api/auth/account-activation', body, config);
-        toast.success(res.data.message);
-        if (res.status === 201) {
-          props.history.push('/login');
-        }
+      const res = await api.post('/api/auth/account-activation', { body: { token } });
+      toast.success(res.message);
+      navigateRef.current('/login');
     } catch (err) {
-        console.error(err.message);
-        toast.error(err.response.data.message);
+      toast.error(err.message);
     }
-  }
+  }, []);
 
-  const isUsersData = (loggedInUserId, userId) => {
-    if (loggedInUserId && userId) {
-        return loggedInUserId === userId;
-    }
-  }
+  // null while the first answer is pending, so Loader and RequireAuth wait instead of guessing.
+  // A failed request counts as logged out, like the old AUTH_ERROR did.
+  const loggedInUser = me ?? null;
+  const isAuthenticated = isPending ? null : Boolean(me);
 
-  const [state, dispatch] = useReducer(AuthReducer, initialState);
+  // One memoized value: consumers re-render when the session changes, not when a parent does.
+  const value = useMemo(() => ({
+    isAuthenticated,
+    authLoading: isPending,
+    loggedInUser,
+    register,
+    login,
+    logout,
+    resetPassword,
+    forgotPassword,
+    activateAccount,
+    isUsersData
+  }), [isAuthenticated, isPending, loggedInUser, register, login, logout, resetPassword, forgotPassword, activateAccount]);
 
   return (
-    <AuthContext.Provider value={{
-      isAuthenticated: state.isAuthenticated,
-      authLoading: state.authLoading,
-      loggedInUser: state.loggedInUser,
-      register,
-      login,
-      logout,
-      resetPassword,
-      forgotPassword,
-      activateAccount,
-      loadUser,
-      isUsersData
-    }}>
-      { props.children }
+    <AuthContext.Provider value={ value }>
+      { children }
     </AuthContext.Provider>
   )
 }
 
-export default withRouter(AuthState);
+export default AuthState;

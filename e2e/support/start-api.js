@@ -36,7 +36,10 @@ Object.assign(process.env, {
 // Development mode enables the CORS rule and keeps cookies usable over plain http.
 process.env.NODE_ENV = 'development';
 
-const PORT = 5000;
+// E2E_SERVE_CLIENT=1 starts a second instance that also serves the built client (client/dist) for the
+// prod-smoke project; E2E_PORT moves it off 5000 so it can run next to the dev setup.
+const PORT = Number(process.env.E2E_PORT ?? 5000);
+const serveClient = process.env.E2E_SERVE_CLIENT === '1';
 let memoryMongo;
 
 async function main() {
@@ -48,7 +51,9 @@ async function main() {
   if (!['json', 'mongo'].includes(driver)) throw new Error('E2E_DB_DRIVER must be json or mongo');
   // The mongo store runs on a throwaway in-memory server, never a real database.
   memoryMongo =
-    driver === 'mongo' ? await (await import('mongodb-memory-server')).MongoMemoryServer.create() : undefined;
+    driver === 'mongo'
+      ? await (await import('mongodb-memory-server')).MongoMemoryServer.create()
+      : undefined;
   const store = await createStore({
     DB_DRIVER: driver,
     DATA_DIR: dataDir,
@@ -58,7 +63,10 @@ async function main() {
   await store.init();
   const counts = await seed(store, { dataDir: runDir });
 
-  const server = createApp({ store }).listen(PORT, () => {
+  const clientOptions = serveClient
+    ? { serveClient: true, clientDir: path.join(__dirname, '../../client/dist') }
+    : {};
+  const server = createApp({ store, ...clientOptions }).listen(PORT, () => {
     console.log(
       `E2E API on http://localhost:${PORT} (seeded ${counts.users} users, ${counts.pending} pending, ${counts.posts} posts)`,
     );

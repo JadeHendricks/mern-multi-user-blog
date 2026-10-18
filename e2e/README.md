@@ -5,7 +5,7 @@ app looks and behaves today so later phases can prove they changed nothing by ac
 
 ## What runs
 
-Playwright starts two servers itself (`webServer` in `playwright.config.js`), then runs the specs:
+Playwright starts three servers itself (a second API instance is described under the specs) (`webServer` in `playwright.config.js`), then runs the specs:
 
 - API on `http://localhost:5000`: `e2e/support/start-api.js` creates a JSON-file store in a temp
   folder, seeds it through the repositories and serves the real Express app.
@@ -19,7 +19,7 @@ Playwright starts two servers itself (`webServer` in `playwright.config.js`), th
   (`strictPort`) because `AuthState.jsx` hard-codes that origin in its public-route list (known bug B14).
   The Vite proxy forwards `/api` and `/uploads` to port 5000.
 
-Ports 3000 and 5000 must be free. The servers are never reused (`reuseExistingServer: false`), so
+Ports 3000, 5000 and 5001 (the production-build instance, see `prod-smoke.spec.js`) must be free. The servers are never reused (`reuseExistingServer: false`), so
 every run starts from the same seed and a fresh rate limiter.
 
 `e2e/global-setup.js` logs the seeded owner (Alice) and visitor (Bob) in over the API and saves
@@ -31,10 +31,20 @@ their cookies to `e2e/.auth/*.json` (ignored by git).
   variants, hover and focus states and one toast.
 - `smoke.spec.js` (desktop only): seeded titles on the home page, login and logout through the UI,
   and the logged-out `/create-post` behaviour (known bug B15).
+- `load-more.spec.js`: the "Load more" button on Home and Users. Two screenshots per project use the
+  real API answer with a `nextCursor` added by `page.route`; one desktop-only test creates 8 posts
+  through the API, pages through them and deletes them again, so later specs see the seeded 6.
+  Create its baselines with `npx playwright test e2e/load-more.spec.js --update-snapshots=missing`
+  (`npm run test:e2e:update -- <file>` passes the file to the wrong option).
+- `prod-smoke.spec.js` (own `prod-smoke` project, no screenshots): the built client in `client/dist`, served by a
+  second API instance on `http://localhost:5001` (`E2E_SERVE_CLIENT=1 E2E_PORT=5001 node e2e/support/start-api.js`,
+  its own seeded temp store). It checks the home feed, a post page, login through the UI and Load more with a
+  route fixture, and asserts the page loaded the hashed `/assets/*.js` bundle and nothing from the Vite dev
+  server. `npm run test:e2e` builds the client first (`pretest:e2e`); the other projects ignore this spec.
 - `a11y.spec.js` (desktop only): runs axe on every route, attaches the JSON result to the report and
   logs counts by impact. It is informational and never fails the run.
 
-No spec submits a form that changes data, so the database is identical at the start of every run.
+Only the desktop load-more test writes data, and it deletes it again, so the database is identical at the start of every run.
 Failed logins and logins are the only writes (a cookie, no database change).
 
 ## Determinism

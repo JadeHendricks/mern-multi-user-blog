@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import AuthContext from '../../../context/authContext/AuthContext';
-import { Link, Redirect } from 'react-router-dom';
+import { Link, Navigate } from 'react-router';
 
 const Login = () => {
 
@@ -17,7 +17,7 @@ const Login = () => {
     }
 
     if (isAuthenticated && loggedInUser) {
-        return <Redirect to='/' />;
+        return <Navigate to='/' replace />;
     }
     
     return (
@@ -35,7 +35,7 @@ const Login = () => {
                     </div>
                     <div className="form__group">
                         <div className="form__useraccount-block">
-                            <Link to='/register'>Don't have an account?</Link>
+                            <Link to='/register'>Don&apos;t have an account?</Link>
                             <Link to='/forgot-password'>Forgot password?</Link>
                         </div>
                     </div>

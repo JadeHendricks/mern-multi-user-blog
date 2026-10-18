@@ -1,19 +1,15 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext } from 'react';
+import { useParams } from 'react-router';
 import AuthContext from '../../../context/authContext/AuthContext';
 
-const ResetPassword = ({ match }) => {
+const ResetPassword = () => {
     const { resetPassword } = useContext(AuthContext);
-    const [values, setValues] = useState({ name: '', token: '', newPassword: ''});
-    const { token, newPassword } = values;
+    const [values, setValues] = useState({ name: '', newPassword: ''});
+    const { newPassword } = values;
 
-    useEffect(() => {
-        const token = match.params.token;
-
-        if (token) {
-            setValues(current => ({ ...current, token }));
-        }
-        // eslint-disable-next-line
-    }, []);
+    // The token comes straight from the URL, so derive it while rendering instead of copying it
+    // into state in an effect.
+    const { token } = useParams();
 
     const handleOnChange = e => setValues({ ...values, [e.target.name]: e.target.value });
 

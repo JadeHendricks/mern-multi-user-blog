@@ -1,15 +1,16 @@
-import React, { useContext } from 'react';
+import React, { memo, useContext } from 'react';
 import svg from '../../assets/images/icons/sprite.svg'
-import Moment from 'react-moment';
-import { Link } from 'react-router-dom';
-import PostContext from '../../context/postContext/PostContext';
+import { formatDate } from '../../lib/formatDate';
+import { Link } from 'react-router';
 import AuthContext from '../../context/authContext/AuthContext';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
+import { descriptionTrimmer, postIsLiked } from '../../utils/postUtils';
+import { useToggleLike } from '../../hooks/useToggleLike';
 
 const PostCard = ({ post: { _id, title, image, date, tag, description, user, likes, comments } }) => {
 
     const { loggedInUser } = useContext(AuthContext);	    
-    const { likePost, unLikePost, postIsLiked, descriptionTrimmer } = useContext(PostContext);
+    const toggleLike = useToggleLike();
 
     return (
         <div className="card">
@@ -33,10 +34,10 @@ const PostCard = ({ post: { _id, title, image, date, tag, description, user, lik
                     </div>
                     <div className="card__interaction-block">	
                         { postIsLiked(likes, loggedInUser) ? 	
-                            <svg className="card__interaction-icon" onClick={ () => unLikePost(_id) }>	
+                            <svg className="card__interaction-icon" onClick={ () => toggleLike(_id, true) }>	
                                 <use xlinkHref={`${svg}#icon-heart`}></use>	
                             </svg> :
-                            <svg className="card__interaction-icon" onClick={ () => likePost(_id) }>	
+                            <svg className="card__interaction-icon" onClick={ () => toggleLike(_id, false) }>	
                                 <use xlinkHref={`${svg}#icon-heart-o`}></use>	
                             </svg>	
                         }
@@ -49,7 +50,7 @@ const PostCard = ({ post: { _id, title, image, date, tag, description, user, lik
                     <img className="card__user-image" src={ uploadUrl('users', user?.avatar) } onError={ onImageError('users') } alt={ user?.name } title={ user?.name } />
                     <div className="card__user-info">
                         <div>{ user?.name }</div>
-                        <div>Posted on: <Moment format="DD/MM/YYYY">{ date }</Moment></div>
+                        <div>Posted on: { formatDate(date) }</div>
                     </div>
                 </div>
             </Link>
@@ -57,4 +58,5 @@ const PostCard = ({ post: { _id, title, image, date, tag, description, user, lik
     )
 }
 
-export default PostCard;
+// memo: a like patches one post, so the other cards keep their props and do not render again.
+export default memo(PostCard);

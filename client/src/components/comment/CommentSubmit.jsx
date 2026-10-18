@@ -1,25 +1,18 @@
 import React, { useState, useContext } from 'react';
 import CommentPost from './CommentPost';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import AuthContext from '../../context/authContext/AuthContext';
-import PostContext from '../../context/postContext/PostContext';
-
+import { useAddComment } from '../../hooks/useAddComment';
 const CommentSubmit = ({ postId, postUser, comments }) => {
     const { isAuthenticated } = useContext(AuthContext);
-    const { createComment } = useContext(PostContext);
-
+    const addComment = useAddComment(postId);
     const [ comment, setComment] = useState('');
-    
     const handleOnChange = e => setComment(e.target.value);
-
-    const handleSubmit = async e => {
+    const handleSubmit = e => {
         e.preventDefault();
         // The API expects { comment }; clear the box only after it was saved.
-        if (await createComment(postId, { comment })) {
-            setComment('');
-        }
+        addComment.mutate(comment, { onSuccess: () => setComment('') });
     }
-
     return (
         <div className="comment">
             <div className="comment__header">
@@ -45,5 +38,4 @@ const CommentSubmit = ({ postId, postUser, comments }) => {
         </div>
     )
 }
-
 export default CommentSubmit;

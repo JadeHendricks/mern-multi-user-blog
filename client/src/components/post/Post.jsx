@@ -1,33 +1,36 @@
-import React, { Fragment, useContext, useEffect } from 'react';
+import React, { Fragment, useContext } from 'react';
 import svg from '../../assets/images/icons/sprite.svg'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router';
 import AuthContext from '../../context/authContext/AuthContext';
-import PostContext from '../../context/postContext/PostContext';
 import CommentSubmit from '../comment/CommentSubmit';
 import ContentLoader from '../layouts/ContentLoader';
 import { isHttpsUrl } from '../../utils/safeUrl';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
+import { postIsLiked } from '../../utils/postUtils';
+import { usePost } from '../../hooks/usePost';
+import { useToggleLike } from '../../hooks/useToggleLike';
+import { useDeletePost } from '../../hooks/useDeletePost';
 
-const FullPost = ({ match, history }) => {
+// A post that has not arrived (or failed to load) renders the empty frame, as before.
+const NO_POST = {};
+
+const FullPost = () => {
+    const { id } = useParams();
+    const navigate = useNavigate();
     const { loggedInUser, isUsersData, authLoading } = useContext(AuthContext);
-    const { deletePost, likePost, unLikePost, postIsLiked, getPost, post, postLoading } = useContext(PostContext);
+    const { data, isPending: postLoading } = usePost(id);
+    const post = data ?? NO_POST;
+    const toggleLike = useToggleLike();
+    const deletePost = useDeletePost();
     const  { title, description, image, _id, user, likes, comments } = post;
 
-    useEffect(() => {
-        getPost(match.params.id);
-        // eslint-disable-next-line
-    }, [match.params.id]);
-
-    // Only leave the page once the server confirmed the delete.
-    const handleDelete = async () => {
+    // useDeletePost only leaves the page once the server confirmed the delete.
+    const handleDelete = () => {
         if (!window.confirm('Delete this post? This cannot be undone.')) {
             return;
         }
-        if (await deletePost(_id)) {
-            history.push('/');
-        }
+        deletePost.mutate(_id);
     };
-
     return (
         <Fragment>
             { authLoading && postLoading ? (<ContentLoader />) : (
@@ -36,10 +39,10 @@ const FullPost = ({ match, history }) => {
                         <div className="author-options">
                             { post._id && (
                                 <Fragment>
-                                    <button className="button button--white" onClick={ () => history.goBack() }>Go back</button>
+                                    <button className="button button--white" onClick={ () => navigate(-1) }>Go back</button>
                                     { postIsLiked(likes, loggedInUser) ? 	
-                                        <button className="button button--red" onClick={ () => unLikePost(_id) }>Unlike Post</button> :	
-                                        <button className="button" onClick={ () => likePost(_id) }>Like Post</button>	
+                                        <button className="button button--red" onClick={ () => toggleLike(_id, true) }>Unlike Post</button> :	
+                                        <button className="button" onClick={ () => toggleLike(_id, false) }>Like Post</button>	
                                     }
                                     { loggedInUser && isUsersData(loggedInUser._id, user._id) && (
                                         <Fragment>

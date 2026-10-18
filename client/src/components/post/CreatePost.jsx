@@ -1,9 +1,9 @@
-import React, { Fragment, useContext, useState } from 'react';
-import PostContext from '../../context/postContext/PostContext';
+import React, { Fragment, useState } from 'react';
+import { useCreatePost } from '../../hooks/useCreatePost';
 import noImageFound from '../../assets/images/posts/default.jpg';
 
 const PostForm = () => {
-    const { createPost } = useContext(PostContext);
+    const createPost = useCreatePost();
     
     const [values, setValues] = useState({ title: '', tag: '', description: ''});
     const { title, tag, description } = values;
@@ -15,7 +15,7 @@ const PostForm = () => {
 
     const handleSubmit = e => {
         e.preventDefault();
-        createPost(title, tag, description, image);
+        createPost.mutate({ title, tag, description, image });
     }
 
     return (

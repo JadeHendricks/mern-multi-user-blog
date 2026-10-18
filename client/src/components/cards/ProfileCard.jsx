@@ -1,25 +1,22 @@
 import React, { useContext } from 'react';
 import svg from '../../assets/images/icons/sprite.svg';
 import AuthContext from '../../context/authContext/AuthContext';
-import PostContext from '../../context/postContext/PostContext';
-import { Link, useHistory } from 'react-router-dom';
+import { Link } from 'react-router';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
-
+import { descriptionTrimmer, postIsLiked } from '../../utils/postUtils';
+import { useToggleLike } from '../../hooks/useToggleLike';
+import { useDeletePost } from '../../hooks/useDeletePost';
 const ProfileCard = ({ post: { _id, title, image, tag, description, comments, likes } }) => {
-    const history = useHistory();
-    const { loggedInUser } = useContext(AuthContext);	
-    const { deletePost, likePost, unLikePost, postIsLiked, descriptionTrimmer } = useContext(PostContext);
-
-    // Only leave the page once the server confirmed the delete.
-    const handleDelete = async () => {
+    const { loggedInUser } = useContext(AuthContext);
+    const toggleLike = useToggleLike();
+    const deletePost = useDeletePost();
+    // useDeletePost only leaves the page once the server confirmed the delete.
+    const handleDelete = () => {
         if (!window.confirm('Delete this post? This cannot be undone.')) {
             return;
         }
-        if (await deletePost(_id)) {
-            history.push('/');
-        }
+        deletePost.mutate(_id);
     };
-
     return (
         <div className="card">
             <Link to={`/post/${_id}`}>
@@ -44,10 +41,10 @@ const ProfileCard = ({ post: { _id, title, image, tag, description, comments, li
                     </div>
                     <div className="card__interaction-block">	
                         { postIsLiked(likes, loggedInUser) ? 	
-                            <svg className="card__interaction-icon" onClick={ () => unLikePost(_id) }>	
+                            <svg className="card__interaction-icon" onClick={ () => toggleLike(_id, true) }>	
                                 <use xlinkHref={`${svg}#icon-heart`}></use>	
                             </svg> :
-                            <svg className="card__interaction-icon" onClick={ () => likePost(_id) }>	
+                            <svg className="card__interaction-icon" onClick={ () => toggleLike(_id, false) }>	
                                 <use xlinkHref={`${svg}#icon-heart-o`}></use>	
                             </svg>	
                         } 	
@@ -64,5 +61,4 @@ const ProfileCard = ({ post: { _id, title, image, tag, description, comments, li
         </div>
     )
 }
-
 export default ProfileCard;

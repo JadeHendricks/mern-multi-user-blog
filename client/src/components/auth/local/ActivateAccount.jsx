@@ -1,36 +1,26 @@
-import React, { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
+import React, { useContext } from 'react';
+import { useParams } from 'react-router';
+import { useQuery } from '@tanstack/react-query';
 import AuthContext from '../../../context/authContext/AuthContext';
-
-const ActivateAccount = ({ match }) => {
+import { api } from '../../../lib/api';
+import { queryKeys } from '../../../lib/queryKeys';
+const ActivateAccount = () => {
+    const { token } = useParams();
     const { activateAccount } = useContext(AuthContext);
-    const [values, setValues] = useState({ name: '', token: '' });
-    const { name, token } = values;
-
-    useEffect(() => {
-        const token = match.params.token;
-        if (token) {
-            // The token is opaque now, so the server tells us who it belongs to.
-            let cancelled = false;
-            setValues(current => ({ ...current, token }));
-            axios.get(`/api/auth/account-activation/${encodeURIComponent(token)}`)
-                .then(res => {
-                    if (!cancelled && res.data && typeof res.data.name === 'string') {
-                        setValues(current => ({ ...current, name: res.data.name }));
-                    }
-                })
-                // Generic greeting is fine when the lookup fails.
-                .catch(() => {});
-            return () => { cancelled = true; };
-        }
-    // eslint-disable-next-line
-    }, [match.params.token]);
-
+    // The token is opaque, so the server tells us who it belongs to. The lookup is read-only (it
+    // does not use up the link), and Query shares one request between StrictMode's two mounts.
+    // A failed lookup is fine: the greeting just stays generic, so no toast and no retry.
+    const { data } = useQuery({
+        queryKey: queryKeys.activation(token),
+        queryFn: ({ signal }) => api.get(`/api/auth/account-activation/${encodeURIComponent(token)}`, { signal }),
+        enabled: Boolean(token),
+        retry: false,
+    });
+    const name = typeof data?.name === 'string' ? data.name : '';
     const handleActivationClick = async (e) => {
         e.preventDefault();
         activateAccount(token);
     }
-    
     return (
         <div className="container">
             <div className="forgot-password-form">
@@ -47,5 +37,4 @@ const ActivateAccount = ({ match }) => {
         </div>
     )
 }
-
 export default ActivateAccount;

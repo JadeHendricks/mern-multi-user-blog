@@ -1,30 +1,24 @@
-import React, { useEffect, useContext, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import UserCard from '../cards/UserCard';
-import UserContext from '../../context/userContext/UserContext';
 import ContentLoader from '../layouts/ContentLoader';
-
+import LoadMore from './LoadMore';
+import { useUsers } from '../../hooks/useUsers';
 const AllUsers = () => {
-    const { getAllUsers, users, userLoading} = useContext(UserContext);
-
-    useEffect(() => {
-        getAllUsers();
-        // eslint-disable-next-line
-    }, []);
-    
+    // A failed request shows the toast and the empty state, as before.
+    const { data: users = [], isPending, hasNextPage, isFetchingNextPage, fetchNextPage } = useUsers();
     return (
         <Fragment>
-            { userLoading ? (<ContentLoader />) : (
+            { isPending ? (<ContentLoader />) : (
                 <section className="all-user">
                     <div className="container">
                         <div className="all-userCards">
                             { users.length === 0 ? <h3>No Content Found...</h3> : users.map(user => <UserCard key={ user._id } user={ user }/>) }
                         </div>
+                        { hasNextPage && <LoadMore onClick={ () => fetchNextPage() } loading={ isFetchingNextPage } /> }
                     </div>
                 </section>
             ) }
         </Fragment>
-
     )
 }
-
 export default AllUsers;

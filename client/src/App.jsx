@@ -1,7 +1,6 @@
-import React, { Fragment } from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.min.css';
+import React, { Suspense, lazy } from 'react';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter, Routes, Route } from 'react-router';
 import './App.css';
 import Register from './components/auth/local/Register';
 import Login from './components/auth/local/Login';
@@ -9,54 +8,57 @@ import ActivateAccount from './components/auth/local/ActivateAccount';
 import ForgotPassword from './components/auth/local/ForgotPassword';
 import ResetPassword from './components/auth/local/ResetPassword';
 import Base from './components/layouts/Base';
-import Navigation from './components/layouts/Navigation';
-import Footer from './components/layouts/Footer';
-import Loader from './components/layouts/Loader';
-import PrivateRoute from './components/routing/PrivateRoute';
+import AppShell from './components/layouts/AppShell';
+import RequireAuth from './components/routing/RequireAuth';
 import CreatePost from './components/post/CreatePost';
 import EditPost from './components/post/EditPost';
 import Post from './components/post/Post';
 import AccountProfile from './components/account/AccountProfile';
 import AllUsers from './components/layouts/AllUsers';
 import MostPopularPosts from './components/layouts/MostPopularPosts';
-
+import { queryClient } from './lib/queryClient';
 import AuthState from "./context/authContext/AuthState";
-import PostState from "./context/postContext/PostState";
-import UserState from "./context/userContext/UserState";
 
-function App (props) {
+// Dev only: import.meta.env.DEV is false in a production build, so the devtools chunk is never
+// bundled. VITE_QUERY_DEVTOOLS=false hides it in dev too (Playwright does, so the floating button
+// is not in screenshots).
+const ReactQueryDevtools =
+  import.meta.env.DEV && import.meta.env.VITE_QUERY_DEVTOOLS !== 'false'
+    ? lazy(() => import('@tanstack/react-query-devtools').then(m => ({ default: m.ReactQueryDevtools })))
+    : null;
+function App () {
   return (
-    <Router>
+    <QueryClientProvider client={ queryClient }>
+    <BrowserRouter>
       <AuthState>
-      <PostState>
-      <UserState>
-        <Fragment>
-          <Loader />
-          <ToastContainer autoClose={ 4000 } pauseOnHover={ false } />
-          <Navigation />
-          <main className="main">
-            <Switch>
-              <Route path='/' exact component={ Base } />
-              <Route path='/register' exact component={ Register } />
-              <Route path='/login' exact component={ Login } />
-              <Route path='/forgot-password' exact component={ ForgotPassword } />
-              <Route path='/auth/password/reset/:token' exact component={ ResetPassword } />
-              <Route path='/auth/activate/:token' history={props.history} exact component={ ActivateAccount } />
-              <PrivateRoute path='/create-post' history={props.history} exact component={ CreatePost } />
-              <PrivateRoute path='/edit-post/:id' history={props.history} exact component={ EditPost } />
-              <Route path='/post/:id' history={props.history} exact component={ Post } />
-              <Route path='/profile/:id' history={props.history} exact component={ AccountProfile } />
-              <Route path='/users' exact component={ AllUsers } />
-              <Route path='/most-popular-posts' exact component={ MostPopularPosts } />
-            </Switch>
-          </main>
-          <Footer />
-        </Fragment>
-      </UserState>
-      </PostState>
+        <Routes>
+          <Route element={ <AppShell /> }>
+            <Route path='/' element={ <Base /> } />
+            <Route path='/register' element={ <Register /> } />
+            <Route path='/login' element={ <Login /> } />
+            <Route path='/forgot-password' element={ <ForgotPassword /> } />
+            <Route path='/auth/password/reset/:token' element={ <ResetPassword /> } />
+            <Route path='/auth/activate/:token' element={ <ActivateAccount /> } />
+            <Route element={ <RequireAuth /> }>
+              <Route path='/create-post' element={ <CreatePost /> } />
+              <Route path='/edit-post/:id' element={ <EditPost /> } />
+            </Route>
+            <Route path='/post/:id' element={ <Post /> } />
+            <Route path='/profile/:id' element={ <AccountProfile /> } />
+            <Route path='/users' element={ <AllUsers /> } />
+            <Route path='/most-popular-posts' element={ <MostPopularPosts /> } />
+            {/* Unknown URLs keep the shell with an empty main, as the old Switch without a catch-all did. */}
+            <Route path='*' element={ null } />
+          </Route>
+        </Routes>
       </AuthState>
-    </Router>
-
+    </BrowserRouter>
+    { ReactQueryDevtools && (
+      <Suspense fallback={ null }>
+        <ReactQueryDevtools initialIsOpen={ false } />
+      </Suspense>
+    ) }
+    </QueryClientProvider>
   );
 }
 

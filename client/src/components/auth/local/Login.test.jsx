@@ -1,6 +1,6 @@
-import React from 'react';
+﻿import React from 'react';
 import { render, fireEvent, cleanup } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 import AuthContext from '../../../context/authContext/AuthContext';
 import Login from './Login';
 
@@ -24,3 +24,4 @@ describe('Login form', () => {
     expect(login).toHaveBeenCalledWith('a@b.co', 'secret12');
   });
 });
+

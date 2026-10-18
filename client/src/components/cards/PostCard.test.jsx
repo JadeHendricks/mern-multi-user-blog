@@ -1,9 +1,9 @@
 import React from 'react';
-import { render, fireEvent, cleanup } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-import AuthContext from '../../context/authContext/AuthContext';
-import PostContext from '../../context/postContext/PostContext';
+import { fireEvent, waitFor, cleanup } from '@testing-library/react';
+import { toast } from 'react-toastify';
 import PostCard from './PostCard';
+import { mockApi } from '../../testing/mockApi';
+import { renderWithProviders } from '../../testing/renderWithProviders';
 
 const post = {
   _id: 'p1',
@@ -17,41 +17,66 @@ const post = {
   comments: [],
 };
 
-const renderCard = liked => {
-  const post_ctx = {
-    likePost: vi.fn(),
-    unLikePost: vi.fn(),
-    postIsLiked: () => liked,
-    descriptionTrimmer: text => text,
-  };
-  const utils = render(
-    <AuthContext.Provider value={{ loggedInUser: { _id: 'u2' } }}>
-      <PostContext.Provider value={post_ctx}>
-        <MemoryRouter>
-          <PostCard post={post} />
-        </MemoryRouter>
-      </PostContext.Provider>
-    </AuthContext.Provider>
-  );
+const renderCard = (likes, routes = {}) => {
+  const api = mockApi({
+    'PUT /api/post/like/p1': { body: { message: 'Post has been liked.', likes: [{ user: 'u2' }] } },
+    'PUT /api/post/unlike/p1': { body: { message: 'Post has been disliked.', likes: [] } },
+    ...routes,
+  });
+  const utils = renderWithProviders(<PostCard post={{ ...post, likes }} />, {
+    auth: { loggedInUser: { _id: 'u2' } },
+  });
   // The heart is the interaction icon that is not the comment icon.
   const heart = utils.container.querySelector('svg.card__interaction-icon:not(.card__interaction-icon-comment)');
-  return { ...utils, heart, post_ctx };
+  return { ...utils, heart, api };
 };
 
 describe('PostCard like toggle', () => {
-  afterEach(cleanup);
-
-  it('likes the post when it is not liked yet', () => {
-    const { heart, post_ctx } = renderCard(false);
-    fireEvent.click(heart);
-    expect(post_ctx.likePost).toHaveBeenCalledWith('p1');
-    expect(post_ctx.unLikePost).not.toHaveBeenCalled();
+  beforeEach(() => {
+    vi.spyOn(toast, 'success').mockImplementation(() => 0);
+    vi.spyOn(toast, 'error').mockImplementation(() => 0);
+  });
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
-  it('unlikes the post when it is already liked', () => {
-    const { heart, post_ctx } = renderCard(true);
+  it('likes the post when it is not liked yet', async () => {
+    const { heart, api } = renderCard([]);
     fireEvent.click(heart);
-    expect(post_ctx.unLikePost).toHaveBeenCalledWith('p1');
-    expect(post_ctx.likePost).not.toHaveBeenCalled();
+    await waitFor(() => expect(toast.success).toHaveBeenCalledWith('Post has been liked.'));
+    expect(api.callsTo('PUT /api/post/like/p1')).toHaveLength(1);
+    expect(api.callsTo('PUT /api/post/unlike/p1')).toHaveLength(0);
+  });
+
+  it('unlikes the post when it is already liked', async () => {
+    const { heart, api } = renderCard([{ user: 'u2' }]);
+    fireEvent.click(heart);
+    await waitFor(() => expect(toast.success).toHaveBeenCalledWith('Post has been disliked.'));
+    expect(api.callsTo('PUT /api/post/unlike/p1')).toHaveLength(1);
+    expect(api.callsTo('PUT /api/post/like/p1')).toHaveLength(0);
+  });
+
+  it('shows the server message when liking fails', async () => {
+    const { heart } = renderCard([], {
+      'PUT /api/post/like/p1': { status: 401, body: { message: 'You are not logged in! Please log in to get access.' } },
+    });
+    fireEvent.click(heart);
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('You are not logged in! Please log in to get access.'));
+    expect(toast.success).not.toHaveBeenCalled();
+  });
+
+  it('ignores more clicks while the request is still running', async () => {
+    let release;
+    const { heart, api } = renderCard([], {
+      'PUT /api/post/like/p1': () => new Promise((resolve) => (release = resolve)),
+    });
+    fireEvent.click(heart);
+    fireEvent.click(heart);
+    fireEvent.click(heart);
+    await waitFor(() => expect(api.callsTo('PUT /api/post/like/p1')).toHaveLength(1));
+    release({ body: { message: 'Post has been liked.', likes: [{ user: 'u2' }] } });
+    await waitFor(() => expect(toast.success).toHaveBeenCalledTimes(1));
   });
 });

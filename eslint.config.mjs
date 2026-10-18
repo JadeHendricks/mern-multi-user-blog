@@ -57,7 +57,7 @@ export default [
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
   {
-    // Client (React 16, Vite). Classic JSX runtime: every component imports React, so
+    // Client (React 19, Vite). Classic JSX runtime: every component imports React, so
     // jsx-uses-react keeps that import from being reported as unused.
     files: ['client/**/*.{js,jsx}'],
     plugins: { react, 'react-hooks': reactHooks, 'jsx-a11y': jsxA11y },
@@ -68,7 +68,7 @@ export default [
       globals: { ...globals.browser },
     },
     // Pinned: 'detect' calls context.getFilename(), which ESLint 10 removed and eslint-plugin-react 7.37 still uses.
-    settings: { react: { version: '16.13' } },
+    settings: { react: { version: '19.3' } },
     rules: {
       ...react.configs.recommended.rules,
       ...jsxA11y.flatConfigs.recommended.rules,

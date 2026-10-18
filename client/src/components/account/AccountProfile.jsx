@@ -1,26 +1,29 @@
-import React, { Fragment, useEffect, useState, useContext } from 'react';
+import React, { Fragment, useState, useContext } from 'react';
 import svg from '../../assets/images/icons/sprite.svg'
+import { useParams } from 'react-router';
 import ProfileCard from '../cards/ProfileCard';
 import PostCard from '../cards/PostCard';
 import AccountSettings from './AccountSettings';
 import AuthContext from '../../context/authContext/AuthContext';
-import UserContext from '../../context/userContext/UserContext';
 import ContentLoader from '../layouts/ContentLoader';
 import { isHttpsUrl } from '../../utils/safeUrl';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
+import { useUserPosts } from '../../hooks/useUserPosts';
+import { useUser } from '../../hooks/useUser';
 
-const Profile = ({ match }) => {
+// A profile that has not arrived (or failed to load) renders the empty frame, as before.
+const NO_USER = {};
+
+const Profile = () => {
+    const { id } = useParams();
     const { loggedInUser, isUsersData, authLoading } = useContext(AuthContext);
-    const { getAllUsersPosts, getUser, user, userPosts, userLoading } = useContext(UserContext);
+    const { data, isPending: userLoading } = useUser(id);
+    const user = data ?? NO_USER;
+    // Posts come from Query so a like on a card here updates the count shown on it.
+    const { data: userPosts = [] } = useUserPosts(id);
 
     const [ navigationState, setNavigationState ] = useState('all-posts');
     const handleNavigationState = e => setNavigationState(e.target.name);
-
-    useEffect(() => {
-        getUser(match.params.id);
-        getAllUsersPosts(match.params.id);
-        // eslint-disable-next-line
-    }, [match.params.id, loggedInUser]);
 
     return (
         <Fragment>
@@ -92,7 +95,7 @@ const Profile = ({ match }) => {
                                             { !isUsersData(loggedInUser?._id, user._id) && userPosts?.map(post => <PostCard key={post._id} post={ post } />) }
                                         </div>
                                     </section>
-                                ) : <AccountSettings user={ user } email={ loggedInUser?.email }/> }
+                                ) : <AccountSettings key={ user._id } user={ user } email={ loggedInUser?.email }/> }
                             </main>
                         </div>
                     </div>

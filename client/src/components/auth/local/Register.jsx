@@ -1,6 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Redirect } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router';
 import AuthContext from '../../../context/authContext/AuthContext';
 
 const Register = () => {
@@ -19,7 +18,7 @@ const Register = () => {
     }
 
     if (isAuthenticated && loggedInUser) {
-        return <Redirect to='/' />;
+        return <Navigate to='/' replace />;
     }
     
     return (

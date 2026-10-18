@@ -1,7 +1,7 @@
 import React from 'react';
-import Moment from 'react-moment';
+import { formatDate } from '../../lib/formatDate';
 import svg from '../../assets/images/icons/sprite.svg'
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { isHttpsUrl } from '../../utils/safeUrl';
 import { uploadUrl, onImageError } from '../../utils/imageUrl';
 
@@ -14,7 +14,7 @@ const UserCard = ({ user: { createdAt, name, _id, avatar, socials } }) => {
                 </Link>
                 <div className="card-user__userInfo">
                     <Link to={`/profile/${_id}`} className="card-user__title">{ name }</Link>
-                    <p className="card-user__date">Joined date: <Moment format="DD/MM/YYYY">{ createdAt }</Moment></p>
+                    <p className="card-user__date">Joined date: { formatDate(createdAt) }</p>
                     <Link to={`/profile/${_id}`} className="button button--yellow">Visit Profile</Link>
                 </div>
             </div>
