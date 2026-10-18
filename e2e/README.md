@@ -7,8 +7,14 @@ app looks and behaves today so later phases can prove they changed nothing by ac
 
 Playwright starts two servers itself (`webServer` in `playwright.config.js`), then runs the specs:
 
-- API on `http://localhost:5000`: `e2e/support/start-api.js` creates a JSON-file store in a temp\n  folder, seeds it through the repositories and serves the real Express app.
+- API on `http://localhost:5000`: `e2e/support/start-api.js` creates a JSON-file store in a temp
+  folder, seeds it through the repositories and serves the real Express app.
   Mail goes to a temp folder and uploads to a temp folder, so nothing leaves the machine.
+  It loads the compiled server (`server/dist/src/...` and `server/dist/scripts/seed.js`) with
+  `import()` and file URLs, so it stays CommonJS like the rest of `e2e/` and needs no tsx.
+  `npm run test:e2e` and `npm run serve:memory` build `shared/` and `server/` first
+  (`npm run build:api`); if you run `npx playwright test` directly, run `npm run build:api`
+  yourself after a server change.
 - Client on exactly `http://localhost:3000`: the CRA dev server. The port is fixed because
   `AuthState.js` hard-codes that origin in its public-route list (known bug B14). The CRA proxy
   forwards `/api` to port 5000.
@@ -58,11 +64,11 @@ Review the changed PNGs before committing them.
 ## Try the seeded app by hand
 
 ```powershell
-npm run serve:memory      # API on 5000 with seeded in-memory data (nothing is saved)
-npm run start:client      # in a second terminal: http://localhost:3000
+npm run serve:memory      # API on 5000 with seeded throwaway data (nothing outlives the run)
+npm run dev:web           # in a second terminal: http://localhost:3000
 ```
 
-All four seeded users share the throwaway E2E password defined in `scripts/seed.js`
+All four seeded users share the throwaway E2E password defined in `server/scripts/seed-data.cjs`
 (`alice@example.test`, `bob@example.test`, `carol@example.test`, `dan@example.test`).
 
 ## First run

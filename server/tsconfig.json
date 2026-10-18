@@ -1,0 +1,13 @@
+{
+  // Type-check only (nothing is emitted from this file): sources, scripts, tests and the vitest
+  // config. The compiled output comes from tsconfig.build.json.
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    // Everything is TypeScript. The one CommonJS file (scripts/seed-data.cjs, which Playwright
+    // must require) is typed by seed-data.d.cts and is not checked itself.
+    "allowJs": false
+  },
+  "include": ["src", "scripts", "test", "vitest.config.ts"],
+  "references": [{ "path": "../shared" }]
+}

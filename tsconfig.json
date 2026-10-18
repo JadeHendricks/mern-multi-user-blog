@@ -1,0 +1,11 @@
+{
+  // Solution file: `tsc -b` (npm run typecheck) builds shared, then type-checks the server (sources,
+  // scripts, tests), the shared tests and the root scripts. It compiles nothing itself.
+  "files": [],
+  "references": [
+    { "path": "shared" },
+    { "path": "shared/test" },
+    { "path": "server" },
+    { "path": "scripts" }
+  ]
+}

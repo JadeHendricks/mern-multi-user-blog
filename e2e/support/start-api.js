@@ -11,6 +11,7 @@ const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 
 // The server is an ES module package; this launcher stays CommonJS, so it loads it with import().
+// It loads the compiled output (server/dist), built by pretest:e2e / serve:memory (npm run build:api).
 const load = (relative) => import(pathToFileURL(path.join(__dirname, relative)).href);
 
 const fake = (label) => `e2e-${label}-${randomBytes(16).toString('hex')}`;
@@ -39,10 +40,10 @@ const PORT = 5000;
 let memoryMongo;
 
 async function main() {
-  const { createStore } = await load('../../server/src/store/index.js');
-  const { createApp } = await load('../../server/src/app.js');
+  const { createStore } = await load('../../server/dist/src/store/index.js');
+  const { createApp } = await load('../../server/dist/src/app.js');
 
-  const { seed } = await load('../../server/scripts/seed.js');
+  const { seed } = await load('../../server/dist/scripts/seed.js');
   const driver = process.env.E2E_DB_DRIVER ?? 'json';
   if (!['json', 'mongo'].includes(driver)) throw new Error('E2E_DB_DRIVER must be json or mongo');
   // The mongo store runs on a throwaway in-memory server, never a real database.

@@ -27,3 +27,5 @@ e2e/.auth
 playwright-report
 .env
 coverage
+dist
+*.tsbuildinfo
