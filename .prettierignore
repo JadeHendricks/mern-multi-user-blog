@@ -1,11 +1,7 @@
 # Legacy code is reformatted in later phases, not now.
-controllers/
-models/
-routes/
-validators/
-server.js
-app.js
-db.js
+server/src/modules/
+server/src/server.js
+server/src/app.js
 client/
 node_modules/
 package-lock.json
@@ -13,5 +9,6 @@ package-lock.json
 e2e/__screenshots__/
 playwright-report/
 tmp/
+server/data/
 coverage/
 README.md

@@ -1,0 +1,40 @@
+{
+  "name": "@mern-blog/server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Express API for the MERN multi-user blog",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "node --watch --env-file-if-exists=../.env src/server.js",
+    "start": "node --env-file-if-exists=../.env src/server.js",
+    "test:api": "vitest run --config vitest.config.mjs",
+    "test:api:mongo": "cross-env TEST_DB_DRIVER=mongo vitest run --config vitest.config.mjs test/api",
+    "seed": "node --env-file-if-exists=../.env scripts/seed.js",
+    "db:export": "node --env-file-if-exists=../.env scripts/db-export.js",
+    "db:import": "node --env-file-if-exists=../.env scripts/db-import.js"
+  },
+  "dependencies": {
+    "@sendgrid/mail": "8.1.6",
+    "bcryptjs": "3.0.3",
+    "cookie-parser": "1.4.7",
+    "cors": "2.8.6",
+    "express": "5.3.0",
+    "express-rate-limit": "8.7.1",
+    "express-validator": "7.3.2",
+    "helmet": "8.3.0",
+    "jsonwebtoken": "9.0.3",
+    "mongoose": "9.11.2",
+    "morgan": "1.12.1",
+    "multer": "2.4.0",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "11.3.0",
+    "supertest": "7.3.1",
+    "vitest": "5.0.5"
+  }
+}

@@ -48,7 +48,7 @@ module.exports = defineConfig({
       use: { viewport: { width: 1280, height: 800 } },
     },
   ],
-  // Playwright starts these before globalSetup. The API launcher starts its own in-memory MongoDB.
+  // Playwright starts these before globalSetup. The API launcher seeds a JSON-file store in a temp folder.
   webServer: [
     {
       command: 'node e2e/support/start-api.js',
@@ -59,7 +59,7 @@ module.exports = defineConfig({
       stderr: 'pipe',
     },
     {
-      command: 'npm run start --prefix client',
+      command: 'npm run start -w client',
       url: 'http://localhost:3000',
       reuseExistingServer: false,
       timeout: 300000,
