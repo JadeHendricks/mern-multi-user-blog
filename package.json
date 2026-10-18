@@ -29,7 +29,7 @@
     "pretest:api:mongo": "npm run build:shared",
     "test:api:mongo": "npm run test:api:mongo -w server",
     "test:client": "npm run test -w client",
-    "pretest:e2e": "npm run build:api && npm run build -w client",
+    "pretest:e2e": "node e2e/support/check-ports.js && npm run build:api && npm run build -w client",
     "test:e2e": "playwright test",
     "test:e2e:update": "playwright test --update-snapshots",
     "e2e:install": "playwright install chromium",

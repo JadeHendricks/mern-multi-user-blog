@@ -14,9 +14,9 @@ One definition per thing: types are inferred from zod schemas, never written twi
 It is a compiled package: `npm run build -w shared` runs `tsc` and writes `dist/` (JavaScript, `.d.ts`
 and declaration maps, ES2020). `main`, `types` and `exports` all point at `dist`.
 
-- Why `dist` and not `.ts` source: Node ESM and the Create React App client (webpack 4, which does not
-  transpile `node_modules` and ignores the `exports` map) cannot load TypeScript. `main` points at
-  `dist` too, so the client can use the package without a config change.
+- Why `dist` and not `.ts` source: Node ESM cannot load TypeScript from `node_modules`, so the server and the
+  production client build read the compiled package. `main` points at `dist` too. The client's Vite dev
+  server and Vitest alias the package to `src/index.ts` instead (see `client/vite.config.ts`).
 - The server's Vitest config aliases `@mern-blog/shared` to `shared/src/index.ts`, so tests never run
   against a stale build.
 - `shared/dist` is generated and gitignored. The root scripts build it before anything that loads the

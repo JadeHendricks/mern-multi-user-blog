@@ -4,8 +4,8 @@ const desktopOnly = ['**/smoke.spec.js', '**/a11y.spec.js'];
 // Runs only in the prod-smoke project, against the built client served by Express on port 5001.
 const prodSmoke = '**/prod-smoke.spec.js';
 
-// The client has to be served on exactly http://localhost:3000: AuthState.js hard-codes that origin
-// in its public-route allow-list (B14), and the Vite dev proxy (client/vite.config.mjs) forwards
+// The client has to be served on exactly http://localhost:3000: the baselines and the specs use that origin,
+// and the Vite dev proxy (client/vite.config.ts) forwards
 // /api and /uploads to the API on port 5000.
 module.exports = defineConfig({
   testDir: 'e2e',
@@ -79,7 +79,7 @@ module.exports = defineConfig({
       stderr: 'pipe',
     },
     {
-      // Vite dev server on the fixed port 3000 (strictPort in client/vite.config.mjs).
+      // Vite dev server on the fixed port 3000 (strictPort in client/vite.config.ts).
       command: 'npm run dev -w client',
       // The query devtools button would sit on top of every screenshot.
       env: { VITE_QUERY_DEVTOOLS: 'false' },

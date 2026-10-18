@@ -1,0 +1,17 @@
+{
+  // Tests and test helpers. vite.config.ts sets test.globals, so the vitest globals are declared here.
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    // ES2024.Promise: Promise.withResolvers, which the tests use to hold a request open.
+    "lib": ["ES2023", "ES2024.Promise", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "noEmit": true,
+    "types": ["vite/client", "vitest/globals"],
+    "tsBuildInfoFile": "../node_modules/.tmp/client-test.tsbuildinfo"
+  },
+  "include": ["src"],
+  "references": [{ "path": "../shared" }]
+}

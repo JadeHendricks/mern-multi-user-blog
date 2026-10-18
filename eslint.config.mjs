@@ -8,7 +8,9 @@ import jsxA11y from 'eslint-plugin-jsx-a11y';
 
 // Strict, type-aware rules apply to TypeScript only. Plain JS (e2e, *.mjs, *.cjs and the server files
 // that are not converted yet) keeps the base rules, so the conversion can land file by file.
-const tsFiles = ['server/**/*.ts', 'shared/**/*.ts', 'scripts/**/*.mts'];
+const nodeTsFiles = ['server/**/*.ts', 'shared/**/*.ts', 'scripts/**/*.mts'];
+const clientTsFiles = ['client/**/*.ts', 'client/**/*.tsx'];
+const tsFiles = [...nodeTsFiles, ...clientTsFiles];
 const typeChecked = [
   ...tseslint.configs.strictTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
@@ -56,28 +58,25 @@ export default [
     files: ['e2e/**/*.js'],
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
+  ...typeChecked,
   {
-    // Client (React 19, Vite). Classic JSX runtime: every component imports React, so
-    // jsx-uses-react keeps that import from being reported as unused.
-    files: ['client/**/*.{js,jsx}'],
+    files: nodeTsFiles,
+    languageOptions: { globals: { ...globals.node } },
+  },
+  {
+    // Client TypeScript (React 19, Vite, automatic JSX runtime: no React import needed).
+    files: clientTsFiles,
     plugins: { react, 'react-hooks': reactHooks, 'jsx-a11y': jsxA11y },
-    languageOptions: {
-      ecmaVersion: 2022,
-      sourceType: 'module',
-      parserOptions: { ecmaFeatures: { jsx: true } },
-      globals: { ...globals.browser },
-    },
+    languageOptions: { globals: { ...globals.browser } },
     // Pinned: 'detect' calls context.getFilename(), which ESLint 10 removed and eslint-plugin-react 7.37 still uses.
     settings: { react: { version: '19.3' } },
     rules: {
       ...react.configs.recommended.rules,
       ...jsxA11y.flatConfigs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
-      // React is imported in every file and props are not typed yet.
+      // Automatic JSX runtime, and props are typed.
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
-      // Existing catch blocks ignore the error on purpose; changing them would touch component code.
-      'no-unused-vars': ['error', { caughtErrors: 'none' }],
       // Existing patterns flagged by the React Compiler rules in hooks 7. Warn until the components are reworked.
       'react-hooks/set-state-in-effect': 'warn',
       'react-hooks/immutability': 'warn',
@@ -85,21 +84,24 @@ export default [
     },
   },
   {
-    files: ['client/**/*.test.{js,jsx}', 'client/src/setupTests.js'],
+    files: [
+      'client/**/*.test.{ts,tsx}',
+      'client/src/setupTests.ts',
+      'client/src/testing/**/*.{ts,tsx}',
+    ],
     languageOptions: { globals: { ...globals.browser, ...globals.vitest } },
   },
   {
-    files: ['client/*.{js,mjs}'],
+    files: ['client/*.ts'],
     languageOptions: { globals: { ...globals.node } },
   },
-  ...typeChecked,
   {
     files: tsFiles,
     languageOptions: {
       sourceType: 'module',
-      globals: { ...globals.node },
       parserOptions: {
-        // projectService picks the nearest tsconfig.json for each file (server/, shared/, shared/test/).
+        // projectService picks the nearest tsconfig.json for each file: server/, shared/, shared/test/
+        // and the client solution file, which references the app, test and node projects.
         projectService: true,
         tsconfigRootDir: import.meta.dirname,
       },
@@ -142,6 +144,19 @@ export default [
       '@typescript-eslint/no-unsafe-argument': 'off',
       '@typescript-eslint/no-unsafe-call': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
+    },
+  },
+  {
+    // Client tests. Two idioms of the existing tests would fire on nearly every file:
+    // - `waitFor(() => expect(...))` and `afterEach(() => vi.unstubAllGlobals())` return a void call
+    //   from an arrow shorthand. Allowed for arrow shorthands only; elsewhere the rule stays on.
+    // - fetch stubs are `async` on purpose so they return a promise like fetch does, but have nothing
+    //   to await.
+    // Everything else, including the no-unsafe-* rules and no-explicit-any, stays on.
+    files: ['client/**/*.test.{ts,tsx}', 'client/src/testing/**/*.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/no-confusing-void-expression': ['error', { ignoreArrowShorthand: true }],
+      '@typescript-eslint/require-await': 'off',
     },
   },
   {

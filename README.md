@@ -6,8 +6,7 @@ posts with an optional image, like and comment, and edit a profile with an avata
 It runs on your own machine with no database server: data is kept in plain files under
 `server/data/`. MongoDB is optional and can be switched on later without code changes.
 
-The API and the package it shares with the client are written in TypeScript. The client is still
-JavaScript (Create React App) and is not part of this conversion.
+The API, the package it shares with the client and the React client are all written in TypeScript.
 
 ## Prerequisites
 
@@ -122,20 +121,20 @@ Run from the repo root.
 | `npm run setup` | Create `.env` with a random `JWT_SECRET` if there is none (runs through `tsx`). |
 | `npm run dev` | `shared` watch (`dev:shared`), API under `tsx watch` (`dev:api`) and client (`dev:web`) together. |
 | `npm run dev:shared`, `dev:api`, `dev:web` | Only one of the three. |
-| `npm run build` | Compile `shared/` and `server/` to `dist/`, then build the client into `client/dist`. |
+| `npm run build` | Compile `shared/` and `server/` to `dist/`, then build the client into `client/dist`. The client's `prebuild` compiles `shared/` first, so `npm run build -w client` also works on a fresh clone. |
 | `npm run build:shared`, `npm run build:api` | Only `shared/`, or `shared/` plus `server/`. |
 | `npm start` | Build `shared/` and `server/`, then start the compiled API (`node server/dist/src/server.js`). With `NODE_ENV=production` it also serves `client/dist` (hashed files under `assets/` are cached as immutable, `index.html` is not, and unknown page routes fall back to `index.html`). |
-| `npm run typecheck` | `tsc -b`: builds `shared/`, then type-checks the server (sources, scripts, tests), the shared tests and the root scripts. Nothing is emitted except `shared/dist`. |
+| `npm run typecheck` | `tsc -b`: builds `shared/`, then type-checks the server (sources, scripts, tests), the client (app, tests and Vite config as three projects), the shared tests and the root scripts. Nothing is emitted except `shared/dist`. |
 | `npm run seed [-- --reset]` | Fill the store with demo data (runs the TypeScript through `tsx`). |
 | `npm run db:export [-- file]` | Export users and posts to JSON. |
 | `npm run db:import -- file [--replace] [--driver d] [--allow-remote]` | Import an export file. |
-| `npm run lint` | ESLint with type-aware rules on all server, shared and root-script TypeScript and the React client (`eslint-plugin-react`, `react-hooks`, `jsx-a11y`). |
+| `npm run lint` | ESLint with type-aware strict rules on all TypeScript (server, shared, root scripts and the React client, which also gets `eslint-plugin-react`, `react-hooks` and `jsx-a11y`). |
 | `npm run format`, `npm run format:check` | Prettier (legacy files are skipped, see `.prettierignore`). |
 | `npm test` | `test:api` and `test:client`. |
 | `npm run test:api` | Vitest + supertest on the JSON store, plus the store contract tests on both stores and the shared package tests. |
 | `npm run test:api:mongo` | The same API tests on the Mongo store (in-memory MongoDB). |
 | `npm run test:client` | Client unit tests (Vitest + jsdom + Testing Library). |
-| `npm run test:e2e` | Playwright: screenshots, smoke flows, axe report and the `prod-smoke` project (the built client served by Express). Builds `shared/`, `server/` and the client first (`pretest:e2e`). |
+| `npm run test:e2e` | Playwright: screenshots, smoke flows, axe report and the `prod-smoke` project (the built client served by Express). Builds `shared/`, `server/` and the client first (`pretest:e2e`), after checking that ports 3000, 5000 and 5001 are free. |
 | `npm run test:e2e:update` | Re-record screenshot baselines (only for intended visual changes). |
 | `npm run e2e:install` | Download the Chromium build Playwright uses. |
 | `npm run serve:memory` | Compiled API on :5000 with seeded throwaway data, to click around by hand. |
@@ -149,7 +148,7 @@ Both produce the same output; the `:dist` ones prove the build.
 
 ```text
 shared/src (zod schemas)  --z.infer-->  DTO and request types  -->  server (views, controllers, validateBody)
-                                                                -->  client (Phase 6: not wired yet)
+                                                                -->  client (import type, see below)
 ```
 
 - `shared/` (`@mern-blog/shared`) holds the zod schemas for requests and responses, plus the constants.
@@ -168,7 +167,9 @@ shared/src (zod schemas)  --z.infer-->  DTO and request types  -->  server (view
   emits `server/dist/src` and `server/dist/scripts` (`rootDir` is `server/`, so the folders keep their depth).
   `server/build-assets.mjs` then copies `scripts/seed-data.cjs`, the one CommonJS file (Playwright must
   `require` it), next to the compiled seed script.
-- `any`, `@ts-ignore` and unexplained non-null assertions are lint errors in `server/` and `shared/`.
+- **Client:** `client/src` imports DTO and request types with `import type { ... } from '@mern-blog/shared'` (and only the constants it needs as values, e.g. `DEFAULT_AVATAR`; zod and `validator` are tree-shaken out of the bundle). The forms do not run the zod schemas: they send raw values and show the server's messages. Vite's dev server and Vitest alias the package to `shared/src` (no rebuild while editing); the production build and `tsc -b` read `shared/dist`, like the server.
+- `PostDto.user` is a bare id on the create/edit answers but a populated author (or `null` once the account is gone) on lists and the post page. `client/src/lib/types.ts` narrows it to `PostWithAuthor` for the pages that only ever see populated posts.
+- `any`, `@ts-ignore` and unexplained non-null assertions are lint errors in `server/`, `shared/` and `client/`.
 
 ## API notes
 
@@ -206,8 +207,8 @@ npm run check
   Settings, pagination parameters and import files use `zod` too.
 - **Storage:** JSON files by default so the project runs anywhere with no setup; Mongo sits behind the
   same interface for when you want it.
-- **Dependencies:** `npm audit` reports 0 vulnerabilities. Dates use `Intl` (`client/src/lib/formatDate.js`)
-  instead of `moment`, and requests go through `fetch` in `client/src/lib/api.js` instead of `axios`.
+- **Dependencies:** `npm audit` reports 0 vulnerabilities. Dates use `Intl` (`client/src/lib/formatDate.ts`)
+  instead of `moment`, and requests go through `fetch` in `client/src/lib/api.ts` instead of `axios`.
 - **Client build:** Vite replaced create-react-app 3.4. Measured sizes and audit counts:
 
 | | Before (CRA 3.4) | After (Vite 8) |
@@ -219,19 +220,19 @@ npm run check
 
 ## Client architecture
 
-React 19 with React Router 8 and TanStack Query 5 (JavaScript, Vite). Source is in `client/src`.
+React 19 with React Router 8 and TanStack Query 5 (TypeScript, Vite). Source is in `client/src`.
 
-- **Providers, outside in** (`App.jsx`): `QueryClientProvider` > `BrowserRouter` > `AuthState` > `Routes`.
+- **Providers, outside in** (`App.tsx`): `QueryClientProvider` > `BrowserRouter` > `AuthState` > `Routes`.
   Query is outermost so the router and auth can use it; auth sits inside the router because its actions navigate.
 - **Routes:** one layout route (`AppShell`: navigation, `main`, footer, toasts) holds every page.
   `RequireAuth` wraps `/create-post` and `/edit-post/:id` and redirects a visitor to `/login` once the session
   check has finished. An unknown URL keeps the shell with an empty `main` (a `*` route that renders nothing).
 - **Auth context** (`context/authContext`): `AuthState` reads the session with `useMe` and exposes
-  `loggedInUser`, `loading` and the actions (`login`, `logout`, `register`, `forgotPassword`, ...) through
-  `AuthContext`. The value is memoised, so a parent re-render does not re-render consumers. A visitor is
+  `loggedInUser`, `authLoading` and the actions (`login`, `logout`, `register`, `forgotPassword`, ...) through
+  `AuthContext`; components read it with `useAuth()`, which throws outside the provider. The value is memoised, so a parent re-render does not re-render consumers. A visitor is
   `null` (a 401 from `/api/user/me` is a normal answer, not an error). Logout clears the whole query cache.
 - **Folders:** `components/` (by feature), `hooks/` (one query or mutation each), `lib/` (`api`, `queryKeys`,
-  `queryClient`, `postCache`, `formatDate`), `utils/` (image and URL helpers), `testing/` (`mockApi`,
+  `queryClient`, `postCache`, `formatDate`), `utils/` (image and URL helpers), `testing/` (`mockApi`, `testAuth`, `fixtures`, `dom`,
   `renderWithProviders`).
 - **Router version:** React Router 8.4 (needs React >= 19.2.7). The move went 5 to 7 on React 18, then React 19,
   then router 8, because router 5 uses legacy context that React 19 removed. Imports come from `react-router`.
@@ -240,25 +241,25 @@ React 19 with React Router 8 and TanStack Query 5 (JavaScript, Vite). Source is 
 
 ## Client data layer
 
-- **`lib/api.js`:** a small `fetch` wrapper (`api.get/post/put/delete`) that always sends cookies. A plain object
+- **`lib/api.ts`:** a small `fetch` wrapper (`api.get/post/put/delete`) that always sends cookies. A plain object
   goes out as JSON; a `FormData` goes out untouched with no `Content-Type`, so the browser adds the multipart
   boundary. Every failure becomes an `ApiError { status, message }` (status `0` for a network failure; the
-  message is the server's `message` or `msg`). Aborts pass through as `AbortError`.
-- **Query keys** (`lib/queryKeys.js`): the only place keys are written. They nest, e.g.
+  message is the server's `message` or `msg`). Aborts pass through as `AbortError`. `api.get<T>()` and friends take the response type from the caller; the one cast sits at the end of `request()` because the shapes are pinned by the contract tests and a runtime check would pull zod into the bundle.
+- **Query keys** (`lib/queryKeys.ts`, `as const` tuples): the only place keys are written. They nest, e.g.
   `['posts', 'list', params]` and `['posts', 'detail', id]`, so invalidating `posts.all` hits every post query.
-- **Query client** (`lib/queryClient.js`): 30 s stale time, no refetch on window focus, one retry only for
+- **Query client** (`lib/queryClient.ts`): 30 s stale time, no refetch on window focus, one retry only for
   network and 5xx errors.
 - **Hooks:** reads are `useMe`, `usePost`, `usePosts`, `usePostsInfinite`, `useUser`, `useUsers`,
   `useUserPosts`; writes are `useCreatePost`, `useEditPost`, `useDeletePost`, `useToggleLike`, `useAddComment`,
   `useDeleteComment`, `useUpdateProfile`, `useUpdateSocials`. Failed reads show the server message in a toast
   (`useErrorToast`), as the old contexts did.
-- **Cache patching** (`lib/postCache.js`): a like changes a post that can sit in the feed pages, the post page
+- **Cache patching** (`lib/postCache.ts`): a like changes a post that can sit in the feed pages, the post page
   and a profile list at once. `useToggleLike` snapshots those caches, flips the heart at once in all of them,
   replaces the guess with the server's answer, and restores the snapshot on failure. Only that card changes.
 - **Pagination:** the feed and the users page use `useInfiniteQuery` with `limit=12` and the API's `nextCursor`.
   `LoadMore` shows a "Load more" button while there is a next page, disables it while the page loads and
   removes it when `nextCursor` is `null`. Most popular posts keep one unpaginated list because they sort the whole set.
-- **Dates:** `lib/formatDate.js` prints `DD/MM/YYYY` with `Intl` (en-GB); `moment` is gone.
+- **Dates:** `lib/formatDate.ts` prints `DD/MM/YYYY` with `Intl` (en-GB); `moment` is gone.
 
 ## Tooling notes
 
@@ -269,6 +270,22 @@ React 19 with React Router 8 and TanStack Query 5 (JavaScript, Vite). Source is 
 - **React version in ESLint:** `eslint.config.mjs` pins `settings.react.version` instead of `'detect'`.
   `'detect'` still crashes with ESLint 10 (`context.getFilename is not a function` in `eslint-plugin-react`).
   Retry `'detect'` after upgrading that plugin.
+- **ESLint peers, rechecked (npm registry, 2026-10-17):** `eslint-plugin-react` 7.37.5 is the latest release
+  and its `eslint` peer stops at `^9.7`; `eslint-plugin-jsx-a11y` 6.10.2 stops at `^9`;
+  `eslint-plugin-react-hooks` 7.1.1 already lists `^10`. Removing the `overrides` makes `npm install` fail
+  with `ERESOLVE` and `'detect'` still crashes, so both stay (tried by execution, not assumed).
+- **Client TypeScript projects:** `client/tsconfig.json` is a solution file that references three projects, all
+  extending `tsconfig.base.json`: `tsconfig.app.json` (app code, only `vite/client` types), `tsconfig.test.json`
+  (tests and `src/testing`, plus the Vitest globals because `test.globals` is on) and `tsconfig.node.json`
+  (`vite.config.ts`). The root `tsc -b` builds them all. Every strict flag of the base applies, including
+  `exactOptionalPropertyTypes`: it needed no library workaround.
+- **Client lint:** `client/**/*.ts(x)` get `strictTypeChecked` + `stylisticTypeChecked` like the server, plus
+  the React, hooks and a11y rules. Two relaxations apply to client tests only (see `eslint.config.mjs`):
+  `no-confusing-void-expression` allows arrow shorthands (`waitFor(() => expect(...))`) and `require-await`
+  is off (async fetch stubs).
+- **TypeScript 7:** not adopted. Checked 2026-10-17: `typescript` latest is 7.0.2, but the latest
+  `typescript-eslint` (8.71.2) declares the peer `typescript >=4.8.4 <6.1.0`, so the type-aware lint cannot
+  run on 7. TypeScript stays pinned to 6.0.3.
 
 ## Workspace layout
 
@@ -284,7 +301,7 @@ server/           Express 5 API (TypeScript, ESM)
   seed-assets/      sample images copied by the seed
   test/             api, store and unit tests (TypeScript)
   dist/             compiled output of src/ and scripts/ (generated, gitignored)
-client/           React 19 app (Vite, JavaScript; `tsconfig.json` allows TypeScript files to be added one by one)
+client/           React 19 app (Vite, TypeScript)
 shared/           @mern-blog/shared: zod schemas, DTO types, constants
   dist/             compiled package the server and client load (generated, gitignored)
 e2e/              Playwright specs (CommonJS JavaScript), support and screenshot baselines

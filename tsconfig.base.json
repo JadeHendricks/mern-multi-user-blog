@@ -1,5 +1,5 @@
 {
-  // Shared compiler options for the server and shared workspaces (the client stays on CRA/JS).
+  // Shared compiler options for every workspace (server, shared and client); each project overrides target, module and lib.
   "compilerOptions": {
     "target": "ES2023",
     "lib": ["ES2023"],
@@ -24,3 +24,4 @@
     "forceConsistentCasingInFileNames": true
   }
 }
+
